@@ -1,16 +1,16 @@
 {
-  "email": "info@laccistudio.com",
-  "phone": "",
-  "hoursWeekday": "By appointment",
-  "hoursSaturday": "By appointment",
-  "hoursSunday": "Closed",
-  "instagram": "",
+  "uploadcarePublicKey": "c5f8429d49f1794a1843",
   "facebook": "",
-  "etsy": "",
+  "snipcartApiKey": "Y2YzYTdlYjMtNDA5OC00NTk5LWE0OGEtMjQ4NzU1YzhiZTcwNjM5MjAwNTc3NjY0NTQwNTk1",
+  "hoursSaturday": "By appointment",
   "checkoutMode": "snipcart",
   "orderEmail": "info@laccistudio.com",
-  "paypalClientId": "",
-  "snipcartApiKey": "ZjljMTFhMDEtMmFlNC00OGJmLTk2NGQtZTU2NWQ5YTZjNDg0NjM5MjAwNTc3NjY0NTQwNTk1",
+  "phone": "",
+  "instagram": "@laccistudio",
+  "etsy": "",
   "uploadEndpoint": "",
-  "uploadcarePublicKey": "c5f8429d49f1794a1843"
+  "hoursWeekday": "By appointment",
+  "paypalClientId": "AQu34nwXc0Gpf1cX2uii9FXKmSTkJZcbZO1pXUTsKxONHow5BDG9iUPzme3edVkJmNoXGibiZaeIM9hR",
+  "email": "info@laccistudio.com",
+  "hoursSunday": "Closed"
 }
