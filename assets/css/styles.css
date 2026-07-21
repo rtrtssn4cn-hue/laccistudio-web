@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Lacci Studio — Brand Stylesheet
+   Lacci Studio â€” Brand Stylesheet
    Palette + typography per Brand Guidelines v1.0
    ========================================================================== */
 
@@ -333,7 +333,7 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .filter-btn:hover{border-color:var(--gold);color:var(--gold-deep)}
 .filter-btn.active{background:var(--walnut);border-color:var(--walnut);color:var(--gold)}
 
-/* Shop grid — compact, 4-up */
+/* Shop grid â€” compact, 4-up */
 .shop-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem}
 .prod-card{background:var(--white);border:1px solid var(--sandstone);border-radius:7px;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s}
 .prod-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-sm);border-color:var(--gold)}
@@ -521,21 +521,20 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
   .strip-inner{gap:.4rem 1.2rem}
 }
 
-/* ---------- Compact Snipcart cart & checkout ---------- */
-.snipcart { font-size: 14px; }
-.snipcart-item-line { padding: .55rem 0 !important; }
-.snipcart-item-line__header { font-size: .95rem !important; margin-bottom: .2rem !important; }
-.snipcart-item-line__product-name, .snipcart-cart-summary-item__name { font-size: .9rem !important; }
-.snipcart-item-custom-fields, .snipcart-item-line__variants { margin-top: .3rem !important; }
-.snipcart-form__field, .snipcart-item-custom-fields__field { margin-bottom: .4rem !important; }
-.snipcart-form__label { font-size: .68rem !important; margin-bottom: .12rem !important; letter-spacing: .04em; }
-.snipcart-input, .snipcart-dropdown, .snipcart-textbox, .snipcart-form__select, .snipcart-form__input {
-  min-height: 34px !important; padding: .3rem .55rem !important; font-size: .82rem !important; line-height: 1.2 !important;
+/* ---------- Compact Snipcart cart & checkout (element-based, robust) ---------- */
+#snipcart, .snipcart { font-size: 13.5px; }
+#snipcart select, #snipcart input, #snipcart textarea,
+.snipcart select, .snipcart input, .snipcart textarea {
+  min-height: 30px !important; height: auto !important;
+  padding: .25rem .5rem !important; font-size: .8rem !important; line-height: 1.15 !important;
 }
-.snipcart-checkout-step { padding: .8rem 1rem !important; }
-.snipcart-checkout-step__title { font-size: 1rem !important; }
-.snipcart-cart-header, .snipcart-cart__header { padding: .6rem 1rem !important; }
-.snipcart-cart-summary { font-size: .85rem !important; }
-.snipcart-cart-summary-fees__amount, .snipcart-cart-summary-item__quantity { font-size: .82rem !important; }
-/* tighten the quantity + summary spacing */
-.snipcart-item-quantity { transform: scale(.9); transform-origin: left center; }
+#snipcart textarea, .snipcart textarea { min-height: 44px !important; }
+#snipcart label, .snipcart label {
+  font-size: .68rem !important; margin-bottom: .1rem !important; line-height: 1.1 !important;
+}
+/* tighten the gaps between each field/row in the cart item + checkout */
+#snipcart .snipcart-form__field, .snipcart .snipcart-form__field,
+#snipcart .snipcart-form-field, .snipcart .snipcart-form-field,
+#snipcart [class*="custom-field"], .snipcart [class*="custom-field"] { margin-bottom: .3rem !important; }
+#snipcart .snipcart-item-line, .snipcart .snipcart-item-line { padding: .4rem 0 !important; }
+#snipcart h1, #snipcart h2, .snipcart h1, .snipcart h2 { font-size: 1rem !important; }
