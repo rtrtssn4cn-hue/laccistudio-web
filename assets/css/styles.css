@@ -520,3 +520,22 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
   .foot-grid{grid-template-columns:1fr;gap:1.6rem}
   .strip-inner{gap:.4rem 1.2rem}
 }
+
+/* ---------- Compact Snipcart cart & checkout ---------- */
+.snipcart { font-size: 14px; }
+.snipcart-item-line { padding: .55rem 0 !important; }
+.snipcart-item-line__header { font-size: .95rem !important; margin-bottom: .2rem !important; }
+.snipcart-item-line__product-name, .snipcart-cart-summary-item__name { font-size: .9rem !important; }
+.snipcart-item-custom-fields, .snipcart-item-line__variants { margin-top: .3rem !important; }
+.snipcart-form__field, .snipcart-item-custom-fields__field { margin-bottom: .4rem !important; }
+.snipcart-form__label { font-size: .68rem !important; margin-bottom: .12rem !important; letter-spacing: .04em; }
+.snipcart-input, .snipcart-dropdown, .snipcart-textbox, .snipcart-form__select, .snipcart-form__input {
+  min-height: 34px !important; padding: .3rem .55rem !important; font-size: .82rem !important; line-height: 1.2 !important;
+}
+.snipcart-checkout-step { padding: .8rem 1rem !important; }
+.snipcart-checkout-step__title { font-size: 1rem !important; }
+.snipcart-cart-header, .snipcart-cart__header { padding: .6rem 1rem !important; }
+.snipcart-cart-summary { font-size: .85rem !important; }
+.snipcart-cart-summary-fees__amount, .snipcart-cart-summary-item__quantity { font-size: .82rem !important; }
+/* tighten the quantity + summary spacing */
+.snipcart-item-quantity { transform: scale(.9); transform-origin: left center; }
