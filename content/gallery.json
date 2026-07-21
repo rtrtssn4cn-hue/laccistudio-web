@@ -1,0 +1,61 @@
+{
+ "intro": "A look at recent custom pieces we've created for our customers. Add your own photos and short videos anytime.",
+ "items": [
+  {
+   "images": [
+    "assets/img/gal-drinkware.jpg"
+   ],
+   "video": "",
+   "category": "Drinkware",
+   "caption": "Custom Tumblers"
+  },
+  {
+   "images": [
+    "assets/img/gal-coasters.jpg"
+   ],
+   "video": "",
+   "category": "Home",
+   "caption": "Personalized Coasters"
+  },
+  {
+   "images": [
+    "assets/img/gal-desk.jpg"
+   ],
+   "video": "",
+   "category": "Gifts",
+   "caption": "Desk Accessories"
+  },
+  {
+   "images": [
+    "assets/img/gal-stickers.jpg"
+   ],
+   "video": "",
+   "category": "Stickers",
+   "caption": "Stickers & Decals"
+  },
+  {
+   "images": [
+    "assets/img/gal-apparel.jpg"
+   ],
+   "video": "",
+   "category": "Apparel",
+   "caption": "Custom Apparel"
+  },
+  {
+   "images": [
+    "assets/img/gal-packaging.jpg"
+   ],
+   "video": "",
+   "category": "Gifts",
+   "caption": "Gift Packaging"
+  },
+  {
+   "images": [
+    "assets/img/gal-gifts.jpg"
+   ],
+   "video": "",
+   "category": "Gifts",
+   "caption": "Personalized Gifts"
+  }
+ ]
+}

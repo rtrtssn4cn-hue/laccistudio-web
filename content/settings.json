@@ -1,0 +1,16 @@
+{
+  "email": "info@laccistudio.com",
+  "phone": "",
+  "hoursWeekday": "By appointment",
+  "hoursSaturday": "By appointment",
+  "hoursSunday": "Closed",
+  "instagram": "",
+  "facebook": "",
+  "etsy": "",
+  "checkoutMode": "snipcart",
+  "orderEmail": "info@laccistudio.com",
+  "paypalClientId": "",
+  "snipcartApiKey": "ZjljMTFhMDEtMmFlNC00OGJmLTk2NGQtZTU2NWQ5YTZjNDg0NjM5MjAwNTc3NjY0NTQwNTk1",
+  "uploadEndpoint": "",
+  "uploadcarePublicKey": "c5f8429d49f1794a1843"
+}

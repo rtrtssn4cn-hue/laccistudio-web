@@ -1,0 +1,8 @@
+# Tells Cloudflare this repo is a static website served by the Worker.
+# On every git push, "npx wrangler deploy" uploads these files to the worker
+# that laccistudio.com already points at — so edits publish automatically.
+name = "laccistudio"
+compatibility_date = "2026-07-21"
+
+[assets]
+directory = "./"
