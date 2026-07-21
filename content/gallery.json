@@ -1,61 +1,63 @@
 {
- "intro": "A look at recent custom pieces we've created for our customers. Add your own photos and short videos anytime.",
- "items": [
-  {
-   "images": [
-    "assets/img/gal-drinkware.jpg"
-   ],
-   "video": "",
-   "category": "Drinkware",
-   "caption": "Custom Tumblers"
-  },
-  {
-   "images": [
-    "assets/img/gal-coasters.jpg"
-   ],
-   "video": "",
-   "category": "Home",
-   "caption": "Personalized Coasters"
-  },
-  {
-   "images": [
-    "assets/img/gal-desk.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "caption": "Desk Accessories"
-  },
-  {
-   "images": [
-    "assets/img/gal-stickers.jpg"
-   ],
-   "video": "",
-   "category": "Stickers",
-   "caption": "Stickers & Decals"
-  },
-  {
-   "images": [
-    "assets/img/gal-apparel.jpg"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "caption": "Custom Apparel"
-  },
-  {
-   "images": [
-    "assets/img/gal-packaging.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "caption": "Gift Packaging"
-  },
-  {
-   "images": [
-    "assets/img/gal-gifts.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "caption": "Personalized Gifts"
-  }
- ]
+  "intro": "A look at recent custom pieces we've created for our customers. Add your own photos and short videos anytime.",
+  "items": [
+    {
+      "images": [
+        "assets/img/gal-drinkware.jpg"
+      ],
+      "video": "",
+      "category": "Drinkware",
+      "caption": "Custom Tumblers"
+    },
+    {
+      "images": [
+        "assets/img/gal-coasters.jpg"
+      ],
+      "video": "",
+      "category": "Home",
+      "caption": "Personalized Coasters"
+    },
+    {
+      "images": [
+        "assets/img/gal-desk.jpg"
+      ],
+      "video": "",
+      "category": "Gifts",
+      "caption": "Desk Accessories"
+    },
+    {
+      "images": [
+        "assets/img/gal-stickers.jpg"
+      ],
+      "video": "",
+      "category": "Stickers",
+      "caption": "Stickers & Decals"
+    },
+    {
+      "images": [
+        "/assets/img/26501096-8ee8-455d-86bd-96a6cd04bd67.png",
+        "/assets/img/d9d80561-56fd-4b30-895a-dbaa7ce50b8f.png",
+        "/assets/img/c8915207-7cfa-4389-a140-b0d259dd9601.png"
+      ],
+      "video": "",
+      "category": "Apparel",
+      "caption": "Custom Apparel"
+    },
+    {
+      "images": [
+        "assets/img/gal-packaging.jpg"
+      ],
+      "video": "",
+      "category": "Gifts",
+      "caption": "Gift Packaging"
+    },
+    {
+      "images": [
+        "assets/img/gal-gifts.jpg"
+      ],
+      "video": "",
+      "category": "Gifts",
+      "caption": "Personalized Gifts"
+    }
+  ]
 }
