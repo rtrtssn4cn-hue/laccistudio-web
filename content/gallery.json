@@ -31,7 +31,8 @@
     },
     {
       "images": [
-        "assets/img/gal-stickers.jpg"
+        "assets/img/gal-stickers.jpg",
+        null
       ],
       "video": "",
       "category": "Stickers",
@@ -58,7 +59,9 @@
     },
     {
       "images": [
-        "assets/img/gal-gifts.jpg"
+        "/assets/img/b2393ca0-df98-4362-b267-27f12e6559d9.png",
+        "/assets/img/8807f45c-870b-4ab0-a4f9-d94e5276b268.png",
+        "/assets/img/diseño-de-calcetas-mario-3.png"
       ],
       "video": "",
       "category": "Gifts",
