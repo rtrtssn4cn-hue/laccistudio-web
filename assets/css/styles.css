@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Lacci Studio â€” Brand Stylesheet
+   Lacci Studio — Brand Stylesheet
    Palette + typography per Brand Guidelines v1.0
    ========================================================================== */
 
@@ -333,7 +333,7 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .filter-btn:hover{border-color:var(--gold);color:var(--gold-deep)}
 .filter-btn.active{background:var(--walnut);border-color:var(--walnut);color:var(--gold)}
 
-/* Shop grid â€” compact, 4-up */
+/* Shop grid — compact, 4-up */
 .shop-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem}
 .prod-card{background:var(--white);border:1px solid var(--sandstone);border-radius:7px;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s}
 .prod-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-sm);border-color:var(--gold)}
@@ -538,3 +538,7 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 #snipcart [class*="custom-field"], .snipcart [class*="custom-field"] { margin-bottom: .3rem !important; }
 #snipcart .snipcart-item-line, .snipcart .snipcart-item-line { padding: .4rem 0 !important; }
 #snipcart h1, #snipcart h2, .snipcart h1, .snipcart h2 { font-size: 1rem !important; }
+
+/* second-level (subcategory) filter row */
+.shop-subfilters { margin-top: -.2rem; margin-bottom: 1rem; }
+.shop-subfilters .filter-btn { font-size: .64rem; padding: .38rem .85rem; }
