@@ -77,20 +77,48 @@
   function renderFilters() {
     var bar = document.querySelector("#shop-filters");
     if (!bar) return;
+    var prods = SHOP.products || [];
+    // second-level (subcategory) bar, created once, right under the category bar
+    var sub = document.querySelector("#shop-subfilters");
+    if (!sub) {
+      sub = document.createElement("div");
+      sub.id = "shop-subfilters"; sub.className = "shop-filters shop-subfilters"; sub.style.display = "none";
+      bar.parentNode.insertBefore(sub, bar.nextSibling);
+    }
     var cats = [];
-    (SHOP.products || []).forEach(function (p) { if (p.category && cats.indexOf(p.category) < 0) cats.push(p.category); });
-    var btns = ['<button class="filter-btn active" data-filter="all">All</button>']
-      .concat(cats.map(function (c) { return '<button class="filter-btn" data-filter="' + esc(c) + '">' + esc(c) + "</button>"; }));
-    bar.innerHTML = btns.join("");
+    prods.forEach(function (p) { if (p.category && cats.indexOf(p.category) < 0) cats.push(p.category); });
+    bar.innerHTML = ['<button class="filter-btn active" data-filter="all">All</button>']
+      .concat(cats.map(function (c) { return '<button class="filter-btn" data-filter="' + esc(c) + '">' + esc(c) + "</button>"; })).join("");
+
+    function apply(cat, subcat) {
+      document.querySelectorAll(".prod-card").forEach(function (card) {
+        var okc = (cat === "all") || card.getAttribute("data-category") === cat;
+        var oks = (!subcat || subcat === "all") || card.getAttribute("data-subcategory") === subcat;
+        card.classList.toggle("hide", !(okc && oks));
+      });
+    }
+    function showSubs(cat) {
+      if (cat === "all") { sub.style.display = "none"; sub.innerHTML = ""; return; }
+      var subs = [];
+      prods.forEach(function (p) { if (p.category === cat && p.subcategory && subs.indexOf(p.subcategory) < 0) subs.push(p.subcategory); });
+      if (!subs.length) { sub.style.display = "none"; sub.innerHTML = ""; return; }
+      sub.innerHTML = ['<button class="filter-btn active" data-sub="all">All ' + esc(cat) + "</button>"]
+        .concat(subs.map(function (s) { return '<button class="filter-btn" data-sub="' + esc(s) + '">' + esc(s) + "</button>"; })).join("");
+      sub.style.display = "flex";
+      sub.querySelectorAll(".filter-btn").forEach(function (sb) {
+        sb.addEventListener("click", function () {
+          sub.querySelectorAll(".filter-btn").forEach(function (x) { x.classList.remove("active"); });
+          sb.classList.add("active");
+          apply(cat, sb.getAttribute("data-sub"));
+        });
+      });
+    }
     bar.querySelectorAll(".filter-btn").forEach(function (b) {
       b.addEventListener("click", function () {
         bar.querySelectorAll(".filter-btn").forEach(function (x) { x.classList.remove("active"); });
         b.classList.add("active");
         var f = b.getAttribute("data-filter");
-        document.querySelectorAll(".prod-card").forEach(function (card) {
-          var show = (f === "all") || (card.getAttribute("data-category") === f);
-          card.classList.toggle("hide", !show);
-        });
+        apply(f, "all"); showSubs(f);
       });
     });
   }
@@ -222,7 +250,7 @@
       var btn = SNIPCART
         ? '<button class="btn btn-gold js-customize" data-cz="' + esc(p.id) + '">Add to Cart</button>'
         : '<button class="btn btn-gold js-add" data-add="' + esc(p.id) + '">Add to Cart</button>';
-      return '<article class="prod-card reveal in" data-category="' + esc(p.category || "") + '" title="' + esc(p.description || "") + '">' +
+      return '<article class="prod-card reveal in" data-category="' + esc(p.category || "") + '" data-subcategory="' + esc(p.subcategory || "") + '" title="' + esc(p.description || "") + '">' +
         mediaHTML(p) +
         '<div class="prod-body">' +
         '<h3>' + esc(p.name) + "</h3>" +
