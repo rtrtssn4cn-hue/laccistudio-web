@@ -350,7 +350,7 @@
     groupsOf(p).forEach(function (g) {
       defs.push({ name: g.label, type: "dropdown", options: g.choices.map(function (c) { return snipToken(p, c); }).join("|") });
     });
-    defs.push({ name: "Design file", type: "hidden" });
+    defs.push({ name: "Design file", type: "readonly" });
     GLOBAL_POST.forEach(function (g) { defs.push({ name: g.name, type: "dropdown", options: g.options.join("|") }); });
     defs.push({ name: "Comments", type: "textarea" });
     return defs;
