@@ -166,7 +166,7 @@
           for (var i = 0; i < slides.length; i++) dots += '<span class="pdot' + (i === 0 ? " on" : "") + '" data-d="' + i + '"></span>';
           nav = '<button class="pnav prev" aria-label="Previous photo">‹</button><button class="pnav next" aria-label="Next photo">›</button><div class="pdots">' + dots + "</div>";
         }
-        return '<figure class="gal-item" data-category="' + esc(it.category || "") + '">' +
+        return '<figure class="gal-item" data-category="' + esc(it.category || "") + '" data-subcategory="' + esc(it.subcategory || "") + '">' +
           '<div class="prod-media gal-media" data-idx="0" style="position:absolute;inset:0;aspect-ratio:auto;height:100%">' + slides.join("") + nav + "</div>" +
           (it.caption ? '<figcaption>' + esc(it.caption) + "</figcaption>" : "") + "</figure>";
       }).join("");
@@ -186,21 +186,49 @@
           lbOpen(media, it.caption || "", gm ? parseInt(gm.getAttribute("data-idx") || "0", 10) : 0);
         });
       });
-      // category filters (same set as the shop)
+      // category + subcategory filters, built automatically from your gallery data
       var gfilt = document.querySelector("#gallery-filters");
       if (gfilt) {
-        var order = ["Drinkware", "Apparel", "Gifts", "Home", "Stickers"];
-        var present = order.filter(function (c) { return (g.items || []).some(function (it) { return it.category === c; }); });
+        var items = g.items || [];
+        var gsub = document.querySelector("#gallery-subfilters");
+        if (!gsub) {
+          gsub = document.createElement("div");
+          gsub.id = "gallery-subfilters"; gsub.className = "shop-filters shop-subfilters"; gsub.style.display = "none";
+          gfilt.parentNode.insertBefore(gsub, gfilt.nextSibling);
+        }
+        var cats = [];
+        items.forEach(function (it) { if (it.category && cats.indexOf(it.category) < 0) cats.push(it.category); });
         gfilt.innerHTML = ['<button class="filter-btn active" data-filter="all">All</button>']
-          .concat(present.map(function (c) { return '<button class="filter-btn" data-filter="' + esc(c) + '">' + esc(c) + "</button>"; })).join("");
+          .concat(cats.map(function (c) { return '<button class="filter-btn" data-filter="' + esc(c) + '">' + esc(c) + "</button>"; })).join("");
+        function gapply(cat, subcat) {
+          ggrid.querySelectorAll(".gal-item").forEach(function (fig) {
+            var okc = (cat === "all") || fig.getAttribute("data-category") === cat;
+            var oks = (!subcat || subcat === "all") || fig.getAttribute("data-subcategory") === subcat;
+            fig.style.display = (okc && oks) ? "" : "none";
+          });
+        }
+        function gshowSubs(cat) {
+          if (cat === "all") { gsub.style.display = "none"; gsub.innerHTML = ""; return; }
+          var subs = [];
+          items.forEach(function (it) { if (it.category === cat && it.subcategory && subs.indexOf(it.subcategory) < 0) subs.push(it.subcategory); });
+          if (!subs.length) { gsub.style.display = "none"; gsub.innerHTML = ""; return; }
+          gsub.innerHTML = ['<button class="filter-btn active" data-sub="all">All ' + esc(cat) + "</button>"]
+            .concat(subs.map(function (s) { return '<button class="filter-btn" data-sub="' + esc(s) + '">' + esc(s) + "</button>"; })).join("");
+          gsub.style.display = "flex";
+          gsub.querySelectorAll(".filter-btn").forEach(function (sb) {
+            sb.addEventListener("click", function () {
+              gsub.querySelectorAll(".filter-btn").forEach(function (x) { x.classList.remove("active"); });
+              sb.classList.add("active");
+              gapply(cat, sb.getAttribute("data-sub"));
+            });
+          });
+        }
         gfilt.querySelectorAll(".filter-btn").forEach(function (b) {
           b.addEventListener("click", function () {
             gfilt.querySelectorAll(".filter-btn").forEach(function (x) { x.classList.remove("active"); });
             b.classList.add("active");
             var f = b.getAttribute("data-filter");
-            ggrid.querySelectorAll(".gal-item").forEach(function (fig) {
-              fig.style.display = (f === "all" || fig.getAttribute("data-category") === f) ? "" : "none";
-            });
+            gapply(f, "all"); gshowSubs(f);
           });
         });
       }
