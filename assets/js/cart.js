@@ -631,6 +631,17 @@
       md.onerror = function () { if (tries < 8) setTimeout(function () { showMockDesign(url, tries + 1); }, 700); };
       md.src = src + (tries ? (src.indexOf("?") > -1 ? "&" : "?") + "_r=" + tries : "");
     }
+    // Guard: never let an order be placed while the design is still uploading
+    var addBtn = body.querySelector("#cz-add");
+    var uploading = false;
+    function setUploading(on) {
+      uploading = on;
+      if (!addBtn) return;
+      addBtn.disabled = on;
+      addBtn.textContent = on ? "Uploading your design…" : "Add to Cart";
+      addBtn.style.opacity = on ? ".6" : "";
+      addBtn.style.cursor = on ? "wait" : "";
+    }
     var up = body.querySelector("#cz-upload");
     var fileInput = body.querySelector("#cz-file");
     if (up && fileInput) {
@@ -661,6 +672,7 @@
           }
         }
         if (st) st.textContent = "Uploading " + f.name + "…";
+        setUploading(true);
         var fd = new FormData();
         fd.append("UPLOADCARE_PUB_KEY", UC);
         fd.append("UPLOADCARE_STORE", "auto");
@@ -671,11 +683,16 @@
             if (!d || !d.file) throw new Error("upload failed");
             state.design = "https://ucarecdn.com/" + d.file + "/";
             if (st) st.textContent = "✓ Attached: " + f.name;
+            setUploading(false);
           })
-          .catch(function () { if (st) st.textContent = "Preview ready. Note: final file upload failed — please retry or email your design after ordering."; });
+          .catch(function () {
+            if (st) st.textContent = "Upload failed — please try that file again before adding to cart.";
+            setUploading(false);
+          });
       });
     }
     body.querySelector("#cz-add").addEventListener("click", function () {
+      if (uploading) return; // design still uploading — don't let the order go through without it
       var qv = parseInt((body.querySelector("#cz-qty") || {}).value, 10); if (!qv || qv < 1) qv = 1;
       snipAdd(p, {
         personalization: (body.querySelector("#cz-pers") || {}).value || "",
