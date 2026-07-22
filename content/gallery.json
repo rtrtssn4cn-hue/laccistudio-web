@@ -9,7 +9,8 @@
       ],
       "video": "",
       "category": "Drinkware",
-      "caption": "Custom Tumblers"
+      "caption": "Custom Tumblers",
+      "subcategory": "Tumblers"
     },
     {
       "images": [
@@ -32,22 +33,16 @@
     },
     {
       "images": [
-        "/assets/img/26501096-8ee8-455d-86bd-96a6cd04bd67.png",
+        "/assets/img/76f8fb34-0a18-455f-a4bc-262e085271fe.png",
         "/assets/img/d9d80561-56fd-4b30-895a-dbaa7ce50b8f.png",
         "/assets/img/c8915207-7cfa-4389-a140-b0d259dd9601.png",
-        "/assets/img/diseños-4-july-8.5-x-14-in-8.5-x-14-in-.png"
+        "/assets/img/89fc02fb-fa4c-47d2-8ddf-cd52e36de1a8.png",
+        "/assets/img/c9685fc5-6998-449f-a1d3-1a33d830e91c.png"
       ],
       "video": "",
       "category": "Apparel",
-      "caption": "Custom Apparel"
-    },
-    {
-      "images": [
-        "assets/img/gal-packaging.jpg"
-      ],
-      "video": "",
-      "category": "Gifts",
-      "caption": "Gift Packaging"
+      "caption": "Custom Apparel",
+      "subcategory": "T-shirts"
     },
     {
       "images": [
@@ -58,8 +53,6 @@
       "video": "",
       "category": "Gifts",
       "caption": "Personalized Gifts"
-    },
-    {},
-    {}
+    }
   ]
 }
