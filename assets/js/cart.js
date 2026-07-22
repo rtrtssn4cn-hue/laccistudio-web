@@ -639,6 +639,14 @@
         var f = fileInput.files && fileInput.files[0]; if (!f) return;
         var st = document.querySelector("#cz-upstatus");
         if (f.size > 25 * 1024 * 1024) { if (st) st.textContent = "File is over 25MB — please upload a smaller file."; return; }
+        // Obvious confirmation the file attached: show a thumbnail and switch the button to "Change file"
+        var prev = document.querySelector("#cz-preview");
+        if (prev) {
+          prev.innerHTML = /^image\//.test(f.type)
+            ? '<div class="cz-prev-wrap"><img class="cz-prev-img" src="' + URL.createObjectURL(f) + '" alt="Your uploaded design"><span class="cz-prev-cap">Your uploaded design</span></div>'
+            : '<span class="cz-prev-cap">📎 ' + esc(f.name) + "</span>";
+        }
+        up.textContent = "Change file";
         // INSTANT local preview on the mockup — white background auto-removed so it sits cleanly on the product
         var md = document.querySelector("#cz-mock-design");
         if (md) {
