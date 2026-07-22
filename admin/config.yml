@@ -37,7 +37,8 @@ collections:
                 field: { name: "image", label: "Photo", widget: "image" }
                 hint: "Add several photos — customers swipe through them like Etsy. First one is the main image."
               - { name: "video", label: "Short video (optional, mp4 ≈8s)", widget: "file", required: false, hint: "Optional product video that plays as the last slide." }
-              - { name: "category", label: "Category", widget: "string", hint: "e.g. Drinkware, Apparel, Gifts, Home, Engraving, Stickers. This also makes the filter buttons." }
+              - { name: "category", label: "Category", widget: "string", hint: "Type your own — e.g. Drinkware, Apparel, Gifts. This makes the filter buttons. Spell it the same across products to group them." }
+              - { name: "subcategory", label: "Subcategory (optional)", widget: "string", required: false, hint: "Optional second-level filter, e.g. Tumblers under Drinkware. Appears after you click its category." }
               - { name: "description", label: "Short description", widget: "text" }
               - { name: "optionLabel", label: "Options label", widget: "string", required: false, hint: "e.g. Size, Color, Item. Leave blank if the product has no choices." }
               - name: "choices"
@@ -73,7 +74,8 @@ collections:
                 field: { name: "image", label: "Photo", widget: "image" }
                 hint: "Drag to reorder. The first photo is the cover; the rest become a slideshow."
               - { name: "video", label: "Video (optional, mp4 under 25MB)", widget: "file", required: false, hint: "Plays as the last slide." }
-              - { name: "category", label: "Category (matches shop filters)", widget: "select", options: ["Drinkware", "Apparel", "Gifts", "Home", "Stickers"], required: false }
+              - { name: "category", label: "Category (type your own — becomes a filter button)", widget: "string", required: false, hint: "e.g. Drinkware. Spell it the same across items so they group under one button." }
+              - { name: "subcategory", label: "Subcategory (optional — becomes a sub-filter)", widget: "string", required: false, hint: "e.g. Tumblers. Appears after you click its category." }
               - { name: "caption", label: "Caption", widget: "string", required: false }
 
   # ---------------- Homepage text ----------------
