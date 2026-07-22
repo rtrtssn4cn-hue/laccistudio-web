@@ -1,0 +1,8 @@
+.git
+.git/**
+node_modules
+*.zip
+*.md
+.netlify
+wrangler.toml
+Shop refs per file*
