@@ -14,6 +14,9 @@
   var KEY = "lacci_cart_v2";
   var SNIPCART = (MODE === "snipcart" && CO.snipcartApiKey);
   var UC = CO.uploadcarePublicKey || ""; // Uploadcare public key for customer design uploads
+  // Your Uploadcare project delivers from its own CDN domain (not the shared ucarecdn.com).
+  // Override any time by adding "uploadcareCdnBase" in content/settings.json.
+  var UCCDN = (CO.uploadcareCdnBase || "https://51niy1s3e7.ucarecd.net/").replace(/\/*$/, "/");
 
   var FILES = {}; // in-memory design files this session, keyed by line key
   var money = function (n) { return SYM + Number(n).toFixed(2); };
@@ -430,7 +433,7 @@
         }).join("") + "</select></label>";
     }).join("");
     var uploadHTML = UC ?
-      '<div class="cz-field"><span>Upload your design, photo, or logo (optional)</span>' +
+      '<div class="cz-field"><span>Upload your design, photo, or logo (required)</span>' +
       '<input type="file" id="cz-file" accept="image/*,.pdf,.svg,.ai,.psd,.eps,.heic" style="display:none">' +
       '<button type="button" class="btn btn-ghost-gold" id="cz-upload" style="width:100%;justify-content:center">＋ Choose file</button>' +
       '<div class="cz-preview" id="cz-preview"></div>' +
@@ -681,7 +684,8 @@
           .then(function (r) { return r.json(); })
           .then(function (d) {
             if (!d || !d.file) throw new Error("upload failed");
-            state.design = "https://ucarecdn.com/" + d.file + "/";
+            // "-/inline/no/" makes the CDN serve it as a download when you click it from the order
+            state.design = UCCDN + d.file + "/-/inline/no/";
             if (st) st.textContent = "✓ Attached: " + f.name;
             setUploading(false);
           })
@@ -693,6 +697,20 @@
     }
     body.querySelector("#cz-add").addEventListener("click", function () {
       if (uploading) return; // design still uploading — don't let the order go through without it
+      // Require an uploaded design file (personalization text stays optional)
+      var warn = body.querySelector("#cz-warn");
+      if (!state.design) {
+        if (!warn) {
+          warn = document.createElement("p");
+          warn.id = "cz-warn";
+          warn.style.cssText = "color:#b3261e;font-size:.78rem;line-height:1.3;margin:.5rem 0 0;text-align:center";
+          addBtn.parentNode.insertBefore(warn, addBtn.nextSibling);
+        }
+        warn.textContent = "Please upload your design file before adding to cart.";
+        var uw = body.querySelector("#cz-upload"); if (uw) uw.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      if (warn) warn.remove();
       var qv = parseInt((body.querySelector("#cz-qty") || {}).value, 10); if (!qv || qv < 1) qv = 1;
       snipAdd(p, {
         personalization: (body.querySelector("#cz-pers") || {}).value || "",
