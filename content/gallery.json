@@ -17,22 +17,14 @@
         "/assets/img/7b3c201d-e4fd-4221-8521-2a243cef890b.png",
         "/assets/img/21ede8e0-9325-4f69-98ef-757dd13e6816.png"
       ],
-      "video": "/assets/img/kling_20260718_video_create_a_p_4365_0.mp4",
-      "category": "Home",
-      "caption": "Personalized Coasters"
-    },
-    {
-      "images": [
-        "assets/img/gal-desk.jpg"
-      ],
       "video": "",
-      "category": "Gifts",
-      "caption": "Desk Accessories"
+      "category": "Home",
+      "caption": "Custom Coasters"
     },
     {
       "images": [
-        "assets/img/gal-stickers.jpg",
-        null
+        "/assets/img/stickers.png",
+        "/assets/img/chatgpt-image-jul-18-2026-at-08_09_47-pm.png"
       ],
       "video": "",
       "category": "Stickers",
@@ -67,6 +59,7 @@
       "category": "Gifts",
       "caption": "Personalized Gifts"
     },
+    {},
     {}
   ]
 }
