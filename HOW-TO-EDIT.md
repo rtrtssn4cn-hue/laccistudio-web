@@ -44,9 +44,9 @@ Each page is a plain file you can open in a text editor:
 
 | File | What's on it |
 |------|--------------|
-| `index.html` | Home page (hero, services preview, gallery, story teaser) |
+| `index.html` | Home page (hero, services preview, gallery) |
 | `services.html` | Full list of services |
-| `about.html` | Your story, the name story, the logo story, mission |
+| `about.html` | Your story, mission |
 | `contact.html` | Contact details, inquiry form, FAQ |
 
 To change wording, find the text you want to change and type over it — **only edit the words**, not the tags around them.
