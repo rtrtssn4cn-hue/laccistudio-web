@@ -702,3 +702,23 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 }
 .card.is-soon .ico{opacity:.55}
 .card.is-soon h3{opacity:.85}
+
+/* ---- footer social: bigger, brand-coloured, under Request a Quote ---- */
+.foot-grid .foot-social{margin-top:1.1rem;gap:.7rem;flex-wrap:wrap}
+.foot-grid .foot-social a{
+  width:46px;height:46px;border:0;color:#fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.28);
+  transition:transform .2s var(--ease),box-shadow .2s var(--ease);
+}
+.foot-grid .foot-social svg{width:23px;height:23px}
+.foot-grid .foot-social a:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(0,0,0,.36);color:#fff;border-color:transparent}
+.foot-grid .foot-social .js-instagram{background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fd5949 45%,#d6249f 60%,#285AEB 90%)}
+.foot-grid .foot-social .js-etsy{background:#F1641E}
+.foot-grid .foot-social .js-facebook{background:#1877F2}
+.foot-grid .foot-social .js-tiktok{background:#010101}
+.foot-grid .foot-social .js-pinterest{background:#E60023}
+.foot-grid .foot-social .js-youtube{background:#FF0000}
+@media(max-width:640px){
+  .foot-grid .foot-social a{width:42px;height:42px}
+  .foot-grid .foot-social svg{width:21px;height:21px}
+}
