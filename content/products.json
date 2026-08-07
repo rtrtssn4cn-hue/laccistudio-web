@@ -1151,20 +1151,6 @@
    "mockupPhoto": "assets/img/mock/mock-gift-license-plate.png?v=12"
   },
   {
-   "id": "gift-phone-case",
-   "weight": 65,
-   "name": "Personalized Phone Case",
-   "price": 19.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-phone-case.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized phone case made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-phone-case.png?v=12"
-  },
-  {
    "id": "gift-jigsaw-puzzle",
    "weight": 430,
    "name": "Personalized Jigsaw Puzzle",
