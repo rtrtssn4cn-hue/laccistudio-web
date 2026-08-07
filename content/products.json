@@ -355,7 +355,7 @@
    "id": "apparel-youth-tee",
    "weight": 130,
    "name": "Custom Youth Tee",
-   "price": 23.98,
+   "price": 21.98,
    "images": [
     "https://laccistudio.com/assets/img/mock/mock-apparel-youth-tee.png"
    ],
@@ -367,32 +367,24 @@
      "label": "Size",
      "choices": [
       {
-       "name": "XS",
+       "name": "Youth XS",
+       "price": 21.98
+      },
+      {
+       "name": "Youth S",
+       "price": 22.98
+      },
+      {
+       "name": "Youth M",
        "price": 23.98
       },
       {
-       "name": "S",
+       "name": "Youth L",
        "price": 24.98
       },
       {
-       "name": "M",
-       "price": 26.98
-      },
-      {
-       "name": "L",
-       "price": 28.98
-      },
-      {
-       "name": "XL",
-       "price": 30.98
-      },
-      {
-       "name": "2XL",
-       "price": 32.98
-      },
-      {
-       "name": "3XL",
-       "price": 34.98
+       "name": "Youth XL",
+       "price": 25.98
       }
      ]
     }
@@ -403,7 +395,7 @@
    "id": "apparel-baby-onesie",
    "weight": 100,
    "name": "Custom Baby Onesie",
-   "price": 24.98,
+   "price": 19.98,
    "images": [
     "https://laccistudio.com/assets/img/mock/mock-apparel-baby-onesie.png"
    ],
@@ -415,32 +407,28 @@
      "label": "Size",
      "choices": [
       {
-       "name": "XS",
-       "price": 24.98
+       "name": "Newborn",
+       "price": 19.98
       },
       {
-       "name": "S",
-       "price": 25.98
+       "name": "0-3 months",
+       "price": 19.98
       },
       {
-       "name": "M",
-       "price": 27.98
+       "name": "3-6 months",
+       "price": 19.98
       },
       {
-       "name": "L",
-       "price": 29.98
+       "name": "6-12 months",
+       "price": 20.98
       },
       {
-       "name": "XL",
-       "price": 31.98
+       "name": "12-18 months",
+       "price": 20.98
       },
       {
-       "name": "2XL",
-       "price": 33.98
-      },
-      {
-       "name": "3XL",
-       "price": 35.98
+       "name": "18-24 months",
+       "price": 21.98
       }
      ]
     }
