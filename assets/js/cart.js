@@ -355,7 +355,7 @@
     });
     defs.push({ name: "Design file", type: "hidden" });
     defs.push({ name: "Back design file", type: "hidden" });
-    defs.push({ name: "Colour code", type: "hidden" });
+    defs.push({ name: "Text colour code", type: "hidden" });
     defs.push({ name: "Placement", type: "hidden" });
     defs.push({ name: "Text styling", type: "hidden" });
     defs.push({ name: "Placement preview", type: "hidden" });
@@ -364,7 +364,7 @@
     return defs;
   }
   function valueFor(name, v) {
-    var map = { "Personalization": v.personalization, "Font style": v.font, "Color": v.color, "Design file": v.design, "Back design file": v.design2, "Colour code": v.hex, "Placement": v.placement, "Text styling": v.textStyle, "Placement preview": v.placementImg, "Proof approval": v.proof, "Timeline": v.timeline, "Comments": v.comments };
+    var map = { "Personalization": v.personalization, "Font style": v.font, "Color": v.color, "Design file": v.design, "Back design file": v.design2, "Text colour code": v.hex, "Placement": v.placement, "Text styling": v.textStyle, "Placement preview": v.placementImg, "Proof approval": v.proof, "Timeline": v.timeline, "Comments": v.comments };
     if (map[name] !== undefined) return map[name];
     if (v.options && v.options[name] !== undefined) return v.options[name];
     return "";
@@ -471,7 +471,7 @@
       '<label class="cz-field"><span>Personalization — name, text, or monogram</span><textarea id="cz-pers" rows="2" placeholder="e.g. “The Smith Family” or initials A&amp;B"></textarea></label>' +
       '<div class="cz-two">' + dropdownHTML("Font style", "cz-font", FONTS) + dropdownHTML("Color", "cz-color", COLORS) + "</div>" +
       '<label class="cz-field"><span>Exact colour code (optional)</span>' +
-        '<input type="text" id="cz-hex" maxlength="9" placeholder="e.g. #D79D41 or PMS 1235 C" autocapitalize="characters" spellcheck="false"></label>' +
+        '<input type="text" id="cz-hex" maxlength="9" placeholder="e.g. #D79D41 — overrides the colour above" autocapitalize="characters" spellcheck="false"></label>' +
       groupsHTML +
       '<label class="cz-field"><span>Quantity</span><input type="number" id="cz-qty" min="1" step="1" value="1"></label>' +
       uploadHTML +
@@ -508,13 +508,16 @@
       var col = colorCSS(colorEl ? colorEl.value : "");
       var fam = fontCSS(fn);
       var bold = boldBtn && boldBtn.classList.contains("on");
+      var hexEl = body.querySelector("#cz-hex");
+      var hexVal = hexEl ? hexEl.value.trim() : "";
+      var hexOK = /^#?[0-9a-fA-F]{6}$/.test(hexVal);
       var weight = bold ? "800" : "500";
       var tt = /Monogram/.test(fn) ? "uppercase" : "none";
       var layout = layoutEl ? layoutEl.value : "Horizontal";
       var size = textSizeEl ? Number(textSizeEl.value) : 22;
       var spacing = spacingEl ? Number(spacingEl.value) : 0;
       var bulge = curveEl ? Number(curveEl.value) : 24;
-      mockText.style.color = col; mockText.style.fontFamily = fam; mockText.style.fontWeight = weight; mockText.style.textTransform = tt;
+      mockText.style.color = hexOK ? (hexVal[0] === "#" ? hexVal : "#" + hexVal) : col; mockText.style.fontFamily = fam; mockText.style.fontWeight = weight; mockText.style.textTransform = tt;
       if (/Arched/.test(layout) && txt) {
         var up = /Up/.test(layout);
         var path = up ? ("M14,104 Q100," + (104 - 2 * bulge) + " 186,104") : ("M14,20 Q100," + (20 + 2 * bulge) + " 186,20");
@@ -545,6 +548,8 @@
     if (spacingEl) spacingEl.addEventListener("input", refreshMock);
     if (curveEl) curveEl.addEventListener("input", refreshMock);
     if (boldBtn) boldBtn.addEventListener("click", function () { boldBtn.classList.toggle("on"); refreshMock(); });
+    var hexInput = body.querySelector("#cz-hex");
+    if (hexInput) hexInput.addEventListener("input", refreshMock);
     refreshMock();
     // --- mockup swaps to the selected size/shape variant photo ---
     var baseImg = body.querySelector("#cz-mock-baseimg");
