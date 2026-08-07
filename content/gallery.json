@@ -1,57 +1,46 @@
 {
- "intro": "A look at recent custom pieces we've created for our customers. Add your own photos and short videos anytime.",
- "items": [
-  {
-   "images": [
-    "/assets/img/d7a47d6a-8d81-4756-95fc-288c677a19eb.png",
-    "/assets/img/7a616a6a-abb3-47f8-ab50-b3365b16c8ca.png",
-    "/assets/img/bd412ffd-4cb5-40d8-bd7e-6f812b72111f.png"
-   ],
-   "video": "",
-   "category": "Drinkware",
-   "caption": "Custom Tumblers",
-   "subcategory": "Tumblers"
-  },
-  {
-   "images": [
-    "/assets/img/04e8823f-ab7e-44a4-9235-9f14b304d505.png",
-    "/assets/img/7b3c201d-e4fd-4221-8521-2a243cef890b.png",
-    "/assets/img/21ede8e0-9325-4f69-98ef-757dd13e6816.png"
-   ],
-   "video": "",
-   "category": "Home",
-   "caption": "Custom Coasters"
-  },
-  {
-   "images": [
-    "/assets/img/stickers.png",
-    "/assets/img/chatgpt-image-jul-18-2026-at-08_09_47-pm.png"
-   ],
-   "video": "",
-   "category": "Stickers",
-   "caption": "Stickers & Decals"
-  },
-  {
-   "images": [
-    "/assets/img/76f8fb34-0a18-455f-a4bc-262e085271fe.png",
-    "/assets/img/d9d80561-56fd-4b30-895a-dbaa7ce50b8f.png",
-    "/assets/img/c8915207-7cfa-4389-a140-b0d259dd9601.png",
-    "/assets/img/89fc02fb-fa4c-47d2-8ddf-cd52e36de1a8.png",
-    "/assets/img/c9685fc5-6998-449f-a1d3-1a33d830e91c.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "caption": "Custom Apparel",
-   "subcategory": "T-shirts"
-  },
-  {
-   "images": [
-    "/assets/img/b2393ca0-df98-4362-b267-27f12e6559d9.png",
-    "/assets/img/8807f45c-870b-4ab0-a4f9-d94e5276b268.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "caption": "Personalized Gifts"
-  }
- ]
+  "intro": "A look at recent custom pieces we've created for our customers. Add your own photos and short videos anytime.",
+  "items": [
+    {
+      "images": [],
+      "video": "",
+      "category": "Drinkware",
+      "caption": "Custom Tumblers",
+      "subcategory": "Tumblers"
+    },
+    {
+      "images": [],
+      "video": "",
+      "category": "Home",
+      "caption": "Custom Coasters"
+    },
+    {
+      "images": [
+        "/assets/img/stickers.png",
+        "/assets/img/chatgpt-image-jul-18-2026-at-08_09_47-pm.png"
+      ],
+      "video": "",
+      "category": "Stickers",
+      "caption": "Stickers & Decals"
+    },
+    {
+      "images": [
+        "/assets/img/76f8fb34-0a18-455f-a4bc-262e085271fe.png",
+        "/assets/img/d9d80561-56fd-4b30-895a-dbaa7ce50b8f.png",
+        "/assets/img/c8915207-7cfa-4389-a140-b0d259dd9601.png",
+        "/assets/img/89fc02fb-fa4c-47d2-8ddf-cd52e36de1a8.png",
+        "/assets/img/c9685fc5-6998-449f-a1d3-1a33d830e91c.png"
+      ],
+      "video": "",
+      "category": "Apparel",
+      "caption": "Custom Apparel",
+      "subcategory": "T-shirts"
+    },
+    {
+      "images": [],
+      "video": "",
+      "category": "Gifts",
+      "caption": "Personalized Gifts"
+    }
+  ]
 }
