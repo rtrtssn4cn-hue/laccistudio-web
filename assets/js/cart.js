@@ -434,7 +434,9 @@
       return '<label class="cz-field"><span>' + esc(g.label) + '</span><select class="cz-opt" data-label="' + esc(g.label) + '">' +
         g.choices.map(function (c) {
           var m = choiceMod(p, c);
-          var tag = m ? " — " + money(Number(p.price) + m) : "";
+          var tag = "";
+          if (c && typeof c === "object" && c.price != null && c.price !== "") tag = " — " + money(Number(c.price));
+          else if (m) tag = " (+" + money(m) + ")";
           return '<option value="' + esc(snipToken(p, c)) + '">' + esc(choiceName(c)) + esc(tag) + "</option>";
         }).join("") + "</select></label>";
     }).join("");
@@ -458,11 +460,6 @@
         '</div>' +
         '<div class="cz-zoom"><button type="button" id="cz-zoom-out" aria-label="Zoom out">–</button><button type="button" id="cz-zoom-in" aria-label="Zoom in">+</button></div>' +
       "</div>" +
-      '<div class="cz-field" id="cz-upload2row" style="display:none"><span>Upload your BACK design (required)</span>' +
-        '<button type="button" class="cz-upload" id="cz-upload2">Choose file</button>' +
-        '<input type="file" id="cz-file2" accept="image/*,.pdf,.ai,.psd,.svg" style="display:none">' +
-        '<div class="cz-upstatus" id="cz-upstatus2"></div></div>' +
-      '<div class="cz-sizerow" id="cz-sizerow2" style="display:none"><span>Back size</span><input type="range" id="cz-mock-size2" min="12" max="92" value="34"></div>' +
       '<div class="cz-sizerow" id="cz-sizerow" style="display:none"><span>Size</span><input type="range" id="cz-mock-size" min="12" max="92" value="34"><span>Rotate</span><input type="range" id="cz-mock-rot" min="-180" max="180" value="0"></div>' +
       '<div class="cz-textrow"><span>Text</span>' +
         '<select id="cz-text-layout"><option>Horizontal</option><option>Vertical</option><option>Arched Up</option><option>Arched Down</option></select>' +
@@ -476,6 +473,11 @@
       groupsHTML +
       '<label class="cz-field"><span>Quantity</span><input type="number" id="cz-qty" min="1" step="1" value="1"></label>' +
       uploadHTML +
+      '<div class="cz-field" id="cz-upload2row" style="display:none"><span>Upload your back design (required)</span>' +
+        '<input type="file" id="cz-file2" accept="image/*,.pdf,.svg,.ai,.psd,.eps,.heic" style="display:none">' +
+        '<button type="button" class="btn btn-ghost-gold" id="cz-upload2" style="width:100%;justify-content:center">＋ Choose back file</button>' +
+        '<div class="cz-upstatus" id="cz-upstatus2"></div></div>' +
+      '<div class="cz-sizerow" id="cz-sizerow2" style="display:none"><span>Back size</span><input type="range" id="cz-mock-size2" min="12" max="92" value="34"></div>' +
       dropdownHTML("Digital proof before we make it?", "cz-proof", PROOF) +
       '<label class="cz-field"><span>Comments / special requests (optional)</span><textarea id="cz-comments" rows="2" placeholder="Placement, exact wording, event date, or any notes"></textarea></label>' +
       '<button class="btn btn-gold" id="cz-add" style="width:100%;justify-content:center;margin-top:.4rem">Add to Cart</button>' +
