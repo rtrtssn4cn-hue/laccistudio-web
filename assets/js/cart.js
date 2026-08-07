@@ -637,28 +637,43 @@
             bg[i] = 1;
             stack.push(x + 1, y, x - 1, y, x, y + 1, x, y - 1);
           }
-          // feather the tint over 8px so the soft shadow edge fades instead of banding
-          var N = 8, str = new Float32Array(w * h), cur = new Uint8Array(bg);
-          for (var step = 1; step <= N; step++) {
-            var nb = new Uint8Array(cur);
-            for (var yy = 0; yy < h; yy++) {
-              var rw = yy * w;
-              for (var xx = 0; xx < w; xx++) {
-                if (cur[rw + xx]) continue;
-                if ((xx > 0 && cur[rw + xx - 1]) || (xx < w - 1 && cur[rw + xx + 1]) ||
-                    (yy > 0 && cur[rw - w + xx]) || (yy < h - 1 && cur[rw + w + xx])) {
-                  nb[rw + xx] = 1; str[rw + xx] = step / N;
+          // build a smooth alpha: erode the garment mask, then blur, so the
+          // anti-aliased rim does not produce a jagged comb along the edge
+          var al = new Float32Array(w * h), ER = 2;
+          for (var yy = 0; yy < h; yy++) {
+            for (var xx = 0; xx < w; xx++) {
+              if (bg[yy * w + xx]) continue;
+              var edge = 0;
+              for (var dy = -ER; dy <= ER && !edge; dy++) {
+                for (var dx = -ER; dx <= ER; dx++) {
+                  var ny = yy + dy, nx = xx + dx;
+                  if (ny < 0 || nx < 0 || ny >= h || nx >= w || bg[ny * w + nx]) { edge = 1; break; }
                 }
               }
+              if (!edge) al[yy * w + xx] = 1;
             }
-            cur = nb;
           }
+          var bl = new Float32Array(w * h), RD = 3;
+          for (var yy2 = 0; yy2 < h; yy2++) {
+            for (var xx2 = 0; xx2 < w; xx2++) {
+              var sum = 0, cnt = 0;
+              for (var dy2 = -RD; dy2 <= RD; dy2++) {
+                var ny2 = yy2 + dy2; if (ny2 < 0 || ny2 >= h) continue;
+                for (var dx2 = -RD; dx2 <= RD; dx2++) {
+                  var nx2 = xx2 + dx2; if (nx2 < 0 || nx2 >= w) continue;
+                  sum += al[ny2 * w + nx2]; cnt++;
+                }
+              }
+              bl[yy2 * w + xx2] = sum / cnt;
+            }
+          }
+          var str = bl;
           var r = parseInt(hex.substr(1, 2), 16) / 255,
               g = parseInt(hex.substr(3, 2), 16) / 255,
               b = parseInt(hex.substr(5, 2), 16) / 255;
           for (var k = 0; k < w * h; k++) {
-            if (bg[k]) continue;
-            var q = k * 4, t = str[k] > 0 ? str[k] : 1;
+            var q = k * 4, t = str[k];
+            if (t <= 0) continue;
             d[q] = d[q] * (r * t + (1 - t));
             d[q + 1] = d[q + 1] * (g * t + (1 - t));
             d[q + 2] = d[q + 2] * (b * t + (1 - t));
