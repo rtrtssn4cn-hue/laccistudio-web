@@ -356,9 +356,9 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .pdot.on{background:var(--gold)}
 .prod-tag{position:absolute;top:.5rem;left:.5rem;background:rgba(49,26,17,.82);color:var(--gold);font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:.2rem .5rem;border-radius:40px}
 .prod-body{padding:.55rem .7rem .65rem;display:flex;flex-direction:column;flex:1;gap:.1rem}
-.prod-body h3{font-size:.82rem;margin:0;line-height:1.15;font-weight:600}
+.prod-body h3{font-size:1.12rem;margin:0 0 .12rem;line-height:1.2;font-weight:600}
 .prod-foot{display:flex;align-items:center;justify-content:space-between;margin:.05rem 0 .45rem;margin-top:auto}
-.prod-price{font-family:'Montserrat',sans-serif;font-size:.92rem;font-weight:600;color:var(--gold-deep)}
+.prod-price{font-family:'Montserrat',sans-serif;font-size:.88rem;font-weight:600;color:var(--gold-deep)}
 .up-status{display:inline-block;margin-top:.35rem;font-size:.72rem;font-weight:600;color:#2e7d32}
 /* customize (add-to-cart) modal */
 .cz-overlay{position:fixed;inset:0;background:rgba(31,22,16,.55);opacity:0;visibility:hidden;transition:.25s;z-index:1400}
