@@ -571,21 +571,22 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .promo-bar{position:relative;z-index:60;overflow:hidden;transition:height .3s ease,opacity .3s ease}
 .promo-bar.promo-hiding{height:0 !important;opacity:0}
 
-/* colour themes */
-.promo-gold{background:linear-gradient(90deg,#E0B04A 0%,#D9A83E 50%,#C69433 100%);color:#2A1509}
-.promo-espresso{background:linear-gradient(90deg,#3E281C 0%,#311A11 50%,#241009 100%);color:var(--ivory)}
-.promo-noir{background:linear-gradient(90deg,#191919 0%,#0B0B0B 100%);color:#F6E7C8}
-.promo-cream{background:linear-gradient(90deg,#F7EFE4 0%,#EFE2D1 100%);color:var(--walnut)}
-.promo-berry{background:linear-gradient(90deg,#7E2A3F 0%,#5E1B2C 100%);color:#FBEFE2}
+/* colour themes — brand palette only */
+.promo-gold{background:linear-gradient(90deg,#E2AE55 0%,#D79D41 50%,#B8842F 100%);color:#1F1610}
+.promo-walnut{background:linear-gradient(90deg,#2C1F16 0%,#1F1610 100%);color:var(--ivory)}
+.promo-espresso{background:linear-gradient(90deg,#3A211A 0%,#25140F 100%);color:var(--ivory)}
+.promo-ivory{background:linear-gradient(90deg,#FAF7F4 0%,#F4ECE5 100%);color:var(--walnut)}
+.promo-linen{background:linear-gradient(90deg,#F1E8DB 0%,#E9DFD1 100%);color:var(--walnut)}
+.promo-sandstone{background:linear-gradient(90deg,#E2D8CB 0%,#D7CBBE 100%);color:var(--walnut)}
 
 /* full-width background artwork */
 .promo-bg{position:absolute;inset:0;background-size:cover;background-position:center;
   background-repeat:no-repeat;opacity:.34;pointer-events:none}
-.promo-has-bg.promo-gold .promo-bg{mix-blend-mode:multiply;opacity:.26}
-.promo-has-bg.promo-cream .promo-bg{mix-blend-mode:multiply;opacity:.3}
+.promo-has-bg.promo-gold .promo-bg,.promo-has-bg.promo-linen .promo-bg,.promo-has-bg.promo-sandstone .promo-bg,.promo-has-bg.promo-ivory .promo-bg{mix-blend-mode:multiply;opacity:.26}
+
 .promo-has-bg::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(90deg,rgba(0,0,0,.32) 0%,rgba(0,0,0,.12) 35%,rgba(0,0,0,.12) 65%,rgba(0,0,0,.32) 100%)}
-.promo-has-bg.promo-gold::after,.promo-has-bg.promo-cream::after{
+.promo-has-bg.promo-gold::after,.promo-has-bg.promo-linen::after,.promo-has-bg.promo-sandstone::after,.promo-has-bg.promo-ivory::after{
   background:linear-gradient(90deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,.16) 35%,rgba(255,255,255,.16) 65%,rgba(255,255,255,.42) 100%)}
 
 .promo-inner{position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:15px 52px;
@@ -594,13 +595,13 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .promo-msg{font-family:var(--font-head,"Cormorant Garamond",serif);font-size:1.42rem;font-weight:600;
   letter-spacing:.015em;line-height:1.15}
 .promo-has-bg .promo-msg{text-shadow:0 1px 3px rgba(0,0,0,.28)}
-.promo-has-bg.promo-gold .promo-msg,.promo-has-bg.promo-cream .promo-msg{text-shadow:0 1px 2px rgba(255,255,255,.5)}
+.promo-has-bg.promo-gold .promo-msg,.promo-has-bg.promo-linen .promo-msg,.promo-has-bg.promo-sandstone .promo-msg,.promo-has-bg.promo-ivory .promo-msg{text-shadow:0 1px 2px rgba(255,255,255,.5)}
 
 .promo-code{font:inherit;font-family:var(--font-body,Montserrat,sans-serif);font-size:.82rem;font-weight:800;
   letter-spacing:.14em;background:rgba(255,255,255,.96);color:#2A1509;border:0;border-radius:3px;
   padding:8px 16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.16);
   transition:transform .18s ease,box-shadow .18s ease}
-.promo-espresso .promo-code,.promo-noir .promo-code,.promo-berry .promo-code{background:var(--gold);color:#2A1509}
+.promo-walnut .promo-code,.promo-espresso .promo-code{background:var(--gold);color:#2A1509}
 .promo-code:hover{transform:translateY(-2px);box-shadow:0 5px 14px rgba(0,0,0,.24)}
 .promo-code.copied{background:#1E7A4B;color:#fff}
 
@@ -648,13 +649,14 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
   padding:13px 32px;letter-spacing:.2em;transition:background .2s ease,color .2s ease;
 }
 .promo-size-large .promo-link:hover{opacity:1;background:currentColor}
-.promo-size-large.promo-berry .promo-link:hover,
-.promo-size-large.promo-espresso .promo-link:hover,
-.promo-size-large.promo-noir .promo-link:hover{color:#2A1509}
+.promo-size-large.promo-walnut .promo-link:hover,
+.promo-size-large.promo-espresso .promo-link:hover{color:#1F1610}
 .promo-size-large.promo-gold .promo-link:hover,
-.promo-size-large.promo-cream .promo-link:hover{color:var(--ivory)}
+.promo-size-large.promo-linen .promo-link:hover,
+.promo-size-large.promo-sandstone .promo-link:hover,
+.promo-size-large.promo-ivory .promo-link:hover{color:var(--ivory)}
 .promo-size-large .promo-bg{opacity:.42}
-.promo-size-large.promo-gold .promo-bg,.promo-size-large.promo-cream .promo-bg{opacity:.34}
+.promo-size-large.promo-gold .promo-bg,.promo-size-large.promo-linen .promo-bg,.promo-size-large.promo-sandstone .promo-bg{opacity:.34}
 .promo-size-large .promo-close{top:18px;right:20px;transform:none;font-size:1.7rem}
 @media (max-width:640px){
   .promo-size-large .promo-inner{padding:44px 32px;min-height:220px}
@@ -664,7 +666,7 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 /* headline/subtext must take the banner's colour, not the site heading colour */
 .promo-bar .promo-msg,.promo-bar .promo-sub,.promo-bar .promo-eyebrow{color:inherit}
 .promo-size-large .promo-bg{opacity:.3}
-.promo-size-large.promo-gold .promo-bg,.promo-size-large.promo-cream .promo-bg{opacity:.26}
+.promo-size-large.promo-gold .promo-bg,.promo-size-large.promo-linen .promo-bg,.promo-size-large.promo-sandstone .promo-bg{opacity:.26}
 
 /* ---- banner background style: full photo (image is the background) ---- */
 .promo-img-photo .promo-bg{opacity:1 !important;mix-blend-mode:normal !important}
@@ -679,3 +681,24 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .promo-img-photo .promo-link:hover{background:#fff !important;color:#2A1509 !important}
 /* banner renders below the sticky nav */
 .promo-bar{z-index:40}
+
+
+/* ---- image-only: the artwork IS the banner, nothing painted over it ---- */
+.promo-img-only{background:none !important}
+.promo-img-only .promo-full{display:block;width:100%;height:auto}
+.promo-img-only::after{display:none !important}
+.promo-img-only .promo-inner{position:absolute;inset:0;padding:20px 52px;pointer-events:none}
+.promo-img-only .promo-inner > *{pointer-events:auto}
+.promo-img-only .promo-close{color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6)}
+
+/* ---- "Coming soon" badge on service cards ---- */
+.card.is-soon{position:relative}
+.card .soon-tag{
+  display:inline-block;margin-bottom:8px;
+  font-family:var(--font-body,Montserrat,sans-serif);font-size:.6rem;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--mocha);background:var(--linen);
+  border:1px solid var(--sandstone);border-radius:2px;padding:4px 9px;
+}
+.card.is-soon .ico{opacity:.55}
+.card.is-soon h3{opacity:.85}

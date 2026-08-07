@@ -117,6 +117,7 @@
       imageStyle: s.saleBannerImageStyle || "tint",
       eyebrow:   s.saleBannerEyebrow || "",
       subtext:   s.saleBannerSubtext || "",
+      shortText: s.saleBannerShortText || "",
       dismissible: s.saleBannerDismissible !== false
     };
 

@@ -10,7 +10,7 @@
   function build() {
     var P = window.LACCI_PROMO;
     if (!P || !P.on) return;
-    if (!P.message && !P.image && !P.subtext) return;
+    if (!headline && !P.image && !P.subtext) return;
 
     // --- seasonal window ---
     var now = new Date();
@@ -18,13 +18,19 @@
     if (P.end)   { if (now > new Date(P.end   + "T23:59:59")) return; }
 
     // --- respect a dismissal of THIS exact promo ---
-    var stamp = (P.message || "") + "|" + (P.code || "") + "|" + (P.image || "");
+    var stamp = (P.message || "") + "|" + (P.shortText || "") + "|" + (P.code || "") + "|" + (P.image || "");
     if (P.dismissible) {
       try { if (localStorage.getItem(KEY) === stamp) return; } catch (e) {}
     }
 
+    // Large banner on the homepage only; every other page gets the slim strip.
+    var path = location.pathname.replace(/\/+$/, "");
+    var isHome = (path === "" || /\/index\.html$/i.test(path) || path === "/index");
+    var size = isHome ? (P.size || "strip") : "strip";
+    var headline = isHome ? P.message : (P.shortText || P.message);
+
     var bar = document.createElement("div");
-    bar.className = "promo-bar promo-" + (P.theme || "gold") + " promo-size-" + (P.size || "strip");
+    bar.className = "promo-bar promo-" + (P.theme || "gold") + " promo-size-" + size;
     bar.setAttribute("role", "region");
     bar.setAttribute("aria-label", "Promotion");
 
@@ -35,28 +41,37 @@
     if (P.image) {
       bar.classList.add("promo-has-bg");
       bar.classList.add("promo-img-" + (P.imageStyle || "tint"));
-      var bg = document.createElement("div");
-      bg.className = "promo-bg";
-      bg.style.backgroundImage = 'url("' + P.image + '")';
-      bg.setAttribute("aria-hidden", "true");
-      bar.appendChild(bg);
+      if (P.imageStyle === "only") {
+        // The artwork is the banner. Nothing is painted over it.
+        var full = document.createElement("img");
+        full.className = "promo-full";
+        full.src = P.image;
+        full.alt = headline || "";
+        bar.appendChild(full);
+      } else {
+        var bg = document.createElement("div");
+        bg.className = "promo-bg";
+        bg.style.backgroundImage = 'url("' + P.image + '")';
+        bg.setAttribute("aria-hidden", "true");
+        bar.appendChild(bg);
+      }
     }
 
-    if (P.eyebrow) {
+    if (P.eyebrow && size === "large") {
       var eb = document.createElement("span");
       eb.className = "promo-eyebrow";
       eb.textContent = P.eyebrow;
       inner.appendChild(eb);
     }
 
-    if (P.message) {
-      var msg = document.createElement(P.size === "large" ? "h2" : "span");
+    if (headline) {
+      var msg = document.createElement(size === "large" ? "h2" : "span");
       msg.className = "promo-msg";
-      msg.textContent = P.message;
+      msg.textContent = headline;
       inner.appendChild(msg);
     }
 
-    if (P.subtext) {
+    if (P.subtext && size === "large") {
       var sub = document.createElement("p");
       sub.className = "promo-sub";
       sub.textContent = P.subtext;
