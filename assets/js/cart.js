@@ -443,6 +443,7 @@
     var body = document.querySelector("#cz-body"); if (!body) return;
     var state = { design: "", design2: "" };
     var groups = groupsOf(p);
+    var hasFB = groups.some(function (g) { return g.label === "Print location"; });
     var groupsHTML = groups.map(function (g) {
       return '<label class="cz-field"><span>' + esc(g.label) + '</span><select class="cz-opt" data-label="' + esc(g.label) + '">' +
         g.choices.map(function (c) {
@@ -473,7 +474,7 @@
         '</div>' +
         '<div class="cz-zoom"><button type="button" id="cz-zoom-out" aria-label="Zoom out">–</button><button type="button" id="cz-zoom-in" aria-label="Zoom in">+</button></div>' +
       "</div>" +
-      (p.category === "Apparel" ?
+      (hasFB ?
         '<div class="cz-field"><span>Garment colour</span><div class="cz-swatches" id="cz-swatches">' +
         GARMENT.map(function (g, i) {
           return '<button type="button" class="cz-sw' + (i === 0 ? " on" : "") + '" data-hex="' + g.hex +
@@ -984,7 +985,7 @@
         proof: (body.querySelector("#cz-proof") || {}).value || "",
         timeline: (body.querySelector("#cz-timeline") || {}).value || "",
         comments: (body.querySelector("#cz-comments") || {}).value || "",
-        garment: (p.category === "Apparel" ? garment.name + " (" + garment.hex + ")" + (garment.vinyl ? " \u2014 HTV vinyl" : "") : ""),
+        garment: (hasFB ? garment.name + " (" + garment.hex + ")" + (garment.vinyl ? " \u2014 HTV vinyl" : "") : ""),
         hex: ((body.querySelector("#cz-hex") || {}).value || "").trim(),
         placement: placeTxt,
         textStyle: textStyleText(),
