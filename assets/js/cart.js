@@ -759,43 +759,6 @@
           });
       });
     }
-    function placementText() {
-      var md = body.querySelector("#cz-mock-design");
-      if (!md || md.style.display === "none") return "";
-      var L = parseFloat(md.style.left) || 50, T = parseFloat(md.style.top) || 44;
-      var W = sizeSlider ? Number(sizeSlider.value) : 34;
-      var parts = [Math.round(L) + "% across, " + Math.round(T) + "% down, " + W + "% width"];
-      if (designRot) parts.push(designRot + "\u00B0 rotation");
-      var mt = body.querySelector("#cz-mock-text");
-      if (mt && mt.textContent.trim()) {
-        var tl = parseFloat(mt.style.left) || 50, tt = parseFloat(mt.style.top) || 80;
-        parts.push("text at " + Math.round(tl) + "% across, " + Math.round(tt) + "% down");
-      }
-      return parts.join(" \u00B7 ");
-    }
-    function capturePreview(done) {
-      var box = body.querySelector("#cz-mockup");
-      if (!box || !window.html2canvas) return done("");
-      var tag = box.querySelector(".cz-mock-tag"); if (tag) tag.style.visibility = "hidden";
-      html2canvas(box, { backgroundColor: "#ffffff", scale: 2, logging: false, useCORS: true })
-        .then(function (c) {
-          if (tag) tag.style.visibility = "";
-          c.toBlob(function (blob) {
-            if (!blob) return done("");
-            var fd = new FormData();
-            fd.append("UPLOADCARE_PUB_KEY", UC);
-            fd.append("UPLOADCARE_STORE", "auto");
-            fd.append("file", blob, "placement-preview.png");
-            fetch("https://upload.uploadcare.com/base/", { method: "POST", body: fd })
-              .then(function (r) { return r.json(); })
-              .then(function (d) { done(d && d.file ? UCCDN + d.file + "/" : ""); })
-              .catch(function () { done(""); });
-          }, "image/png");
-        })
-        .catch(function () { if (tag) tag.style.visibility = ""; done(""); });
-    }
-    if (!window.html2canvas) loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js", function () {});
-
     function layerText(el, slider, label, defTop) {
       if (!el || el.style.display === "none") return "";
       var L = parseFloat(el.style.left) || 50, T = parseFloat(el.style.top) || defTop;
@@ -814,7 +777,7 @@
       var box = body.querySelector("#cz-mockup");
       if (!box || !window.html2canvas) return done("");
       var tag = box.querySelector(".cz-mock-tag"); if (tag) tag.style.visibility = "hidden";
-      html2canvas(box, { backgroundColor: "#ffffff", scale: 2, logging: false, useCORS: true })
+      html2canvas(box, { backgroundColor: "#ffffff", scale: 3, logging: false, useCORS: true })
         .then(function (c) {
           if (tag) tag.style.visibility = "";
           c.toBlob(function (blob) {
