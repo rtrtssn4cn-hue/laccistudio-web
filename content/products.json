@@ -115,7 +115,7 @@
    "id": "apparel-t-shirt",
    "weight": 200,
    "name": "Custom T-Shirt",
-   "price": 24.99,
+   "price": 26.98,
    "images": [
     "https://laccistudio.com/assets/img/mock/mock-apparel-t-shirt.png"
    ],
@@ -127,35 +127,32 @@
      "label": "Size",
      "choices": [
       {
-       "name": "XS"
+       "name": "XS",
+       "price": 26.98
       },
       {
-       "name": "S"
+       "name": "S",
+       "price": 27.98
       },
       {
-       "name": "M"
+       "name": "M",
+       "price": 29.98
       },
       {
-       "name": "L"
+       "name": "L",
+       "price": 31.98
       },
       {
-       "name": "XL"
+       "name": "XL",
+       "price": 33.98
       },
       {
        "name": "2XL",
-       "add": 2
+       "price": 35.98
       },
       {
        "name": "3XL",
-       "add": 3
-      },
-      {
-       "name": "4XL",
-       "add": 4
-      },
-      {
-       "name": "5XL",
-       "add": 5
+       "price": 37.98
       }
      ]
     }
@@ -166,7 +163,7 @@
    "id": "apparel-v-neck-tee",
    "weight": 200,
    "name": "Custom V-Neck Tee",
-   "price": 24.99,
+   "price": 26.98,
    "images": [
     "https://laccistudio.com/assets/img/mock/mock-apparel-v-neck-tee.png"
    ],
@@ -178,35 +175,32 @@
      "label": "Size",
      "choices": [
       {
-       "name": "XS"
+       "name": "XS",
+       "price": 26.98
       },
       {
-       "name": "S"
+       "name": "S",
+       "price": 27.98
       },
       {
-       "name": "M"
+       "name": "M",
+       "price": 29.98
       },
       {
-       "name": "L"
+       "name": "L",
+       "price": 31.98
       },
       {
-       "name": "XL"
+       "name": "XL",
+       "price": 33.98
       },
       {
        "name": "2XL",
-       "add": 2
+       "price": 35.98
       },
       {
        "name": "3XL",
-       "add": 3
-      },
-      {
-       "name": "4XL",
-       "add": 4
-      },
-      {
-       "name": "5XL",
-       "add": 5
+       "price": 37.98
       }
      ]
     }
@@ -217,7 +211,7 @@
    "id": "apparel-ladies-fitted-tee",
    "weight": 180,
    "name": "Custom Ladies' Fitted Tee",
-   "price": 25.99,
+   "price": 27.98,
    "images": [
     "https://laccistudio.com/assets/img/mock/mock-apparel-ladies-fitted-tee.png"
    ],
@@ -229,35 +223,32 @@
      "label": "Size",
      "choices": [
       {
-       "name": "XS"
+       "name": "XS",
+       "price": 27.98
       },
       {
-       "name": "S"
+       "name": "S",
+       "price": 28.98
       },
       {
-       "name": "M"
+       "name": "M",
+       "price": 30.98
       },
       {
-       "name": "L"
+       "name": "L",
+       "price": 32.98
       },
       {
-       "name": "XL"
+       "name": "XL",
+       "price": 34.98
       },
       {
        "name": "2XL",
-       "add": 2
+       "price": 36.98
       },
       {
        "name": "3XL",
-       "add": 3
-      },
-      {
-       "name": "4XL",
-       "add": 4
-      },
-      {
-       "name": "5XL",
-       "add": 5
+       "price": 38.98
       }
      ]
     }
@@ -268,7 +259,7 @@
    "id": "apparel-tank-top",
    "weight": 140,
    "name": "Custom Tank Top",
-   "price": 23.99,
+   "price": 25.98,
    "images": [
     "https://laccistudio.com/assets/img/mock/mock-apparel-tank-top.png"
    ],
@@ -280,35 +271,32 @@
      "label": "Size",
      "choices": [
       {
-       "name": "XS"
+       "name": "XS",
+       "price": 25.98
       },
       {
-       "name": "S"
+       "name": "S",
+       "price": 26.98
       },
       {
-       "name": "M"
+       "name": "M",
+       "price": 28.98
       },
       {
-       "name": "L"
+       "name": "L",
+       "price": 30.98
       },
       {
-       "name": "XL"
+       "name": "XL",
+       "price": 32.98
       },
       {
        "name": "2XL",
-       "add": 2
+       "price": 34.98
       },
       {
        "name": "3XL",
-       "add": 3
-      },
-      {
-       "name": "4XL",
-       "add": 4
-      },
-      {
-       "name": "5XL",
-       "add": 5
+       "price": 36.98
       }
      ]
     }
@@ -319,7 +307,7 @@
    "id": "apparel-long-sleeve-tee",
    "weight": 260,
    "name": "Custom Long-Sleeve Tee",
-   "price": 28.99,
+   "price": 30.98,
    "images": [
     "https://laccistudio.com/assets/img/mock/mock-apparel-long-sleeve-tee.png"
    ],
@@ -331,35 +319,32 @@
      "label": "Size",
      "choices": [
       {
-       "name": "XS"
+       "name": "XS",
+       "price": 30.98
       },
       {
-       "name": "S"
+       "name": "S",
+       "price": 31.98
       },
       {
-       "name": "M"
+       "name": "M",
+       "price": 33.98
       },
       {
-       "name": "L"
+       "name": "L",
+       "price": 35.98
       },
       {
-       "name": "XL"
+       "name": "XL",
+       "price": 37.98
       },
       {
        "name": "2XL",
-       "add": 2
+       "price": 39.98
       },
       {
        "name": "3XL",
-       "add": 3
-      },
-      {
-       "name": "4XL",
-       "add": 4
-      },
-      {
-       "name": "5XL",
-       "add": 5
+       "price": 41.98
       }
      ]
     }
@@ -370,7 +355,7 @@
    "id": "apparel-youth-tee",
    "weight": 130,
    "name": "Custom Youth Tee",
-   "price": 21.99,
+   "price": 23.98,
    "images": [
     "https://laccistudio.com/assets/img/mock/mock-apparel-youth-tee.png"
    ],
@@ -382,35 +367,32 @@
      "label": "Size",
      "choices": [
       {
-       "name": "XS"
+       "name": "XS",
+       "price": 23.98
       },
       {
-       "name": "S"
+       "name": "S",
+       "price": 24.98
       },
       {
-       "name": "M"
+       "name": "M",
+       "price": 26.98
       },
       {
-       "name": "L"
+       "name": "L",
+       "price": 28.98
       },
       {
-       "name": "XL"
+       "name": "XL",
+       "price": 30.98
       },
       {
        "name": "2XL",
-       "add": 2
+       "price": 32.98
       },
       {
        "name": "3XL",
-       "add": 3
-      },
-      {
-       "name": "4XL",
-       "add": 4
-      },
-      {
-       "name": "5XL",
-       "add": 5
+       "price": 34.98
       }
      ]
     }
@@ -421,7 +403,7 @@
    "id": "apparel-baby-onesie",
    "weight": 100,
    "name": "Custom Baby Onesie",
-   "price": 22.99,
+   "price": 24.98,
    "images": [
     "https://laccistudio.com/assets/img/mock/mock-apparel-baby-onesie.png"
    ],
@@ -433,35 +415,32 @@
      "label": "Size",
      "choices": [
       {
-       "name": "XS"
+       "name": "XS",
+       "price": 24.98
       },
       {
-       "name": "S"
+       "name": "S",
+       "price": 25.98
       },
       {
-       "name": "M"
+       "name": "M",
+       "price": 27.98
       },
       {
-       "name": "L"
+       "name": "L",
+       "price": 29.98
       },
       {
-       "name": "XL"
+       "name": "XL",
+       "price": 31.98
       },
       {
        "name": "2XL",
-       "add": 2
+       "price": 33.98
       },
       {
        "name": "3XL",
-       "add": 3
-      },
-      {
-       "name": "4XL",
-       "add": 4
-      },
-      {
-       "name": "5XL",
-       "add": 5
+       "price": 35.98
       }
      ]
     }
@@ -472,7 +451,7 @@
    "id": "apparel-crewneck-sweatshirt",
    "weight": 560,
    "name": "Custom Crewneck Sweatshirt",
-   "price": 34.99,
+   "price": 36.98,
    "images": [
     "https://laccistudio.com/assets/img/mock/mock-apparel-crewneck-sweatshirt.png"
    ],
@@ -484,35 +463,32 @@
      "label": "Size",
      "choices": [
       {
-       "name": "XS"
+       "name": "XS",
+       "price": 36.98
       },
       {
-       "name": "S"
+       "name": "S",
+       "price": 37.98
       },
       {
-       "name": "M"
+       "name": "M",
+       "price": 39.98
       },
       {
-       "name": "L"
+       "name": "L",
+       "price": 41.98
       },
       {
-       "name": "XL"
+       "name": "XL",
+       "price": 43.98
       },
       {
        "name": "2XL",
-       "add": 2
+       "price": 45.98
       },
       {
        "name": "3XL",
-       "add": 3
-      },
-      {
-       "name": "4XL",
-       "add": 4
-      },
-      {
-       "name": "5XL",
-       "add": 5
+       "price": 47.98
       }
      ]
     }
@@ -523,7 +499,7 @@
    "id": "apparel-hoodie",
    "weight": 700,
    "name": "Custom Hoodie",
-   "price": 37.99,
+   "price": 39.98,
    "images": [
     "https://laccistudio.com/assets/img/mock/mock-apparel-hoodie.png"
    ],
@@ -535,35 +511,32 @@
      "label": "Size",
      "choices": [
       {
-       "name": "XS"
+       "name": "XS",
+       "price": 39.98
       },
       {
-       "name": "S"
+       "name": "S",
+       "price": 40.98
       },
       {
-       "name": "M"
+       "name": "M",
+       "price": 42.98
       },
       {
-       "name": "L"
+       "name": "L",
+       "price": 44.98
       },
       {
-       "name": "XL"
+       "name": "XL",
+       "price": 46.98
       },
       {
        "name": "2XL",
-       "add": 2
+       "price": 48.98
       },
       {
        "name": "3XL",
-       "add": 3
-      },
-      {
-       "name": "4XL",
-       "add": 4
-      },
-      {
-       "name": "5XL",
-       "add": 5
+       "price": 50.98
       }
      ]
     }
@@ -574,7 +547,7 @@
    "id": "apparel-zip-up-hoodie",
    "weight": 780,
    "name": "Custom Zip-Up Hoodie",
-   "price": 42.99,
+   "price": 44.98,
    "images": [
     "https://laccistudio.com/assets/img/mock/mock-apparel-zip-up-hoodie.png"
    ],
@@ -586,35 +559,32 @@
      "label": "Size",
      "choices": [
       {
-       "name": "XS"
+       "name": "XS",
+       "price": 44.98
       },
       {
-       "name": "S"
+       "name": "S",
+       "price": 45.98
       },
       {
-       "name": "M"
+       "name": "M",
+       "price": 47.98
       },
       {
-       "name": "L"
+       "name": "L",
+       "price": 49.98
       },
       {
-       "name": "XL"
+       "name": "XL",
+       "price": 51.98
       },
       {
        "name": "2XL",
-       "add": 2
+       "price": 53.98
       },
       {
        "name": "3XL",
-       "add": 3
-      },
-      {
-       "name": "4XL",
-       "add": 4
-      },
-      {
-       "name": "5XL",
-       "add": 5
+       "price": 55.98
       }
      ]
     }
@@ -701,7 +671,7 @@
    ],
    "video": "",
    "category": "Gifts",
-   "description": "Capture the memory with a custom keepsake ornament featuring names, dates, or a favorite photo. Multiple shapes, sizes & materials — a cherished holiday gift and yearly tradition.",
+   "description": "Capture the memory with a custom keepsake ornament featuring names, dates, or a favorite photo. Ceramic, in multiple shapes and sizes — a cherished holiday gift and yearly tradition.",
    "optionGroups": [
     {
      "label": "Size",
@@ -717,27 +687,6 @@
       {
        "name": "5 inch",
        "price": 19.99
-      }
-     ]
-    },
-    {
-     "label": "Material",
-     "choices": [
-      {
-       "name": "Ceramic"
-      },
-      {
-       "name": "Aluminum"
-      },
-      {
-       "name": "Wood"
-      },
-      {
-       "name": "Acrylic"
-      },
-      {
-       "name": "Glass Bauble",
-       "add": 3
       }
      ]
     },
