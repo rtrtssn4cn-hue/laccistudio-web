@@ -7,27 +7,32 @@
 (function () {
   var KEY = "lacci_promo_dismissed_v1";
 
+  // Old versions remembered a dismissal forever. Clear that out once.
+  try { localStorage.removeItem(KEY); } catch (e) {}
+
   function build() {
     var P = window.LACCI_PROMO;
     if (!P || !P.on) return;
-    if (!headline && !P.image && !P.subtext) return;
 
     // --- seasonal window ---
     var now = new Date();
     if (P.start) { if (now < new Date(P.start + "T00:00:00")) return; }
     if (P.end)   { if (now > new Date(P.end   + "T23:59:59")) return; }
 
-    // --- respect a dismissal of THIS exact promo ---
-    var stamp = (P.message || "") + "|" + (P.shortText || "") + "|" + (P.code || "") + "|" + (P.image || "");
-    if (P.dismissible) {
-      try { if (localStorage.getItem(KEY) === stamp) return; } catch (e) {}
-    }
-
     // Large banner on the homepage only; every other page gets the slim strip.
     var path = location.pathname.replace(/\/+$/, "");
     var isHome = (path === "" || /\/index\.html$/i.test(path) || path === "/index");
     var size = isHome ? (P.size || "strip") : "strip";
     var headline = isHome ? P.message : (P.shortText || P.message);
+
+    // Nothing to show at all.
+    if (!headline && !P.image && !P.subtext) return;
+
+    // --- respect a dismissal of THIS exact promo, for this browsing session only ---
+    var stamp = (P.message || "") + "|" + (P.shortText || "") + "|" + (P.code || "") + "|" + (P.image || "");
+    if (P.dismissible) {
+      try { if (sessionStorage.getItem(KEY) === stamp) return; } catch (e) {}
+    }
 
     var bar = document.createElement("div");
     bar.className = "promo-bar promo-" + (P.theme || "gold") + " promo-size-" + size;
@@ -131,7 +136,7 @@
         bar.style.height = bar.offsetHeight + "px";
         requestAnimationFrame(function () { bar.classList.add("promo-hiding"); });
         setTimeout(function () { bar.remove(); }, 320);
-        try { localStorage.setItem(KEY, stamp); } catch (e) {}
+        try { sessionStorage.setItem(KEY, stamp); } catch (e) {}
       };
       bar.appendChild(x);
     }

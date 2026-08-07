@@ -958,7 +958,16 @@
             b.onclick = function () {
               b.disabled = true;
               b.textContent = "Removing…";
-              Snipcart.api.cart.removeDiscount(code)["catch"](function () {
+              Snipcart.api.cart.removeDiscount(code).then(function () {
+                /* Snipcart does not re-render its discount component after a
+                   removal, so the code input never returns and the customer
+                   cannot enter a different code. Closing and reopening the
+                   cart remounts it. */
+                try {
+                  Snipcart.api.modal.close();
+                  setTimeout(function () { Snipcart.api.modal.open(); }, 200);
+                } catch (e) {}
+              })["catch"](function () {
                 b.disabled = false;
                 b.textContent = "Couldn\u2019t remove — try again";
               });
