@@ -354,12 +354,14 @@
       defs.push({ name: g.label, type: "dropdown", options: g.choices.map(function (c) { return snipToken(p, c); }).join("|") });
     });
     defs.push({ name: "Design file", type: "hidden" });
+    defs.push({ name: "Placement", type: "hidden" });
+    defs.push({ name: "Placement preview", type: "hidden" });
     GLOBAL_POST.forEach(function (g) { defs.push({ name: g.name, type: "dropdown", options: g.options.join("|") }); });
     defs.push({ name: "Comments", type: "textarea" });
     return defs;
   }
   function valueFor(name, v) {
-    var map = { "Personalization": v.personalization, "Font style": v.font, "Color": v.color, "Design file": v.design, "Proof approval": v.proof, "Timeline": v.timeline, "Comments": v.comments };
+    var map = { "Personalization": v.personalization, "Font style": v.font, "Color": v.color, "Design file": v.design, "Placement": v.placement, "Placement preview": v.placementImg, "Proof approval": v.proof, "Timeline": v.timeline, "Comments": v.comments };
     if (map[name] !== undefined) return map[name];
     if (v.options && v.options[name] !== undefined) return v.options[name];
     return "";
@@ -695,6 +697,43 @@
           });
       });
     }
+    function placementText() {
+      var md = body.querySelector("#cz-mock-design");
+      if (!md || md.style.display === "none") return "";
+      var L = parseFloat(md.style.left) || 50, T = parseFloat(md.style.top) || 44;
+      var W = sizeSlider ? Number(sizeSlider.value) : 34;
+      var parts = [Math.round(L) + "% across, " + Math.round(T) + "% down, " + W + "% width"];
+      if (designRot) parts.push(designRot + "\u00B0 rotation");
+      var mt = body.querySelector("#cz-mock-text");
+      if (mt && mt.textContent.trim()) {
+        var tl = parseFloat(mt.style.left) || 50, tt = parseFloat(mt.style.top) || 80;
+        parts.push("text at " + Math.round(tl) + "% across, " + Math.round(tt) + "% down");
+      }
+      return parts.join(" \u00B7 ");
+    }
+    function capturePreview(done) {
+      var box = body.querySelector("#cz-mockup");
+      if (!box || !window.html2canvas) return done("");
+      var tag = box.querySelector(".cz-mock-tag"); if (tag) tag.style.visibility = "hidden";
+      html2canvas(box, { backgroundColor: "#ffffff", scale: 2, logging: false, useCORS: true })
+        .then(function (c) {
+          if (tag) tag.style.visibility = "";
+          c.toBlob(function (blob) {
+            if (!blob) return done("");
+            var fd = new FormData();
+            fd.append("UPLOADCARE_PUB_KEY", UC);
+            fd.append("UPLOADCARE_STORE", "auto");
+            fd.append("file", blob, "placement-preview.png");
+            fetch("https://upload.uploadcare.com/base/", { method: "POST", body: fd })
+              .then(function (r) { return r.json(); })
+              .then(function (d) { done(d && d.file ? UCCDN + d.file + "/" : ""); })
+              .catch(function () { done(""); });
+          }, "image/png");
+        })
+        .catch(function () { if (tag) tag.style.visibility = ""; done(""); });
+    }
+    if (!window.html2canvas) loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js", function () {});
+
     body.querySelector("#cz-add").addEventListener("click", function () {
       if (uploading) return; // design still uploading — don't let the order go through without it
       // Require an uploaded design file (personalization text stays optional)
@@ -712,6 +751,10 @@
       }
       if (warn) warn.remove();
       var qv = parseInt((body.querySelector("#cz-qty") || {}).value, 10); if (!qv || qv < 1) qv = 1;
+      var placeTxt = placementText();
+      addBtn.disabled = true; addBtn.textContent = "Saving your placement\u2026";
+      capturePreview(function (previewUrl) {
+      addBtn.disabled = false; addBtn.textContent = "Add to Cart";
       snipAdd(p, {
         personalization: (body.querySelector("#cz-pers") || {}).value || "",
         font: (body.querySelector("#cz-font") || {}).value || "",
@@ -721,9 +764,12 @@
         proof: (body.querySelector("#cz-proof") || {}).value || "",
         timeline: (body.querySelector("#cz-timeline") || {}).value || "",
         comments: (body.querySelector("#cz-comments") || {}).value || "",
+        placement: placeTxt,
+        placementImg: previewUrl,
         qty: qv
       });
       closeCustomize();
+      });
     });
     document.querySelector("#cz-overlay").classList.add("show");
     document.querySelector("#cz-modal").classList.add("show");
