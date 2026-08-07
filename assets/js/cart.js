@@ -295,7 +295,7 @@
   // Global choice lists (apply to every product)
   var FONTS = ["No preference", "Script / Cursive", "Serif / Classic", "Sans-serif / Modern", "Handwritten", "Bold / Block", "Monogram", "Match my sample (note below)"];
   var COLORS = ["No preference", "White", "Black", "Gold", "Silver", "Rose Gold", "Red", "Navy", "Pink", "Green", "Custom (note below)"];
-  var PROOF = ["Yes — email me a proof to approve first (recommended)", "No proof needed — I trust your design"];
+  var PROOF = ["Yes — send me a proof before production (recommended)", "No proof needed — produce as submitted"];
   var TIMELINE = ["Standard (2–3 weeks)", "Needed within 2 weeks", "Rush — I'll message you"];
   var GLOBAL_PRE = [{ name: "Font style", options: FONTS }, { name: "Color", options: COLORS }];
   var GLOBAL_POST = [{ name: "Proof approval", options: PROOF }, { name: "Timeline", options: TIMELINE }];
@@ -353,7 +353,7 @@
     groupsOf(p).forEach(function (g) {
       defs.push({ name: g.label, type: "dropdown", options: g.choices.map(function (c) { return snipToken(p, c); }).join("|") });
     });
-    defs.push({ name: "Design file", type: "readonly" });
+    defs.push({ name: "Design file", type: "hidden" });
     GLOBAL_POST.forEach(function (g) { defs.push({ name: g.name, type: "dropdown", options: g.options.join("|") }); });
     defs.push({ name: "Comments", type: "textarea" });
     return defs;
