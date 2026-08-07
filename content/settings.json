@@ -5,7 +5,7 @@
   "facebook": "",
   "snipcartApiKey": "Y2YzYTdlYjMtNDA5OC00NTk5LWE0OGEtMjQ4NzU1YzhiZTcwNjM5MjAwNTc3NjY0NTQwNTk1",
   "saleBannerEnd": "2026-09-07",
-  "saleBannerImage": "/assets/img/8f0aa63d-b44e-4f75-a25b-e13f6d21f489.png",
+  "saleBannerImage": "",
   "checkoutMode": "snipcart",
   "saleBannerDismissible": true,
   "saleBannerLink": "shop.html",
@@ -15,15 +15,15 @@
   "saleBannerOn": true,
   "instagram": "@lacci_studio",
   "saleBanner": "Labor Day Sale — 55% off sitewide",
+  "saleBannerSize": "strip",
   "etsy": "https://www.etsy.com/shop/LACCIstudio",
+  "saleBannerEyebrow": "",
   "uploadEndpoint": "",
   "saleBannerTheme": "berry",
   "paypalClientId": "AQu34nwXc0Gpf1cX2uii9FXKmSTkJZcbZO1pXUTsKxONHow5BDG9iUPzme3edVkJmNoXGibiZaeIM9hR",
   "tiktok": "",
+  "saleBannerSubtext": "",
   "pinterest": "",
   "saleBannerLinkText": "Shop now",
-  "email": "info@laccistudio.com",
-  "saleBannerSize": "strip",
-  "saleBannerEyebrow": "",
-  "saleBannerSubtext": ""
+  "email": "info@laccistudio.com"
 }
