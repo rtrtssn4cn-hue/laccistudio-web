@@ -490,8 +490,8 @@
         '<label>Curve<input type="range" id="cz-text-curve" min="5" max="55" value="24"></label></div>' +
       '<label class="cz-field"><span>Personalization — name, text, or monogram</span><textarea id="cz-pers" rows="2" placeholder="e.g. “The Smith Family” or initials A&amp;B"></textarea></label>' +
       '<div class="cz-two">' + dropdownHTML("Font style", "cz-font", FONTS) + dropdownHTML("Color", "cz-color", COLORS) + "</div>" +
-      '<label class="cz-field"><span>Exact colour code (optional)</span>' +
-        '<input type="text" id="cz-hex" maxlength="9" placeholder="e.g. #D79D41 — overrides the colour above" autocapitalize="characters" spellcheck="false"></label>' +
+      '<label class="cz-field"><span>Exact text colour code (optional)</span>' +
+        '<input type="text" id="cz-hex" maxlength="9" placeholder="e.g. #D79D41 — sets your text colour exactly" autocapitalize="characters" spellcheck="false"></label>' +
       groupsHTML +
       '<label class="cz-field"><span>Quantity</span><input type="number" id="cz-qty" min="1" step="1" value="1"></label>' +
       uploadHTML +
