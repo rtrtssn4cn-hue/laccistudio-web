@@ -596,11 +596,7 @@
       viewMode = sel.replace(/\s*\[.*$/, "");
       if (bi && p.mockupPhoto) {
         var suf = /^Front only/.test(viewMode) ? "-front" : (/^Back only/.test(viewMode) ? "-back" : "-both");
-        var want = p.mockupPhoto.replace(/(\.png)(\?.*)?$/i, suf + "$1$2");
-        if (bi.getAttribute("data-base") !== want || bi.getAttribute("data-hex") !== garment.hex) {
-          bi.setAttribute("data-base", want); bi.setAttribute("data-hex", garment.hex);
-          tintBase(want, garment.hex, function (url) { bi.src = url; });
-        }
+        refreshBase();
       }
       if (/^Front only/.test(viewMode)) box.classList.add("cz-view-front");
       if (/^Back only/.test(viewMode)) box.classList.add("cz-view-back");
@@ -673,9 +669,15 @@
       img.onerror = function () { cb(src); };
       img.src = src;
     }
+    function viewSuffix() {
+      if (!viewMode) return "";
+      return /^Front only/.test(viewMode) ? "-front" : (/^Back only/.test(viewMode) ? "-back" : "-both");
+    }
     function refreshBase() {
       if (!baseImg) return;
       var want = variantSrc() || p.mockupPhoto;
+      var suf = viewSuffix();
+      if (suf) want = want.replace(/(\.png)(\?.*)?$/i, suf + "$1$2");
       if (baseImg.getAttribute("data-base") !== want || baseImg.getAttribute("data-hex") !== garment.hex) {
         baseImg.setAttribute("data-base", want);
         baseImg.setAttribute("data-hex", garment.hex);
@@ -691,8 +693,7 @@
         refreshBase();
       });
     });
-    body.querySelectorAll(".cz-opt").forEach(function (s) { s.addEventListener("change", function(){ refreshBase(); applyView(); }); });
-    refreshBase();
+    body.querySelectorAll(".cz-opt").forEach(function (s) { s.addEventListener("change", function(){ applyView(); }); });
     (function(){ var mb=body.querySelector("#cz-mockup"); if(mb && !body.querySelector("#cz-side-tag")){ var t=document.createElement("span"); t.className="cz-side-tag"; t.id="cz-side-tag"; mb.appendChild(t);} })();
     applyView();
     // --- zoom in / out (+ pan when zoomed) ---
