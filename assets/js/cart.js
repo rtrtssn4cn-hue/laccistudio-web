@@ -298,7 +298,7 @@
   var PROOF = ["Yes — send me a proof before production (recommended)", "No proof needed — produce as submitted"];
   var TIMELINE = ["USPS Priority Mail — 5–7 business days", "USPS Ground Advantage — 7–10 business days"];
   var GLOBAL_PRE = [{ name: "Font style", options: FONTS }, { name: "Color", options: COLORS }];
-  var GLOBAL_POST = [{ name: "Proof approval", options: PROOF }, { name: "Timeline", options: TIMELINE }];
+  var GLOBAL_POST = [{ name: "Proof approval", options: PROOF }];
   function fontCSS(name) {
     if (/Script|Handwritten/.test(name)) return "'Pinyon Script', cursive";
     if (/Sans/.test(name)) return "'Montserrat', sans-serif";
