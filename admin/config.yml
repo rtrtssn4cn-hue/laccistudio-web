@@ -108,7 +108,8 @@ collections:
           - { name: "saleBanner", label: "Banner text", widget: "string", required: false, hint: "e.g. Summer Sale — 55% off all drinkware" }
           - { name: "saleBannerSubtext", label: "Supporting line under the headline (large only)", widget: "text", required: false, hint: "One or two sentences." }
           - { name: "saleBannerCode", label: "Promo code (customers click to copy)", widget: "string", required: false, hint: "Must match a discount you created in Snipcart." }
-          - { name: "saleBannerImage", label: "Banner design / graphic (optional)", widget: "image", required: false, hint: "Small graphic shown beside the text. Wide shapes work best." }
+          - { name: "saleBannerImage", label: "Banner background image (optional)", widget: "image", required: false, hint: "Fills the whole banner. Wide, short shapes work best." }
+          - { name: "saleBannerImageStyle", label: "How to use the image", widget: "select", options: ["tint", "photo"], default: "tint", required: false, hint: "tint = image softened behind the banner colour. photo = image IS the background at full strength, text goes white." }
           - { name: "saleBannerLinkText", label: "Button text (optional)", widget: "string", required: false, hint: "e.g. Shop now" }
           - { name: "saleBannerLink", label: "Button link (optional)", widget: "string", required: false, hint: "e.g. shop.html" }
           - { name: "saleBannerStart", label: "Start date (optional)", widget: "string", required: false, hint: "YYYY-MM-DD. Blank = start now." }

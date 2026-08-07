@@ -34,6 +34,7 @@
     // --- your design as a full-width background ---
     if (P.image) {
       bar.classList.add("promo-has-bg");
+      bar.classList.add("promo-img-" + (P.imageStyle || "tint"));
       var bg = document.createElement("div");
       bg.className = "promo-bg";
       bg.style.backgroundImage = 'url("' + P.image + '")';

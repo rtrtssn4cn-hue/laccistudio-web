@@ -665,3 +665,15 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .promo-bar .promo-msg,.promo-bar .promo-sub,.promo-bar .promo-eyebrow{color:inherit}
 .promo-size-large .promo-bg{opacity:.3}
 .promo-size-large.promo-gold .promo-bg,.promo-size-large.promo-cream .promo-bg{opacity:.26}
+
+/* ---- banner background style: full photo (image is the background) ---- */
+.promo-img-photo .promo-bg{opacity:1 !important;mix-blend-mode:normal !important}
+.promo-img-photo::after{
+  background:linear-gradient(180deg,rgba(0,0,0,.42) 0%,rgba(0,0,0,.30) 45%,rgba(0,0,0,.48) 100%) !important;
+}
+.promo-img-photo,.promo-img-photo .promo-msg,.promo-img-photo .promo-sub,
+.promo-img-photo .promo-eyebrow,.promo-img-photo .promo-link{color:#fff !important}
+.promo-img-photo .promo-msg{text-shadow:0 2px 10px rgba(0,0,0,.55) !important}
+.promo-img-photo .promo-sub,.promo-img-photo .promo-eyebrow{text-shadow:0 1px 6px rgba(0,0,0,.6) !important}
+.promo-img-photo .promo-code{background:#fff !important;color:#2A1509 !important}
+.promo-img-photo .promo-link:hover{background:#fff !important;color:#2A1509 !important}

@@ -114,6 +114,7 @@
       end:       s.saleBannerEnd || "",
       theme:     s.saleBannerTheme || "gold",
       size:      s.saleBannerSize || "strip",
+      imageStyle: s.saleBannerImageStyle || "tint",
       eyebrow:   s.saleBannerEyebrow || "",
       subtext:   s.saleBannerSubtext || "",
       dismissible: s.saleBannerDismissible !== false
