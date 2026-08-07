@@ -594,10 +594,7 @@
       }
       if (tag0) tag0.style.display = "";
       viewMode = sel.replace(/\s*\[.*$/, "");
-      if (bi && p.mockupPhoto) {
-        var suf = /^Front only/.test(viewMode) ? "-front" : (/^Back only/.test(viewMode) ? "-back" : "-both");
-        refreshBase();
-      }
+      if (bi && p.mockupPhoto) refreshBase();
       if (/^Front only/.test(viewMode)) box.classList.add("cz-view-front");
       if (/^Back only/.test(viewMode)) box.classList.add("cz-view-back");
       var both = /Front and back/.test(viewMode);
@@ -690,7 +687,7 @@
         btn.classList.add("on");
         garment = { name: btn.getAttribute("data-name"), hex: btn.getAttribute("data-hex") };
         var lbl = body.querySelector("#cz-sw-name"); if (lbl) lbl.textContent = garment.name;
-        refreshBase();
+        applyView();
       });
     });
     body.querySelectorAll(".cz-opt").forEach(function (s) { s.addEventListener("change", function(){ applyView(); }); });
