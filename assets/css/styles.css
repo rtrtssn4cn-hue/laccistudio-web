@@ -722,3 +722,6 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
   .foot-grid .foot-social a{width:42px;height:42px}
   .foot-grid .foot-social svg{width:21px;height:21px}
 }
+
+/* Cart panel must sit above the sticky header and the sale banner */
+#snipcart{position:relative;z-index:9999}
