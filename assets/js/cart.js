@@ -356,15 +356,14 @@
     defs.push({ name: "Design file", type: "hidden" });
     defs.push({ name: "Back design file", type: "hidden" });
     defs.push({ name: "Placement", type: "hidden" });
-    defs.push({ name: "Placement preview", type: "hidden" });
-    defs.push({ name: "Placement", type: "hidden" });
+    defs.push({ name: "Text styling", type: "hidden" });
     defs.push({ name: "Placement preview", type: "hidden" });
     GLOBAL_POST.forEach(function (g) { defs.push({ name: g.name, type: "dropdown", options: g.options.join("|") }); });
     defs.push({ name: "Comments", type: "textarea" });
     return defs;
   }
   function valueFor(name, v) {
-    var map = { "Personalization": v.personalization, "Font style": v.font, "Color": v.color, "Design file": v.design, "Back design file": v.design2, "Placement": v.placement, "Placement preview": v.placementImg, "Placement": v.placement, "Placement preview": v.placementImg, "Proof approval": v.proof, "Timeline": v.timeline, "Comments": v.comments };
+    var map = { "Personalization": v.personalization, "Font style": v.font, "Color": v.color, "Design file": v.design, "Back design file": v.design2, "Placement": v.placement, "Text styling": v.textStyle, "Placement preview": v.placementImg, "Proof approval": v.proof, "Timeline": v.timeline, "Comments": v.comments };
     if (map[name] !== undefined) return map[name];
     if (v.options && v.options[name] !== undefined) return v.options[name];
     return "";
@@ -773,6 +772,21 @@
       if (b) out.push(b);
       return out.join(" \u00B7 ");
     }
+    function textStyleText() {
+      var t = (body.querySelector("#cz-pers") || {}).value || "";
+      if (!t.trim()) return "";
+      var fam = (body.querySelector("#cz-font") || {}).value || "";
+      var css = fontCSS(fam).replace(/['"]/g, "").split(",")[0];
+      var out = [];
+      if (fam) out.push("font " + fam + " (" + css + ")");
+      if (textSizeEl) out.push(textSizeEl.value + "px");
+      if (layoutEl) out.push(layoutEl.value);
+      if (boldBtn && boldBtn.classList.contains("on")) out.push("bold");
+      var sp = body.querySelector("#cz-text-spacing"), cv = body.querySelector("#cz-text-curve");
+      if (sp && Number(sp.value)) out.push("spacing " + sp.value);
+      if (cv && layoutEl && /Arched/.test(layoutEl.value)) out.push("curve " + cv.value);
+      return out.join(" \u00B7 ");
+    }
     function capturePreview(done) {
       var box = body.querySelector("#cz-mockup");
       if (!box || !window.html2canvas) return done("");
@@ -826,6 +840,7 @@
         timeline: (body.querySelector("#cz-timeline") || {}).value || "",
         comments: (body.querySelector("#cz-comments") || {}).value || "",
         placement: placeTxt,
+        textStyle: textStyleText(),
         placementImg: previewUrl,
         qty: qv
       });
