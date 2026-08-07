@@ -1,5 +1,5 @@
 {
-  "saleBannerCode": "",
+  "saleBannerCode": "SALE55",
   "youtube": "",
   "uploadcarePublicKey": "c5f8429d49f1794a1843",
   "facebook": "",
@@ -14,13 +14,13 @@
   "saleBannerStart": "2026-09-04",
   "saleBannerOn": true,
   "instagram": "@lacci_studio",
-  "saleBanner": "LABOR DAY SALE! use code: SALE55",
+  "saleBanner": "Labor Day Sale — 55% off sitewide",
   "etsy": "https://www.etsy.com/shop/LACCIstudio",
   "uploadEndpoint": "",
   "saleBannerTheme": "gold",
   "paypalClientId": "AQu34nwXc0Gpf1cX2uii9FXKmSTkJZcbZO1pXUTsKxONHow5BDG9iUPzme3edVkJmNoXGibiZaeIM9hR",
   "tiktok": "",
   "pinterest": "",
-  "saleBannerLinkText": "Labor Day Sale — 55% off sitewide",
+  "saleBannerLinkText": "Shop now",
   "email": "info@laccistudio.com"
 }
