@@ -573,7 +573,7 @@
       viewMode = sel.replace(/\s*\[.*$/, "");
       if (bi && p.mockupPhoto) {
         var suf = /^Front only/.test(viewMode) ? "-front" : (/^Back only/.test(viewMode) ? "-back" : "-both");
-        var want = p.mockupPhoto.replace(/\.png$/i, suf + ".png");
+        var want = p.mockupPhoto.replace(/(\.png)(\?.*)?$/i, suf + "$1$2");
         if (bi.getAttribute("src") !== want) bi.src = want;
       }
       if (/^Front only/.test(viewMode)) box.classList.add("cz-view-front");
