@@ -729,3 +729,10 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 /* ---- front / back print views ---- */
 .cz-mock-design2{position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);width:34%;max-width:none;max-height:none;display:none;border-radius:2px;cursor:grab;filter:drop-shadow(0 1px 4px rgba(0,0,0,.15))}
 .cz-side-tag{position:absolute;bottom:.5rem;left:.5rem;z-index:3;background:rgba(31,22,16,.62);color:#fff;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;padding:.18rem .5rem;border-radius:99px}
+
+/* ---- garment colour swatches ---- */
+.cz-swatches{display:flex;flex-wrap:wrap;gap:.4rem;margin:.15rem 0 .2rem}
+.cz-sw{width:26px;height:26px;border-radius:50%;border:1px solid var(--sandstone);cursor:pointer;padding:0;transition:transform .12s ease,box-shadow .12s ease}
+.cz-sw:hover{transform:scale(1.08)}
+.cz-sw.on{box-shadow:0 0 0 2px var(--gold-deep);transform:scale(1.08)}
+.cz-sw-name{font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--taupe)}

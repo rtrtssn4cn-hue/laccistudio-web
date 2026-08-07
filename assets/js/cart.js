@@ -296,6 +296,14 @@
   var FONTS = ["No preference", "Script / Cursive", "Serif / Classic", "Sans-serif / Modern", "Handwritten", "Bold / Block", "Monogram", "Match my sample (note below)"];
   var COLORS = ["No preference", "White", "Black", "Gold", "Silver", "Rose Gold", "Red", "Navy", "Pink", "Green", "Custom (note below)"];
   var PROOF = ["Yes — send me a proof before production (recommended)", "No proof needed — produce as submitted"];
+  // Sublimation-safe garment colours. Dark shades are vinyl-only, so they are not offered here.
+  var GARMENT = [
+    { name: "White", hex: "#FFFFFF" }, { name: "Natural", hex: "#F2EADF" },
+    { name: "Light Grey", hex: "#DCDCDC" }, { name: "Athletic Heather", hex: "#C9C9C9" },
+    { name: "Light Blue", hex: "#BBD7EA" }, { name: "Light Pink", hex: "#F3C9D4" },
+    { name: "Butter Yellow", hex: "#F5E6A8" }, { name: "Sage", hex: "#C9D6C2" },
+    { name: "Lilac", hex: "#D5C9E6" }, { name: "Peach", hex: "#F7CFB4" }
+  ];
   var TIMELINE = ["USPS Priority Mail — 5–7 business days", "USPS Ground Advantage — 7–10 business days"];
   var GLOBAL_PRE = [{ name: "Font style", options: FONTS }, { name: "Color", options: COLORS }];
   var GLOBAL_POST = [{ name: "Proof approval", options: PROOF }];
@@ -355,6 +363,7 @@
     });
     defs.push({ name: "Design file", type: "hidden" });
     defs.push({ name: "Back design file", type: "hidden" });
+    defs.push({ name: "Garment colour", type: "hidden" });
     defs.push({ name: "Text colour code", type: "hidden" });
     defs.push({ name: "Placement", type: "hidden" });
     defs.push({ name: "Text styling", type: "hidden" });
@@ -364,7 +373,7 @@
     return defs;
   }
   function valueFor(name, v) {
-    var map = { "Personalization": v.personalization, "Font style": v.font, "Color": v.color, "Design file": v.design, "Back design file": v.design2, "Text colour code": v.hex, "Placement": v.placement, "Text styling": v.textStyle, "Placement preview": v.placementImg, "Proof approval": v.proof, "Timeline": v.timeline, "Comments": v.comments };
+    var map = { "Personalization": v.personalization, "Font style": v.font, "Color": v.color, "Design file": v.design, "Back design file": v.design2, "Garment colour": v.garment, "Text colour code": v.hex, "Placement": v.placement, "Text styling": v.textStyle, "Placement preview": v.placementImg, "Proof approval": v.proof, "Timeline": v.timeline, "Comments": v.comments };
     if (map[name] !== undefined) return map[name];
     if (v.options && v.options[name] !== undefined) return v.options[name];
     return "";
@@ -460,6 +469,12 @@
         '</div>' +
         '<div class="cz-zoom"><button type="button" id="cz-zoom-out" aria-label="Zoom out">–</button><button type="button" id="cz-zoom-in" aria-label="Zoom in">+</button></div>' +
       "</div>" +
+      (p.category === "Apparel" ?
+        '<div class="cz-field"><span>Garment colour</span><div class="cz-swatches" id="cz-swatches">' +
+        GARMENT.map(function (g, i) {
+          return '<button type="button" class="cz-sw' + (i === 0 ? " on" : "") + '" data-hex="' + g.hex +
+                 '" data-name="' + esc(g.name) + '" title="' + esc(g.name) + '" style="background:' + g.hex + '"></button>';
+        }).join("") + '</div><span class="cz-sw-name" id="cz-sw-name">White</span></div>' : "") +
       '<div class="cz-sizerow" id="cz-sizerow" style="display:none"><span>Front size</span><input type="range" id="cz-mock-size" min="12" max="92" value="34"><span>Rotate</span><input type="range" id="cz-mock-rot" min="-180" max="180" value="0"></div>' +
       '<div class="cz-textrow"><span>Text</span>' +
         '<select id="cz-text-layout"><option>Horizontal</option><option>Vertical</option><option>Arched Up</option><option>Arched Down</option></select>' +
@@ -582,7 +597,10 @@
       if (bi && p.mockupPhoto) {
         var suf = /^Front only/.test(viewMode) ? "-front" : (/^Back only/.test(viewMode) ? "-back" : "-both");
         var want = p.mockupPhoto.replace(/(\.png)(\?.*)?$/i, suf + "$1$2");
-        if (bi.getAttribute("src") !== want) bi.src = want;
+        if (bi.getAttribute("data-base") !== want || bi.getAttribute("data-hex") !== garment.hex) {
+          bi.setAttribute("data-base", want); bi.setAttribute("data-hex", garment.hex);
+          tintBase(want, garment.hex, function (url) { bi.src = url; });
+        }
       }
       if (/^Front only/.test(viewMode)) box.classList.add("cz-view-front");
       if (/^Back only/.test(viewMode)) box.classList.add("cz-view-back");
@@ -595,7 +613,66 @@
       var tag = body.querySelector("#cz-side-tag");
       if (tag) tag.textContent = both ? "Front & back" : viewMode;
     }
-    function refreshBase() { if (baseImg) { var s = variantSrc(); var want = s || p.mockupPhoto; if (baseImg.getAttribute("src") !== want) baseImg.src = want; } }
+    var garment = { name: "White", hex: "#FFFFFF" };
+    var tintCache = {};
+    function tintBase(src, hex, cb) {
+      if (!src) return;
+      if (hex.toUpperCase() === "#FFFFFF") return cb(src);
+      var key = src + "|" + hex;
+      if (tintCache[key]) return cb(tintCache[key]);
+      var img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = function () {
+        try {
+          var w = img.naturalWidth, h = img.naturalHeight;
+          var cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+          var ctx = cv.getContext("2d"); ctx.drawImage(img, 0, 0);
+          var id = ctx.getImageData(0, 0, w, h), d = id.data;
+          var bg = new Uint8Array(w * h);
+          var stack = [0, 0, w - 1, 0, 0, h - 1, w - 1, h - 1];
+          while (stack.length) {
+            var y = stack.pop(), x = stack.pop();
+            if (x < 0 || y < 0 || x >= w || y >= h) continue;
+            var i = y * w + x; if (bg[i]) continue;
+            var o = i * 4;
+            if (d[o] < 252 || d[o + 1] < 252 || d[o + 2] < 252) continue;
+            bg[i] = 1;
+            stack.push(x + 1, y, x - 1, y, x, y + 1, x, y - 1);
+          }
+          var r = parseInt(hex.substr(1, 2), 16) / 255,
+              g = parseInt(hex.substr(3, 2), 16) / 255,
+              b = parseInt(hex.substr(5, 2), 16) / 255;
+          for (var k = 0; k < w * h; k++) {
+            if (bg[k]) continue;
+            var q = k * 4;
+            d[q] = d[q] * r; d[q + 1] = d[q + 1] * g; d[q + 2] = d[q + 2] * b;
+          }
+          ctx.putImageData(id, 0, 0);
+          var url = cv.toDataURL("image/png");
+          tintCache[key] = url; cb(url);
+        } catch (e) { cb(src); }
+      };
+      img.onerror = function () { cb(src); };
+      img.src = src;
+    }
+    function refreshBase() {
+      if (!baseImg) return;
+      var want = variantSrc() || p.mockupPhoto;
+      if (baseImg.getAttribute("data-base") !== want || baseImg.getAttribute("data-hex") !== garment.hex) {
+        baseImg.setAttribute("data-base", want);
+        baseImg.setAttribute("data-hex", garment.hex);
+        tintBase(want, garment.hex, function (url) { baseImg.src = url; });
+      }
+    }
+    body.querySelectorAll(".cz-sw").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        body.querySelectorAll(".cz-sw").forEach(function (b) { b.classList.remove("on"); });
+        btn.classList.add("on");
+        garment = { name: btn.getAttribute("data-name"), hex: btn.getAttribute("data-hex") };
+        var lbl = body.querySelector("#cz-sw-name"); if (lbl) lbl.textContent = garment.name;
+        refreshBase();
+      });
+    });
     body.querySelectorAll(".cz-opt").forEach(function (s) { s.addEventListener("change", function(){ refreshBase(); applyView(); }); });
     refreshBase();
     (function(){ var mb=body.querySelector("#cz-mockup"); if(mb && !body.querySelector("#cz-side-tag")){ var t=document.createElement("span"); t.className="cz-side-tag"; t.id="cz-side-tag"; mb.appendChild(t);} })();
@@ -870,6 +947,7 @@
         proof: (body.querySelector("#cz-proof") || {}).value || "",
         timeline: (body.querySelector("#cz-timeline") || {}).value || "",
         comments: (body.querySelector("#cz-comments") || {}).value || "",
+        garment: (p.category === "Apparel" ? garment.name + " (" + garment.hex + ")" : ""),
         hex: ((body.querySelector("#cz-hex") || {}).value || "").trim(),
         placement: placeTxt,
         textStyle: textStyleText(),
