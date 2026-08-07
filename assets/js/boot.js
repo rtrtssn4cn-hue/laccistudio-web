@@ -113,6 +113,9 @@
       start:     s.saleBannerStart || "",
       end:       s.saleBannerEnd || "",
       theme:     s.saleBannerTheme || "gold",
+      size:      s.saleBannerSize || "strip",
+      eyebrow:   s.saleBannerEyebrow || "",
+      subtext:   s.saleBannerSubtext || "",
       dismissible: s.saleBannerDismissible !== false
     };
 

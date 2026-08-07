@@ -17,10 +17,13 @@
   "saleBanner": "Labor Day Sale — 55% off sitewide",
   "etsy": "https://www.etsy.com/shop/LACCIstudio",
   "uploadEndpoint": "",
-  "saleBannerTheme": "gold",
+  "saleBannerTheme": "berry",
   "paypalClientId": "AQu34nwXc0Gpf1cX2uii9FXKmSTkJZcbZO1pXUTsKxONHow5BDG9iUPzme3edVkJmNoXGibiZaeIM9hR",
   "tiktok": "",
   "pinterest": "",
   "saleBannerLinkText": "Shop now",
-  "email": "info@laccistudio.com"
+  "email": "info@laccistudio.com",
+  "saleBannerSize": "strip",
+  "saleBannerEyebrow": "",
+  "saleBannerSubtext": ""
 }

@@ -568,25 +568,100 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 
 
 /* ========================= SALE BANNER ========================= */
-.promo-bar{position:relative;z-index:60;background:var(--gold);color:var(--walnut);overflow:hidden;transition:height .3s ease,opacity .3s ease}
-.promo-bar.promo-espresso{background:var(--espresso);color:var(--ivory)}
+.promo-bar{position:relative;z-index:60;overflow:hidden;transition:height .3s ease,opacity .3s ease}
 .promo-bar.promo-hiding{height:0 !important;opacity:0}
-.promo-inner{max-width:1200px;margin:0 auto;padding:11px 46px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 14px;text-align:center}
-.promo-img{height:30px;width:auto;max-width:150px;object-fit:contain;flex-shrink:0}
-.promo-msg{font-size:.86rem;font-weight:500;letter-spacing:.02em}
-.promo-code{font:inherit;font-size:.78rem;font-weight:700;letter-spacing:.09em;background:rgba(255,255,255,.92);color:var(--walnut);border:1px dashed rgba(49,26,17,.45);border-radius:4px;padding:4px 11px;cursor:pointer;transition:background .18s ease,transform .18s ease}
-.promo-espresso .promo-code{background:rgba(249,241,233,.14);color:var(--ivory);border-color:rgba(249,241,233,.5)}
-.promo-code:hover{background:#fff;transform:translateY(-1px)}
-.promo-espresso .promo-code:hover{background:rgba(249,241,233,.24)}
-.promo-code.copied{background:var(--walnut);color:var(--ivory);border-style:solid}
-.promo-espresso .promo-code.copied{background:var(--gold);color:var(--walnut)}
-.promo-link{font-size:.8rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:inherit;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:1px;opacity:.9}
-.promo-link:hover{opacity:1}
-.promo-close{position:absolute;top:50%;right:14px;transform:translateY(-50%);background:none;border:0;color:inherit;cursor:pointer;font-size:1.4rem;line-height:1;padding:2px 7px;opacity:.55;transition:opacity .18s ease}
+
+/* colour themes */
+.promo-gold{background:linear-gradient(90deg,#E0B04A 0%,#D9A83E 50%,#C69433 100%);color:#2A1509}
+.promo-espresso{background:linear-gradient(90deg,#3E281C 0%,#311A11 50%,#241009 100%);color:var(--ivory)}
+.promo-noir{background:linear-gradient(90deg,#191919 0%,#0B0B0B 100%);color:#F6E7C8}
+.promo-cream{background:linear-gradient(90deg,#F7EFE4 0%,#EFE2D1 100%);color:var(--walnut)}
+.promo-berry{background:linear-gradient(90deg,#7E2A3F 0%,#5E1B2C 100%);color:#FBEFE2}
+
+/* full-width background artwork */
+.promo-bg{position:absolute;inset:0;background-size:cover;background-position:center;
+  background-repeat:no-repeat;opacity:.34;pointer-events:none}
+.promo-has-bg.promo-gold .promo-bg{mix-blend-mode:multiply;opacity:.26}
+.promo-has-bg.promo-cream .promo-bg{mix-blend-mode:multiply;opacity:.3}
+.promo-has-bg::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(0,0,0,.32) 0%,rgba(0,0,0,.12) 35%,rgba(0,0,0,.12) 65%,rgba(0,0,0,.32) 100%)}
+.promo-has-bg.promo-gold::after,.promo-has-bg.promo-cream::after{
+  background:linear-gradient(90deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,.16) 35%,rgba(255,255,255,.16) 65%,rgba(255,255,255,.42) 100%)}
+
+.promo-inner{position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:15px 52px;
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 18px;text-align:center}
+
+.promo-msg{font-family:var(--font-head,"Cormorant Garamond",serif);font-size:1.42rem;font-weight:600;
+  letter-spacing:.015em;line-height:1.15}
+.promo-has-bg .promo-msg{text-shadow:0 1px 3px rgba(0,0,0,.28)}
+.promo-has-bg.promo-gold .promo-msg,.promo-has-bg.promo-cream .promo-msg{text-shadow:0 1px 2px rgba(255,255,255,.5)}
+
+.promo-code{font:inherit;font-family:var(--font-body,Montserrat,sans-serif);font-size:.82rem;font-weight:800;
+  letter-spacing:.14em;background:rgba(255,255,255,.96);color:#2A1509;border:0;border-radius:3px;
+  padding:8px 16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.16);
+  transition:transform .18s ease,box-shadow .18s ease}
+.promo-espresso .promo-code,.promo-noir .promo-code,.promo-berry .promo-code{background:var(--gold);color:#2A1509}
+.promo-code:hover{transform:translateY(-2px);box-shadow:0 5px 14px rgba(0,0,0,.24)}
+.promo-code.copied{background:#1E7A4B;color:#fff}
+
+.promo-link{font-family:var(--font-body,Montserrat,sans-serif);font-size:.74rem;font-weight:800;
+  letter-spacing:.16em;text-transform:uppercase;color:inherit;text-decoration:none;
+  border-bottom:2px solid currentColor;padding-bottom:2px}
+.promo-link:hover{opacity:.75}
+
+.promo-close{position:absolute;top:50%;right:16px;transform:translateY(-50%);z-index:3;
+  background:none;border:0;color:inherit;cursor:pointer;font-size:1.5rem;line-height:1;
+  padding:2px 7px;opacity:.5;transition:opacity .18s ease}
 .promo-close:hover{opacity:1}
-@media (max-width:640px){.promo-inner{padding:10px 40px;gap:6px 10px}.promo-msg{font-size:.79rem}.promo-img{height:24px;max-width:110px}.promo-code{font-size:.72rem;padding:3px 9px}.promo-link{font-size:.74rem}}
+
+@media (max-width:640px){
+  .promo-inner{padding:13px 40px;gap:8px 12px}
+  .promo-msg{font-size:1.1rem}
+  .promo-code{font-size:.74rem;padding:6px 12px;letter-spacing:.1em}
+  .promo-link{font-size:.66rem}
+}
 @media (prefers-reduced-motion:reduce){.promo-bar,.promo-code{transition:none}}
+
 .lacci-remove-discount{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
 .lacci-rm-btn{font:inherit;font-size:.78rem;font-weight:600;letter-spacing:.02em;background:none;color:var(--mocha);border:1px solid var(--sandstone);border-radius:4px;padding:6px 12px;cursor:pointer;transition:background .18s ease,color .18s ease}
 .lacci-rm-btn:hover:not(:disabled){background:var(--walnut);color:var(--ivory);border-color:var(--walnut)}
 .lacci-rm-btn:disabled{opacity:.6;cursor:default}
+
+/* ---------------- SALE BANNER — LARGE (hero size) ---------------- */
+.promo-size-large .promo-inner{
+  flex-direction:column;padding:64px 52px;gap:6px;min-height:270px;justify-content:center;
+}
+.promo-size-large .promo-eyebrow{
+  font-family:var(--font-body,Montserrat,sans-serif);font-size:.72rem;font-weight:700;
+  letter-spacing:.28em;text-transform:uppercase;opacity:.85;margin-bottom:6px;
+}
+.promo-size-large .promo-msg{
+  font-size:clamp(2.1rem,4.6vw,3.4rem);font-weight:600;line-height:1.06;margin:0;max-width:15ch;
+}
+.promo-size-large .promo-sub{
+  font-family:var(--font-body,Montserrat,sans-serif);font-size:1rem;line-height:1.5;
+  margin:10px 0 4px;max-width:46ch;opacity:.92;
+}
+.promo-size-large .promo-code{font-size:.92rem;padding:12px 24px;letter-spacing:.18em;margin-top:14px}
+.promo-size-large .promo-link{
+  font-size:.78rem;margin-top:16px;border:2px solid currentColor;border-radius:2px;
+  padding:13px 32px;letter-spacing:.2em;transition:background .2s ease,color .2s ease;
+}
+.promo-size-large .promo-link:hover{opacity:1;background:currentColor}
+.promo-size-large.promo-berry .promo-link:hover,
+.promo-size-large.promo-espresso .promo-link:hover,
+.promo-size-large.promo-noir .promo-link:hover{color:#2A1509}
+.promo-size-large.promo-gold .promo-link:hover,
+.promo-size-large.promo-cream .promo-link:hover{color:var(--ivory)}
+.promo-size-large .promo-bg{opacity:.42}
+.promo-size-large.promo-gold .promo-bg,.promo-size-large.promo-cream .promo-bg{opacity:.34}
+.promo-size-large .promo-close{top:18px;right:20px;transform:none;font-size:1.7rem}
+@media (max-width:640px){
+  .promo-size-large .promo-inner{padding:44px 32px;min-height:220px}
+  .promo-size-large .promo-sub{font-size:.9rem}
+  .promo-size-large .promo-link{padding:11px 24px;font-size:.7rem}
+}
+/* headline/subtext must take the banner's colour, not the site heading colour */
+.promo-bar .promo-msg,.promo-bar .promo-sub,.promo-bar .promo-eyebrow{color:inherit}
+.promo-size-large .promo-bg{opacity:.3}
+.promo-size-large.promo-gold .promo-bg,.promo-size-large.promo-cream .promo-bg{opacity:.26}

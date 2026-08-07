@@ -10,7 +10,7 @@
   function build() {
     var P = window.LACCI_PROMO;
     if (!P || !P.on) return;
-    if (!P.message && !P.image) return;
+    if (!P.message && !P.image && !P.subtext) return;
 
     // --- seasonal window ---
     var now = new Date();
@@ -24,28 +24,42 @@
     }
 
     var bar = document.createElement("div");
-    bar.className = "promo-bar" + (P.theme === "espresso" ? " promo-espresso" : "");
+    bar.className = "promo-bar promo-" + (P.theme || "gold") + " promo-size-" + (P.size || "strip");
     bar.setAttribute("role", "region");
     bar.setAttribute("aria-label", "Promotion");
 
     var inner = document.createElement("div");
     inner.className = "promo-inner";
 
-    // --- your design / graphic ---
+    // --- your design as a full-width background ---
     if (P.image) {
-      var img = document.createElement("img");
-      img.className = "promo-img";
-      img.src = P.image;
-      img.alt = "";
-      img.setAttribute("aria-hidden", "true");
-      inner.appendChild(img);
+      bar.classList.add("promo-has-bg");
+      var bg = document.createElement("div");
+      bg.className = "promo-bg";
+      bg.style.backgroundImage = 'url("' + P.image + '")';
+      bg.setAttribute("aria-hidden", "true");
+      bar.appendChild(bg);
+    }
+
+    if (P.eyebrow) {
+      var eb = document.createElement("span");
+      eb.className = "promo-eyebrow";
+      eb.textContent = P.eyebrow;
+      inner.appendChild(eb);
     }
 
     if (P.message) {
-      var msg = document.createElement("span");
+      var msg = document.createElement(P.size === "large" ? "h2" : "span");
       msg.className = "promo-msg";
       msg.textContent = P.message;
       inner.appendChild(msg);
+    }
+
+    if (P.subtext) {
+      var sub = document.createElement("p");
+      sub.className = "promo-sub";
+      sub.textContent = P.subtext;
+      inner.appendChild(sub);
     }
 
     // --- click-to-copy promo code ---

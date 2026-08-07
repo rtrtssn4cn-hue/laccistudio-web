@@ -103,14 +103,17 @@ collections:
         file: "content/settings.json"
         fields:
           - { name: "saleBannerOn", label: "SALE BANNER — show it?", widget: "boolean", default: false, required: false }
+          - { name: "saleBannerSize", label: "Banner size", widget: "select", options: ["strip", "large"], default: "strip", required: false, hint: "strip = thin bar across the top. large = full announcement block, same height as a page header." }
+          - { name: "saleBannerEyebrow", label: "Small line above the headline (large only)", widget: "string", required: false, hint: "e.g. LIMITED TIME" }
           - { name: "saleBanner", label: "Banner text", widget: "string", required: false, hint: "e.g. Summer Sale — 55% off all drinkware" }
+          - { name: "saleBannerSubtext", label: "Supporting line under the headline (large only)", widget: "text", required: false, hint: "One or two sentences." }
           - { name: "saleBannerCode", label: "Promo code (customers click to copy)", widget: "string", required: false, hint: "Must match a discount you created in Snipcart." }
           - { name: "saleBannerImage", label: "Banner design / graphic (optional)", widget: "image", required: false, hint: "Small graphic shown beside the text. Wide shapes work best." }
           - { name: "saleBannerLinkText", label: "Button text (optional)", widget: "string", required: false, hint: "e.g. Shop now" }
           - { name: "saleBannerLink", label: "Button link (optional)", widget: "string", required: false, hint: "e.g. shop.html" }
           - { name: "saleBannerStart", label: "Start date (optional)", widget: "string", required: false, hint: "YYYY-MM-DD. Blank = start now." }
           - { name: "saleBannerEnd", label: "End date (optional)", widget: "string", required: false, hint: "YYYY-MM-DD. Banner hides itself after this date." }
-          - { name: "saleBannerTheme", label: "Banner colour", widget: "select", options: ["gold", "espresso"], default: "gold", required: false }
+          - { name: "saleBannerTheme", label: "Banner colour", widget: "select", options: ["gold", "espresso", "noir", "cream", "berry"], default: "gold", required: false, hint: "gold = signature. espresso = dark brown. noir = black + gold text. cream = light. berry = deep wine (high contrast)." }
           - { name: "saleBannerDismissible", label: "Let visitors close it", widget: "boolean", default: true, required: false }
           - { name: "email", label: "Business email", widget: "string" }
           - { name: "phone", label: "Phone (leave blank to hide)", widget: "string", required: false }
