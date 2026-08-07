@@ -121,7 +121,10 @@
       bar.appendChild(x);
     }
 
-    document.body.insertBefore(bar, document.body.firstChild);
+    // Sit BELOW the sticky nav so the header always stays at the top.
+    var header = document.querySelector(".site-header");
+    if (header && header.parentNode) header.parentNode.insertBefore(bar, header.nextSibling);
+    else document.body.insertBefore(bar, document.body.firstChild);
   }
 
   if (window.LACCI_READY) build();

@@ -677,3 +677,5 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .promo-img-photo .promo-sub,.promo-img-photo .promo-eyebrow{text-shadow:0 1px 6px rgba(0,0,0,.6) !important}
 .promo-img-photo .promo-code{background:#fff !important;color:#2A1509 !important}
 .promo-img-photo .promo-link:hover{background:#fff !important;color:#2A1509 !important}
+/* banner renders below the sticky nav */
+.promo-bar{z-index:40}
