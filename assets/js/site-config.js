@@ -12,11 +12,6 @@ window.LACCI_CONFIG = {
   email: "info@laccistudio.com",     // your business email
   phone: "",                        // e.g. "(555) 123-4567"  — leave "" to hide
 
-  // --- Business hours ---
-  hoursWeekday:  "By appointment",  // Monday–Friday
-  hoursSaturday: "By appointment",  // Saturday
-  hoursSunday:   "Closed",          // Sunday
-
   // --- Social links (paste the full web address, or leave "" to hide the icon) ---
   instagram: "",                    // e.g. "https://instagram.com/laccistudio"
   facebook:  "",                    // e.g. "https://facebook.com/laccistudio"

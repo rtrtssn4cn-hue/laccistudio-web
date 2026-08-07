@@ -94,9 +94,6 @@
     window.LACCI_CONFIG = {
       email: s.email || "",
       phone: s.phone || "",
-      hoursWeekday: s.hoursWeekday || "",
-      hoursSaturday: s.hoursSaturday || "",
-      hoursSunday: s.hoursSunday || "",
       instagram: s.instagram || "",
       facebook: s.facebook || "",
       etsy: s.etsy || ""

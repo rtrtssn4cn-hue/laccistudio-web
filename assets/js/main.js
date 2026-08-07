@@ -20,11 +20,6 @@
     else { var row = el.closest('.info-item') || el; row.style.display = 'none'; }
   });
   // Hours
-  if (cfg.hoursWeekday)  setText('.js-hours-weekday',  cfg.hoursWeekday);
-  if (cfg.hoursSaturday) setText('.js-hours-saturday', cfg.hoursSaturday);
-  if (cfg.hoursSunday)   setText('.js-hours-sunday',   cfg.hoursSunday);
-  setText('.js-foot-hours-weekday', 'Mon–Fri: ' + (cfg.hoursWeekday || 'By appointment'));
-  setText('.js-foot-hours-sunday',  'Sun: ' + (cfg.hoursSunday || 'Closed'));
   // Social links (hide icon if no URL provided)
   [['instagram', '.js-instagram'], ['facebook', '.js-facebook'], ['etsy', '.js-etsy']].forEach(function (pair) {
     var url = cfg[pair[0]];

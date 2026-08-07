@@ -2,15 +2,12 @@
   "uploadcarePublicKey": "c5f8429d49f1794a1843",
   "facebook": "",
   "snipcartApiKey": "Y2YzYTdlYjMtNDA5OC00NTk5LWE0OGEtMjQ4NzU1YzhiZTcwNjM5MjAwNTc3NjY0NTQwNTk1",
-  "hoursSaturday": "N/A",
   "checkoutMode": "snipcart",
   "orderEmail": "info@laccistudio.com",
   "phone": "",
   "instagram": "@lacci_studio",
   "etsy": "https://www.etsy.com/shop/LACCIstudio",
   "uploadEndpoint": "",
-  "hoursWeekday": "N/A",
   "paypalClientId": "AQu34nwXc0Gpf1cX2uii9FXKmSTkJZcbZO1pXUTsKxONHow5BDG9iUPzme3edVkJmNoXGibiZaeIM9hR",
-  "email": "info@laccistudio.com",
-  "hoursSunday": "N/A"
+  "email": "info@laccistudio.com"
 }

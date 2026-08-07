@@ -104,9 +104,6 @@ collections:
         fields:
           - { name: "email", label: "Business email", widget: "string" }
           - { name: "phone", label: "Phone (leave blank to hide)", widget: "string", required: false }
-          - { name: "hoursWeekday", label: "Hours — Monday to Friday", widget: "string" }
-          - { name: "hoursSaturday", label: "Hours — Saturday", widget: "string" }
-          - { name: "hoursSunday", label: "Hours — Sunday", widget: "string" }
           - { name: "instagram", label: "Instagram link (blank to hide)", widget: "string", required: false }
           - { name: "facebook", label: "Facebook link (blank to hide)", widget: "string", required: false }
           - { name: "etsy", label: "Etsy link (blank to hide)", widget: "string", required: false }

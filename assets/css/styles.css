@@ -558,3 +558,10 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .cz-prev-wrap{display:flex;align-items:center;gap:.6rem;margin:.5rem 0}
 .cz-prev-img{width:64px;height:64px;object-fit:contain;border:1px solid var(--sandstone);border-radius:8px;background:#fff;padding:3px}
 .cz-prev-cap{font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe);font-weight:600}
+
+
+/* ---- sale banner ---- */
+.sale-banner{display:block;width:100%;background:var(--walnut,#3B2A1E);color:var(--gold,#D9A441);
+  text-align:center;padding:.6rem 1rem;font-size:.8rem;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;text-decoration:none;position:relative;z-index:200;line-height:1.35}
+.sale-banner span{display:inline-block}
