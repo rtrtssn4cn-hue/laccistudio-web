@@ -459,7 +459,7 @@
         '</div>' +
         '<div class="cz-zoom"><button type="button" id="cz-zoom-out" aria-label="Zoom out">–</button><button type="button" id="cz-zoom-in" aria-label="Zoom in">+</button></div>' +
       "</div>" +
-      '<div class="cz-sizerow" id="cz-sizerow" style="display:none"><span>Size</span><input type="range" id="cz-mock-size" min="12" max="92" value="34"><span>Rotate</span><input type="range" id="cz-mock-rot" min="-180" max="180" value="0"></div>' +
+      '<div class="cz-sizerow" id="cz-sizerow" style="display:none"><span>Front size</span><input type="range" id="cz-mock-size" min="12" max="92" value="34"><span>Rotate</span><input type="range" id="cz-mock-rot" min="-180" max="180" value="0"></div>' +
       '<div class="cz-textrow"><span>Text</span>' +
         '<select id="cz-text-layout"><option>Horizontal</option><option>Vertical</option><option>Arched Up</option><option>Arched Down</option></select>' +
         '<button type="button" id="cz-bold" class="cz-toggle">Bold</button>' +
@@ -476,7 +476,7 @@
         '<input type="file" id="cz-file2" accept="image/*,.pdf,.svg,.ai,.psd,.eps,.heic" style="display:none">' +
         '<button type="button" class="btn btn-ghost-gold" id="cz-upload2" style="width:100%;justify-content:center">＋ Choose back file</button>' +
         '<div class="cz-upstatus" id="cz-upstatus2"></div></div>' +
-      '<div class="cz-sizerow" id="cz-sizerow2" style="display:none"><span>Back size</span><input type="range" id="cz-mock-size2" min="12" max="92" value="34"></div>' +
+      '<div class="cz-sizerow" id="cz-sizerow2" style="display:none"><span>Back size</span><input type="range" id="cz-mock-size2" min="12" max="92" value="34"><span>Rotate</span><input type="range" id="cz-mock-rot2" min="-180" max="180" value="0"></div>' +
       dropdownHTML("Digital proof before we make it?", "cz-proof", PROOF) +
       '<label class="cz-field"><span>Comments / special requests (optional)</span><textarea id="cz-comments" rows="2" placeholder="Placement, exact wording, event date, or any notes"></textarea></label>' +
       '<button class="btn btn-gold" id="cz-add" style="width:100%;justify-content:center;margin-top:.4rem">Add to Cart</button>' +
@@ -640,10 +640,17 @@
     makeDraggable(body.querySelector("#cz-mock-text"));
     makeDraggable(body.querySelector("#cz-mock-design2"));
     var sizeSlider2 = body.querySelector("#cz-mock-size2");
-    if (sizeSlider2) sizeSlider2.addEventListener("input", function () {
+    var rotSlider2 = body.querySelector("#cz-mock-rot2");
+    var designRot2 = 0;
+    function applyDesign2() {
       var m2 = body.querySelector("#cz-mock-design2");
-      if (m2) { m2.style.width = sizeSlider2.value + "%"; m2.style.transform = "translate(-50%,-50%)"; }
-    });
+      if (!m2) return;
+      m2.style.maxWidth = "none"; m2.style.maxHeight = "none"; m2.style.height = "auto";
+      if (sizeSlider2) m2.style.width = sizeSlider2.value + "%";
+      m2.style.transform = "translate(-50%,-50%) rotate(" + designRot2 + "deg)";
+    }
+    if (sizeSlider2) sizeSlider2.addEventListener("input", applyDesign2);
+    if (rotSlider2) rotSlider2.addEventListener("input", function () { designRot2 = Number(rotSlider2.value); applyDesign2(); });
     var up2 = body.querySelector("#cz-upload2"), file2 = body.querySelector("#cz-file2");
     if (up2 && file2) {
       up2.addEventListener("click", function () { file2.click(); });
@@ -652,7 +659,7 @@
         var st = body.querySelector("#cz-upstatus2");
         var m2 = body.querySelector("#cz-mock-design2");
         if (m2 && /^image\//.test(f.type)) removeWhiteBg(f, function (url) {
-          m2.onload = function () { m2.style.display = "block"; var sr = body.querySelector("#cz-sizerow2"); if (sr) sr.style.display = "flex"; };
+          m2.onload = function () { m2.style.display = "block"; applyDesign2(); var sr = body.querySelector("#cz-sizerow2"); if (sr) sr.style.display = "flex"; };
           m2.src = url;
         });
         if (st) st.textContent = "Uploading " + f.name + "\u2026";
@@ -785,7 +792,7 @@
       var a = layerText(body.querySelector("#cz-mock-design"), sizeSlider, /Back only/.test(viewMode) ? "Back" : "Front", 44);
       if (a) out.push(a + (designRot ? " , " + designRot + "\u00B0" : ""));
       var b = layerText(body.querySelector("#cz-mock-design2"), sizeSlider2, "Back", 44);
-      if (b) out.push(b);
+      if (b) out.push(b + (designRot2 ? " , " + designRot2 + "\u00B0" : ""));
       return out.join(" \u00B7 ");
     }
     function textStyleText() {
