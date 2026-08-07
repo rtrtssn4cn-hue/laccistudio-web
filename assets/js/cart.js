@@ -354,6 +354,9 @@
       defs.push({ name: g.label, type: "dropdown", options: g.choices.map(function (c) { return snipToken(p, c); }).join("|") });
     });
     defs.push({ name: "Design file", type: "hidden" });
+    defs.push({ name: "Back design file", type: "hidden" });
+    defs.push({ name: "Placement", type: "hidden" });
+    defs.push({ name: "Placement preview", type: "hidden" });
     defs.push({ name: "Placement", type: "hidden" });
     defs.push({ name: "Placement preview", type: "hidden" });
     GLOBAL_POST.forEach(function (g) { defs.push({ name: g.name, type: "dropdown", options: g.options.join("|") }); });
@@ -361,7 +364,7 @@
     return defs;
   }
   function valueFor(name, v) {
-    var map = { "Personalization": v.personalization, "Font style": v.font, "Color": v.color, "Design file": v.design, "Placement": v.placement, "Placement preview": v.placementImg, "Proof approval": v.proof, "Timeline": v.timeline, "Comments": v.comments };
+    var map = { "Personalization": v.personalization, "Font style": v.font, "Color": v.color, "Design file": v.design, "Back design file": v.design2, "Placement": v.placement, "Placement preview": v.placementImg, "Placement": v.placement, "Placement preview": v.placementImg, "Proof approval": v.proof, "Timeline": v.timeline, "Comments": v.comments };
     if (map[name] !== undefined) return map[name];
     if (v.options && v.options[name] !== undefined) return v.options[name];
     return "";
@@ -425,7 +428,7 @@
   function openCustomize(p) {
     if (!p) return;
     var body = document.querySelector("#cz-body"); if (!body) return;
-    var state = { design: "" };
+    var state = { design: "", design2: "" };
     var groups = groupsOf(p);
     var groupsHTML = groups.map(function (g) {
       return '<label class="cz-field"><span>' + esc(g.label) + '</span><select class="cz-opt" data-label="' + esc(g.label) + '">' +
@@ -450,10 +453,16 @@
         '<div class="cz-mock-inner" id="cz-mock-inner">' +
           (p.mockupPhoto ? '<img class="cz-mock-base cz-mock-photo" id="cz-mock-baseimg" src="' + esc(p.mockupPhoto) + '" alt="">' : '<div class="cz-mock-base">' + mockupSVG(p) + '</div>') +
           '<img class="cz-mock-design" id="cz-mock-design" alt="">' +
+          '<img class="cz-mock-design2" id="cz-mock-design2" alt="">' +
           '<div class="cz-mock-text" id="cz-mock-text"></div>' +
         '</div>' +
         '<div class="cz-zoom"><button type="button" id="cz-zoom-out" aria-label="Zoom out">–</button><button type="button" id="cz-zoom-in" aria-label="Zoom in">+</button></div>' +
       "</div>" +
+      '<div class="cz-field" id="cz-upload2row" style="display:none"><span>Upload your BACK design (required)</span>' +
+        '<button type="button" class="cz-upload" id="cz-upload2">Choose file</button>' +
+        '<input type="file" id="cz-file2" accept="image/*,.pdf,.ai,.psd,.svg" style="display:none">' +
+        '<div class="cz-upstatus" id="cz-upstatus2"></div></div>' +
+      '<div class="cz-sizerow" id="cz-sizerow2" style="display:none"><span>Back size</span><input type="range" id="cz-mock-size2" min="12" max="92" value="34"></div>' +
       '<div class="cz-sizerow" id="cz-sizerow" style="display:none"><span>Size</span><input type="range" id="cz-mock-size" min="12" max="92" value="34"><span>Rotate</span><input type="range" id="cz-mock-rot" min="-180" max="180" value="0"></div>' +
       '<div class="cz-textrow"><span>Text</span>' +
         '<select id="cz-text-layout"><option>Horizontal</option><option>Vertical</option><option>Arched Up</option><option>Arched Down</option></select>' +
@@ -544,9 +553,28 @@
       });
       return src;
     }
+    var viewMode = "Front only";
+    function applyView() {
+      var box = body.querySelector("#cz-mockup"); if (!box) return;
+      var sel = selectedFor("Print location") || "Front only";
+      viewMode = sel.replace(/\s*\[.*$/, "");
+      box.classList.remove("cz-view-front","cz-view-back");
+      if (/^Front only/.test(viewMode)) box.classList.add("cz-view-front");
+      if (/^Back only/.test(viewMode)) box.classList.add("cz-view-back");
+      var both = /Front and back/.test(viewMode);
+      var u2 = body.querySelector("#cz-upload2row"), s2 = body.querySelector("#cz-sizerow2"),
+          d2 = body.querySelector("#cz-mock-design2");
+      if (u2) u2.style.display = both ? "" : "none";
+      if (s2) s2.style.display = both && d2 && d2.getAttribute("src") ? "flex" : "none";
+      if (d2) d2.style.display = both && d2.getAttribute("src") ? "block" : "none";
+      var tag = body.querySelector("#cz-side-tag");
+      if (tag) tag.textContent = both ? "Front & back" : viewMode;
+    }
     function refreshBase() { if (baseImg) { var s = variantSrc(); var want = s || p.mockupPhoto; if (baseImg.getAttribute("src") !== want) baseImg.src = want; } }
-    body.querySelectorAll(".cz-opt").forEach(function (s) { s.addEventListener("change", refreshBase); });
+    body.querySelectorAll(".cz-opt").forEach(function (s) { s.addEventListener("change", function(){ refreshBase(); applyView(); }); });
     refreshBase();
+    (function(){ var mb=body.querySelector("#cz-mockup"); if(mb && !body.querySelector("#cz-side-tag")){ var t=document.createElement("span"); t.className="cz-side-tag"; t.id="cz-side-tag"; mb.appendChild(t);} })();
+    applyView();
     // --- zoom in / out (+ pan when zoomed) ---
     var zoom = 1, panX = 0, panY = 0, designRot = 0;
     function dtx(el) { return (el && el.id === "cz-mock-design") ? ("translate(-50%,-50%) rotate(" + designRot + "deg)") : "translate(-50%,-50%)"; }
@@ -593,6 +621,38 @@
     }
     makeDraggable(body.querySelector("#cz-mock-design"));
     makeDraggable(body.querySelector("#cz-mock-text"));
+    makeDraggable(body.querySelector("#cz-mock-design2"));
+    var sizeSlider2 = body.querySelector("#cz-mock-size2");
+    if (sizeSlider2) sizeSlider2.addEventListener("input", function () {
+      var m2 = body.querySelector("#cz-mock-design2");
+      if (m2) { m2.style.width = sizeSlider2.value + "%"; m2.style.transform = "translate(-50%,-50%)"; }
+    });
+    var up2 = body.querySelector("#cz-upload2"), file2 = body.querySelector("#cz-file2");
+    if (up2 && file2) {
+      up2.addEventListener("click", function () { file2.click(); });
+      file2.addEventListener("change", function () {
+        var f = file2.files && file2.files[0]; if (!f) return;
+        var st = body.querySelector("#cz-upstatus2");
+        var m2 = body.querySelector("#cz-mock-design2");
+        if (m2 && /^image\//.test(f.type)) removeWhiteBg(f, function (url) {
+          m2.onload = function () { m2.style.display = "block"; var sr = body.querySelector("#cz-sizerow2"); if (sr) sr.style.display = "flex"; };
+          m2.src = url;
+        });
+        if (st) st.textContent = "Uploading " + f.name + "\u2026";
+        setUploading(true);
+        var fd = new FormData();
+        fd.append("UPLOADCARE_PUB_KEY", UC); fd.append("UPLOADCARE_STORE", "auto"); fd.append("file", f);
+        fetch("https://upload.uploadcare.com/base/", { method: "POST", body: fd })
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            if (!d || !d.file) throw new Error("upload failed");
+            state.design2 = UCCDN + d.file + "/-/inline/no/";
+            if (st) st.textContent = "\u2713 Attached: " + f.name;
+            setUploading(false);
+          })
+          .catch(function () { if (st) st.textContent = "Upload failed \u2014 try that file again."; setUploading(false); });
+      });
+    }
     // resize the design with the slider
     var sizeSlider = body.querySelector("#cz-mock-size");
     function applyDesignSize() {
@@ -723,6 +783,42 @@
             var fd = new FormData();
             fd.append("UPLOADCARE_PUB_KEY", UC);
             fd.append("UPLOADCARE_STORE", "auto");
+            fd.append("file", blob, "placement-preview.png");
+            fetch("https://upload.uploadcare.com/base/", { method: "POST", body: fd })
+              .then(function (r) { return r.json(); })
+              .then(function (d) { done(d && d.file ? UCCDN + d.file + "/" : ""); })
+              .catch(function () { done(""); });
+          }, "image/png");
+        })
+        .catch(function () { if (tag) tag.style.visibility = ""; done(""); });
+    }
+    if (!window.html2canvas) loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js", function () {});
+
+    function layerText(el, slider, label, defTop) {
+      if (!el || el.style.display === "none") return "";
+      var L = parseFloat(el.style.left) || 50, T = parseFloat(el.style.top) || defTop;
+      var W = slider ? Number(slider.value) : 34;
+      return label + ": " + Math.round(L) + "% across, " + Math.round(T) + "% down, " + W + "% width";
+    }
+    function placementText() {
+      var out = [viewMode];
+      var a = layerText(body.querySelector("#cz-mock-design"), sizeSlider, /Back only/.test(viewMode) ? "Back" : "Front", 44);
+      if (a) out.push(a + (designRot ? " , " + designRot + "\u00B0" : ""));
+      var b = layerText(body.querySelector("#cz-mock-design2"), sizeSlider2, "Back", 44);
+      if (b) out.push(b);
+      return out.join(" \u00B7 ");
+    }
+    function capturePreview(done) {
+      var box = body.querySelector("#cz-mockup");
+      if (!box || !window.html2canvas) return done("");
+      var tag = box.querySelector(".cz-mock-tag"); if (tag) tag.style.visibility = "hidden";
+      html2canvas(box, { backgroundColor: "#ffffff", scale: 2, logging: false, useCORS: true })
+        .then(function (c) {
+          if (tag) tag.style.visibility = "";
+          c.toBlob(function (blob) {
+            if (!blob) return done("");
+            var fd = new FormData();
+            fd.append("UPLOADCARE_PUB_KEY", UC); fd.append("UPLOADCARE_STORE", "auto");
             fd.append("file", blob, "placement-preview.png");
             fetch("https://upload.uploadcare.com/base/", { method: "POST", body: fd })
               .then(function (r) { return r.json(); })

@@ -124,6 +124,21 @@
    "description": "Custom t-shirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
    "optionGroups": [
     {
+     "label": "Print location",
+     "choices": [
+      {
+       "name": "Front only"
+      },
+      {
+       "name": "Back only"
+      },
+      {
+       "name": "Front and back",
+       "add": 6
+      }
+     ]
+    },
+    {
      "label": "Size",
      "choices": [
       {
@@ -171,6 +186,21 @@
    "category": "Apparel",
    "description": "Custom v-neck tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
    "optionGroups": [
+    {
+     "label": "Print location",
+     "choices": [
+      {
+       "name": "Front only"
+      },
+      {
+       "name": "Back only"
+      },
+      {
+       "name": "Front and back",
+       "add": 6
+      }
+     ]
+    },
     {
      "label": "Size",
      "choices": [
@@ -220,6 +250,21 @@
    "description": "Custom ladies' fitted tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
    "optionGroups": [
     {
+     "label": "Print location",
+     "choices": [
+      {
+       "name": "Front only"
+      },
+      {
+       "name": "Back only"
+      },
+      {
+       "name": "Front and back",
+       "add": 6
+      }
+     ]
+    },
+    {
      "label": "Size",
      "choices": [
       {
@@ -267,6 +312,21 @@
    "category": "Apparel",
    "description": "Custom tank top printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
    "optionGroups": [
+    {
+     "label": "Print location",
+     "choices": [
+      {
+       "name": "Front only"
+      },
+      {
+       "name": "Back only"
+      },
+      {
+       "name": "Front and back",
+       "add": 6
+      }
+     ]
+    },
     {
      "label": "Size",
      "choices": [
@@ -316,6 +376,21 @@
    "description": "Custom long-sleeve tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
    "optionGroups": [
     {
+     "label": "Print location",
+     "choices": [
+      {
+       "name": "Front only"
+      },
+      {
+       "name": "Back only"
+      },
+      {
+       "name": "Front and back",
+       "add": 6
+      }
+     ]
+    },
+    {
      "label": "Size",
      "choices": [
       {
@@ -364,6 +439,21 @@
    "description": "Custom youth tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
    "optionGroups": [
     {
+     "label": "Print location",
+     "choices": [
+      {
+       "name": "Front only"
+      },
+      {
+       "name": "Back only"
+      },
+      {
+       "name": "Front and back",
+       "add": 6
+      }
+     ]
+    },
+    {
      "label": "Size",
      "choices": [
       {
@@ -403,6 +493,21 @@
    "category": "Apparel",
    "description": "Custom baby onesie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
    "optionGroups": [
+    {
+     "label": "Print location",
+     "choices": [
+      {
+       "name": "Front only"
+      },
+      {
+       "name": "Back only"
+      },
+      {
+       "name": "Front and back",
+       "add": 6
+      }
+     ]
+    },
     {
      "label": "Size",
      "choices": [
@@ -447,6 +552,21 @@
    "category": "Apparel",
    "description": "Custom crewneck sweatshirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
    "optionGroups": [
+    {
+     "label": "Print location",
+     "choices": [
+      {
+       "name": "Front only"
+      },
+      {
+       "name": "Back only"
+      },
+      {
+       "name": "Front and back",
+       "add": 6
+      }
+     ]
+    },
     {
      "label": "Size",
      "choices": [
@@ -496,6 +616,21 @@
    "description": "Custom hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
    "optionGroups": [
     {
+     "label": "Print location",
+     "choices": [
+      {
+       "name": "Front only"
+      },
+      {
+       "name": "Back only"
+      },
+      {
+       "name": "Front and back",
+       "add": 6
+      }
+     ]
+    },
+    {
      "label": "Size",
      "choices": [
       {
@@ -543,6 +678,21 @@
    "category": "Apparel",
    "description": "Custom zip-up hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
    "optionGroups": [
+    {
+     "label": "Print location",
+     "choices": [
+      {
+       "name": "Front only"
+      },
+      {
+       "name": "Back only"
+      },
+      {
+       "name": "Front and back",
+       "add": 6
+      }
+     ]
+    },
     {
      "label": "Size",
      "choices": [
