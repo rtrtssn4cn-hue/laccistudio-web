@@ -736,3 +736,5 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .cz-sw:hover{transform:scale(1.08)}
 .cz-sw.on{box-shadow:0 0 0 2px var(--gold-deep);transform:scale(1.08)}
 .cz-sw-name{font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--taupe)}
+
+.cz-vinyl-note{margin:.35rem 0 0;font-size:.72rem;line-height:1.5;color:var(--taupe);padding:.5rem .6rem;background:var(--linen);border-left:3px solid var(--gold-deep)}

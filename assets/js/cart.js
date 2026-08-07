@@ -302,7 +302,11 @@
     { name: "Light Grey", hex: "#DCDCDC" }, { name: "Athletic Heather", hex: "#C9C9C9" },
     { name: "Light Blue", hex: "#BBD7EA" }, { name: "Light Pink", hex: "#F3C9D4" },
     { name: "Butter Yellow", hex: "#F5E6A8" }, { name: "Sage", hex: "#C9D6C2" },
-    { name: "Lilac", hex: "#D5C9E6" }, { name: "Peach", hex: "#F7CFB4" }
+    { name: "Lilac", hex: "#D5C9E6" }, { name: "Peach", hex: "#F7CFB4" },
+    { name: "Charcoal", hex: "#3F3F3F", vinyl: 1 }, { name: "Black", hex: "#1B1B1B", vinyl: 1 },
+    { name: "Navy", hex: "#20304F", vinyl: 1 }, { name: "Maroon", hex: "#5C2233", vinyl: 1 },
+    { name: "Forest", hex: "#264334", vinyl: 1 }, { name: "Royal Blue", hex: "#22357F", vinyl: 1 },
+    { name: "Red", hex: "#9B1C1C", vinyl: 1 }
   ];
   var TIMELINE = ["USPS Priority Mail — 5–7 business days", "USPS Ground Advantage — 7–10 business days"];
   var GLOBAL_PRE = [{ name: "Font style", options: FONTS }, { name: "Color", options: COLORS }];
@@ -473,8 +477,9 @@
         '<div class="cz-field"><span>Garment colour</span><div class="cz-swatches" id="cz-swatches">' +
         GARMENT.map(function (g, i) {
           return '<button type="button" class="cz-sw' + (i === 0 ? " on" : "") + '" data-hex="' + g.hex +
-                 '" data-name="' + esc(g.name) + '" title="' + esc(g.name) + '" style="background:' + g.hex + '"></button>';
-        }).join("") + '</div><span class="cz-sw-name" id="cz-sw-name">White</span></div>' : "") +
+                 '" data-name="' + esc(g.name) + '" data-vinyl="' + (g.vinyl ? "1" : "") + '" title="' + esc(g.name) + '" style="background:' + g.hex + '"></button>';
+        }).join("") + '</div><span class="cz-sw-name" id="cz-sw-name">White</span>' +
+        '<p class="cz-vinyl-note" id="cz-vinyl-note" style="display:none">Dark garments are decorated with heat-transfer vinyl rather than sublimation. Best for logos, text, and solid-colour artwork &mdash; photographs and gradients are not suitable on dark fabric.</p></div>' : "") +
       '<div class="cz-sizerow" id="cz-sizerow" style="display:none"><span>Front size</span><input type="range" id="cz-mock-size" min="12" max="92" value="34"><span>Rotate</span><input type="range" id="cz-mock-rot" min="-180" max="180" value="0"></div>' +
       '<div class="cz-textrow"><span>Text</span>' +
         '<select id="cz-text-layout"><option>Horizontal</option><option>Vertical</option><option>Arched Up</option><option>Arched Down</option></select>' +
@@ -685,8 +690,9 @@
       btn.addEventListener("click", function () {
         body.querySelectorAll(".cz-sw").forEach(function (b) { b.classList.remove("on"); });
         btn.classList.add("on");
-        garment = { name: btn.getAttribute("data-name"), hex: btn.getAttribute("data-hex") };
+        garment = { name: btn.getAttribute("data-name"), hex: btn.getAttribute("data-hex"), vinyl: !!btn.getAttribute("data-vinyl") };
         var lbl = body.querySelector("#cz-sw-name"); if (lbl) lbl.textContent = garment.name;
+        var note = body.querySelector("#cz-vinyl-note"); if (note) note.style.display = garment.vinyl ? "block" : "none";
         applyView();
       });
     });
@@ -963,7 +969,7 @@
         proof: (body.querySelector("#cz-proof") || {}).value || "",
         timeline: (body.querySelector("#cz-timeline") || {}).value || "",
         comments: (body.querySelector("#cz-comments") || {}).value || "",
-        garment: (p.category === "Apparel" ? garment.name + " (" + garment.hex + ")" : ""),
+        garment: (p.category === "Apparel" ? garment.name + " (" + garment.hex + ")" + (garment.vinyl ? " \u2014 HTV vinyl" : "") : ""),
         hex: ((body.querySelector("#cz-hex") || {}).value || "").trim(),
         placement: placeTxt,
         textStyle: textStyleText(),
