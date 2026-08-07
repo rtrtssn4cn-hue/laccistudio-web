@@ -466,7 +466,6 @@
       '<label class="cz-field"><span>Quantity</span><input type="number" id="cz-qty" min="1" step="1" value="1"></label>' +
       uploadHTML +
       dropdownHTML("Digital proof before we make it?", "cz-proof", PROOF) +
-      dropdownHTML("When do you need it?", "cz-timeline", TIMELINE) +
       '<label class="cz-field"><span>Comments / special requests (optional)</span><textarea id="cz-comments" rows="2" placeholder="Placement, exact wording, event date, or any notes"></textarea></label>' +
       '<button class="btn btn-gold" id="cz-add" style="width:100%;justify-content:center;margin-top:.4rem">Add to Cart</button>' +
       '<p class="qv-hint">After you order, we email a digital proof to approve before production. Large/bulk order? Message us on Contact for a quote.</p>';
