@@ -355,6 +355,7 @@
     });
     defs.push({ name: "Design file", type: "hidden" });
     defs.push({ name: "Back design file", type: "hidden" });
+    defs.push({ name: "Colour code", type: "hidden" });
     defs.push({ name: "Placement", type: "hidden" });
     defs.push({ name: "Text styling", type: "hidden" });
     defs.push({ name: "Placement preview", type: "hidden" });
@@ -363,7 +364,7 @@
     return defs;
   }
   function valueFor(name, v) {
-    var map = { "Personalization": v.personalization, "Font style": v.font, "Color": v.color, "Design file": v.design, "Back design file": v.design2, "Placement": v.placement, "Text styling": v.textStyle, "Placement preview": v.placementImg, "Proof approval": v.proof, "Timeline": v.timeline, "Comments": v.comments };
+    var map = { "Personalization": v.personalization, "Font style": v.font, "Color": v.color, "Design file": v.design, "Back design file": v.design2, "Colour code": v.hex, "Placement": v.placement, "Text styling": v.textStyle, "Placement preview": v.placementImg, "Proof approval": v.proof, "Timeline": v.timeline, "Comments": v.comments };
     if (map[name] !== undefined) return map[name];
     if (v.options && v.options[name] !== undefined) return v.options[name];
     return "";
@@ -469,6 +470,8 @@
         '<label>Curve<input type="range" id="cz-text-curve" min="5" max="55" value="24"></label></div>' +
       '<label class="cz-field"><span>Personalization — name, text, or monogram</span><textarea id="cz-pers" rows="2" placeholder="e.g. “The Smith Family” or initials A&amp;B"></textarea></label>' +
       '<div class="cz-two">' + dropdownHTML("Font style", "cz-font", FONTS) + dropdownHTML("Color", "cz-color", COLORS) + "</div>" +
+      '<label class="cz-field"><span>Exact colour code (optional)</span>' +
+        '<input type="text" id="cz-hex" maxlength="9" placeholder="e.g. #D79D41 or PMS 1235 C" autocapitalize="characters" spellcheck="false"></label>' +
       groupsHTML +
       '<label class="cz-field"><span>Quantity</span><input type="number" id="cz-qty" min="1" step="1" value="1"></label>' +
       uploadHTML +
@@ -862,6 +865,7 @@
         proof: (body.querySelector("#cz-proof") || {}).value || "",
         timeline: (body.querySelector("#cz-timeline") || {}).value || "",
         comments: (body.querySelector("#cz-comments") || {}).value || "",
+        hex: ((body.querySelector("#cz-hex") || {}).value || "").trim(),
         placement: placeTxt,
         textStyle: textStyleText(),
         placementImg: previewUrl,
