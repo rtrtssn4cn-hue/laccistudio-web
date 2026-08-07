@@ -296,7 +296,7 @@
   var FONTS = ["No preference", "Script / Cursive", "Serif / Classic", "Sans-serif / Modern", "Handwritten", "Bold / Block", "Monogram", "Match my sample (note below)"];
   var COLORS = ["No preference", "White", "Black", "Gold", "Silver", "Rose Gold", "Red", "Navy", "Pink", "Green", "Custom (note below)"];
   var PROOF = ["Yes — send me a proof before production (recommended)", "No proof needed — produce as submitted"];
-  var TIMELINE = ["Standard (2–3 weeks)", "Needed within 2 weeks", "Rush — I'll message you"];
+  var TIMELINE = ["USPS Priority Mail — 5–7 business days", "USPS Ground Advantage — 7–10 business days"];
   var GLOBAL_PRE = [{ name: "Font style", options: FONTS }, { name: "Color", options: COLORS }];
   var GLOBAL_POST = [{ name: "Proof approval", options: PROOF }, { name: "Timeline", options: TIMELINE }];
   function fontCSS(name) {
@@ -375,6 +375,7 @@
     b.setAttribute("data-item-image", p.image || "");
     b.setAttribute("data-item-description", p.description || "");
     b.setAttribute("data-item-quantity", String(v.qty || 1));
+    if (p.weight) b.setAttribute("data-item-weight", String(p.weight)); // grams, per unit
     customFieldDefs(p).forEach(function (d, i) {
       var pre = "data-item-custom" + (i + 1) + "-";
       b.setAttribute(pre + "name", d.name);

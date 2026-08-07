@@ -2,6 +2,7 @@
  "products": [
   {
    "id": "sublimation-tumbler",
+   "weight": 450,
    "name": "Personalized Tumbler",
    "price": 27.99,
    "images": [
@@ -56,6 +57,7 @@
   },
   {
    "id": "sublimation-mug",
+   "weight": 600,
    "name": "Personalized Mug",
    "price": 18.99,
    "images": [
@@ -111,6 +113,7 @@
   },
   {
    "id": "apparel-t-shirt",
+   "weight": 200,
    "name": "Custom T-Shirt",
    "price": 24.99,
    "images": [
@@ -161,6 +164,7 @@
   },
   {
    "id": "apparel-v-neck-tee",
+   "weight": 200,
    "name": "Custom V-Neck Tee",
    "price": 24.99,
    "images": [
@@ -211,6 +215,7 @@
   },
   {
    "id": "apparel-ladies-fitted-tee",
+   "weight": 180,
    "name": "Custom Ladies' Fitted Tee",
    "price": 25.99,
    "images": [
@@ -261,6 +266,7 @@
   },
   {
    "id": "apparel-tank-top",
+   "weight": 140,
    "name": "Custom Tank Top",
    "price": 23.99,
    "images": [
@@ -311,6 +317,7 @@
   },
   {
    "id": "apparel-long-sleeve-tee",
+   "weight": 260,
    "name": "Custom Long-Sleeve Tee",
    "price": 28.99,
    "images": [
@@ -361,6 +368,7 @@
   },
   {
    "id": "apparel-youth-tee",
+   "weight": 130,
    "name": "Custom Youth Tee",
    "price": 21.99,
    "images": [
@@ -411,6 +419,7 @@
   },
   {
    "id": "apparel-baby-onesie",
+   "weight": 100,
    "name": "Custom Baby Onesie",
    "price": 22.99,
    "images": [
@@ -461,6 +470,7 @@
   },
   {
    "id": "apparel-crewneck-sweatshirt",
+   "weight": 560,
    "name": "Custom Crewneck Sweatshirt",
    "price": 34.99,
    "images": [
@@ -511,6 +521,7 @@
   },
   {
    "id": "apparel-hoodie",
+   "weight": 700,
    "name": "Custom Hoodie",
    "price": 37.99,
    "images": [
@@ -561,6 +572,7 @@
   },
   {
    "id": "apparel-zip-up-hoodie",
+   "weight": 780,
    "name": "Custom Zip-Up Hoodie",
    "price": 42.99,
    "images": [
@@ -611,6 +623,7 @@
   },
   {
    "id": "apparel-dad-cap",
+   "weight": 120,
    "name": "Custom Dad Cap",
    "price": 22.99,
    "images": [
@@ -624,6 +637,7 @@
   },
   {
    "id": "apparel-trucker-hat",
+   "weight": 110,
    "name": "Custom Trucker Hat",
    "price": 22.99,
    "images": [
@@ -637,6 +651,7 @@
   },
   {
    "id": "apparel-beanie",
+   "weight": 100,
    "name": "Custom Beanie",
    "price": 21.99,
    "images": [
@@ -650,6 +665,7 @@
   },
   {
    "id": "apparel-tote-bag",
+   "weight": 170,
    "name": "Custom Tote Bag",
    "price": 20.99,
    "images": [
@@ -663,6 +679,7 @@
   },
   {
    "id": "apparel-apron",
+   "weight": 270,
    "name": "Custom Apron",
    "price": 26.99,
    "images": [
@@ -676,6 +693,7 @@
   },
   {
    "id": "personalized-ornament",
+   "weight": 70,
    "name": "Personalized Ornament",
    "price": 14.99,
    "images": [
@@ -754,6 +772,7 @@
   },
   {
    "id": "gift-bookmark",
+   "weight": 25,
    "name": "Personalized Bookmark",
    "price": 6.99,
    "images": [
@@ -767,6 +786,7 @@
   },
   {
    "id": "gift-fridge-magnet",
+   "weight": 30,
    "name": "Personalized Fridge Magnet",
    "price": 7.99,
    "images": [
@@ -780,6 +800,7 @@
   },
   {
    "id": "gift-can-cooler-koozie",
+   "weight": 45,
    "name": "Personalized Can Cooler",
    "price": 8.99,
    "images": [
@@ -793,6 +814,7 @@
   },
   {
    "id": "gift-shot-glass",
+   "weight": 190,
    "name": "Personalized Shot Glass",
    "price": 8.99,
    "images": [
@@ -807,6 +829,7 @@
   },
   {
    "id": "gift-keychain",
+   "weight": 30,
    "name": "Personalized Keychain",
    "price": 9.99,
    "images": [
@@ -821,6 +844,7 @@
   },
   {
    "id": "gift-photo-print",
+   "weight": 45,
    "name": "Personalized Photo Print",
    "price": 9.99,
    "images": [
@@ -835,6 +859,7 @@
   },
   {
    "id": "gift-pet-id-tag",
+   "weight": 25,
    "name": "Personalized Pet ID Tag",
    "price": 9.99,
    "images": [
@@ -849,6 +874,7 @@
   },
   {
    "id": "gift-bag-charm",
+   "weight": 35,
    "name": "Personalized Bag Charm",
    "price": 10.99,
    "images": [
@@ -863,6 +889,7 @@
   },
   {
    "id": "gift-luggage-tag",
+   "weight": 40,
    "name": "Personalized Luggage Tag",
    "price": 10.99,
    "images": [
@@ -877,6 +904,7 @@
   },
   {
    "id": "gift-lanyard",
+   "weight": 40,
    "name": "Personalized Lanyard",
    "price": 10.99,
    "images": [
@@ -891,6 +919,7 @@
   },
   {
    "id": "gift-compact-mirror",
+   "weight": 95,
    "name": "Personalized Compact Mirror",
    "price": 11.99,
    "images": [
@@ -905,6 +934,7 @@
   },
   {
    "id": "gift-bottle-opener",
+   "weight": 65,
    "name": "Personalized Bottle Opener",
    "price": 12.99,
    "images": [
@@ -919,6 +949,7 @@
   },
   {
    "id": "gift-pot-holder",
+   "weight": 75,
    "name": "Personalized Pot Holder",
    "price": 12.99,
    "images": [
@@ -933,6 +964,7 @@
   },
   {
    "id": "gift-tea-towel",
+   "weight": 95,
    "name": "Personalized Tea Towel",
    "price": 13.99,
    "images": [
@@ -947,6 +979,7 @@
   },
   {
    "id": "gift-socks",
+   "weight": 75,
    "name": "Personalized Socks",
    "price": 14.99,
    "images": [
@@ -960,6 +993,7 @@
   },
   {
    "id": "gift-mouse-pad",
+   "weight": 140,
    "name": "Personalized Mouse Pad",
    "price": 14.99,
    "images": [
@@ -973,6 +1007,7 @@
   },
   {
    "id": "gift-notebook-journal",
+   "weight": 280,
    "name": "Personalized Notebook",
    "price": 16.99,
    "images": [
@@ -987,6 +1022,7 @@
   },
   {
    "id": "gift-zip-pouch",
+   "weight": 85,
    "name": "Personalized Zip Pouch",
    "price": 16.99,
    "images": [
@@ -1000,6 +1036,7 @@
   },
   {
    "id": "gift-makeup-bag",
+   "weight": 110,
    "name": "Personalized Makeup Bag",
    "price": 16.99,
    "images": [
@@ -1014,6 +1051,7 @@
   },
   {
    "id": "gift-license-plate",
+   "weight": 170,
    "name": "Personalized License Plate",
    "price": 16.99,
    "images": [
@@ -1027,6 +1065,7 @@
   },
   {
    "id": "gift-phone-case",
+   "weight": 65,
    "name": "Personalized Phone Case",
    "price": 19.99,
    "images": [
@@ -1040,6 +1079,7 @@
   },
   {
    "id": "gift-jigsaw-puzzle",
+   "weight": 430,
    "name": "Personalized Jigsaw Puzzle",
    "price": 21.99,
    "images": [
@@ -1054,6 +1094,7 @@
   },
   {
    "id": "gift-garden-flag",
+   "weight": 100,
    "name": "Personalized Garden Flag",
    "price": 21.99,
    "images": [
@@ -1068,6 +1109,7 @@
   },
   {
    "id": "gift-water-bottle",
+   "weight": 430,
    "name": "Personalized Water Bottle",
    "price": 22.99,
    "images": [
@@ -1082,6 +1124,7 @@
   },
   {
    "id": "gift-pillow-cover",
+   "weight": 170,
    "name": "Personalized Pillow Cover",
    "price": 24.99,
    "images": [
@@ -1096,6 +1139,7 @@
   },
   {
    "id": "gift-wine-tumbler",
+   "weight": 330,
    "name": "Personalized Wine Tumbler",
    "price": 26.99,
    "images": [
@@ -1110,6 +1154,7 @@
   },
   {
    "id": "ceramic-coasters",
+   "weight": 260,
    "name": "Personalized Coasters",
    "price": 8.99,
    "images": [
@@ -1191,6 +1236,7 @@
   },
   {
    "id": "custom-stickers",
+   "weight": 15,
    "name": "Custom Stickers & Decals",
    "price": 3.99,
    "images": [

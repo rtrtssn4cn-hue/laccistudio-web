@@ -140,7 +140,7 @@
       }
       var imgs = (pr.images && pr.images.length) ? pr.images : (pr.image ? [pr.image] : []);
       return {
-        id: pr.id, name: pr.name, price: Number(pr.price),
+        id: pr.id, name: pr.name, price: Number(pr.price), weight: Number(pr.weight) || 0,
         image: imgs[0] || "", images: imgs, video: pr.video || "",
         category: pr.category, description: pr.description,
         mockupPhoto: pr.mockupPhoto || "",

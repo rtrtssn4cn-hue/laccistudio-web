@@ -50,6 +50,7 @@ collections:
                   - { name: "name", label: "Choice", widget: "string" }
                   - { name: "price", label: "Price for this choice ($)", widget: "number", value_type: "float", required: false, min: 0, hint: "Leave blank to use the product's base price." }
               - { name: "id", label: "Internal ID (leave as-is)", widget: "string", hint: "Unique tag used behind the scenes — don't change on existing products." }
+              - { name: "weight", label: "Shipping weight (grams)", widget: "number", value_type: "int", required: false, hint: "Product + packaging, in grams. Snipcart multiplies this by quantity to pick the shipping rate. 1 oz = 28g." }
 
   # ---------------- Gallery (Our Work) ----------------
   - name: "gallery"
