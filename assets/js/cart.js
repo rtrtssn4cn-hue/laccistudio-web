@@ -639,6 +639,19 @@
             bg[i] = 1;
             stack.push(x + 1, y, x - 1, y, x, y + 1, x, y - 1);
           }
+          // grow the background 2px so the soft edge/shadow ring is not tinted
+          for (var pass = 0; pass < 2; pass++) {
+            var nb = new Uint8Array(bg);
+            for (var yy = 0; yy < h; yy++) {
+              var rw = yy * w;
+              for (var xx = 0; xx < w; xx++) {
+                if (bg[rw + xx]) continue;
+                if ((xx > 0 && bg[rw + xx - 1]) || (xx < w - 1 && bg[rw + xx + 1]) ||
+                    (yy > 0 && bg[rw - w + xx]) || (yy < h - 1 && bg[rw + w + xx])) nb[rw + xx] = 1;
+              }
+            }
+            bg = nb;
+          }
           var r = parseInt(hex.substr(1, 2), 16) / 255,
               g = parseInt(hex.substr(3, 2), 16) / 255,
               b = parseInt(hex.substr(5, 2), 16) / 255;
