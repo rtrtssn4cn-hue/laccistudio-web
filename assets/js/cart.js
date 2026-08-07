@@ -583,7 +583,7 @@
     var mockInner = body.querySelector("#cz-mock-inner");
     var mockBox = body.querySelector("#cz-mockup");
     function applyZoom() { if (mockInner) mockInner.style.transform = "translate(" + panX + "px," + panY + "px) scale(" + zoom + ")"; }
-    function clampPan() { var c = mockBox.getBoundingClientRect(); var mx = (zoom - 1) * c.width / 2, my = (zoom - 1) * c.height / 2; panX = Math.max(-mx, Math.min(mx, panX)); panY = Math.max(-my, Math.min(my, panY)); }
+    function clampPan() { var c = mockBox.getBoundingClientRect(); var mx = Math.max(0, (zoom - 1) * c.width / 2), my = Math.max(0, (zoom - 1) * c.height / 2); panX = Math.max(-mx, Math.min(mx, panX)); panY = Math.max(-my, Math.min(my, panY)); }
     var zin = body.querySelector("#cz-zoom-in"), zout = body.querySelector("#cz-zoom-out");
     if (zin) zin.addEventListener("click", function () { zoom = Math.min(3, Math.round((zoom + 0.25) * 100) / 100); clampPan(); if (mockBox) mockBox.classList.toggle("zoomed", zoom > 1); applyZoom(); });
     if (zout) zout.addEventListener("click", function () { zoom = Math.max(0.5, Math.round((zoom - 0.25) * 100) / 100); if (zoom <= 1) { panX = 0; panY = 0; } clampPan(); if (mockBox) mockBox.classList.toggle("zoomed", zoom > 1); applyZoom(); });
