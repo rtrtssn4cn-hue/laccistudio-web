@@ -9,5 +9,18 @@
   "etsy": "https://www.etsy.com/shop/LACCIstudio",
   "uploadEndpoint": "",
   "paypalClientId": "AQu34nwXc0Gpf1cX2uii9FXKmSTkJZcbZO1pXUTsKxONHow5BDG9iUPzme3edVkJmNoXGibiZaeIM9hR",
-  "email": "info@laccistudio.com"
+  "email": "info@laccistudio.com",
+  "saleBannerOn": false,
+  "saleBanner": "",
+  "saleBannerCode": "",
+  "saleBannerImage": "",
+  "saleBannerLinkText": "",
+  "saleBannerLink": "",
+  "saleBannerStart": "",
+  "saleBannerEnd": "",
+  "saleBannerTheme": "gold",
+  "saleBannerDismissible": true,
+  "tiktok": "",
+  "pinterest": "",
+  "youtube": ""
 }

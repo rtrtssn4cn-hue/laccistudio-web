@@ -929,6 +929,50 @@
     document.body.appendChild(div);
     var css = document.createElement("link"); css.rel = "stylesheet"; css.href = "https://cdn.snipcart.com/themes/v3.7.1/default/snipcart.css"; document.head.appendChild(css);
     loadScript("https://cdn.snipcart.com/themes/v3.7.1/default/snipcart.js", function () {});
+
+    /* Add a "Remove" control beside any discount applied to the cart.
+       Snipcart's default theme has no reliable way for a customer to clear a
+       code once entered, which blocks them swapping to a better one. */
+    document.addEventListener("snipcart.ready", function () {
+      function sync() {
+        try {
+          var state = Snipcart.store.getState();
+          var discounts = (state && state.cart && state.cart.discounts &&
+                           state.cart.discounts.items) || [];
+          var box = document.querySelector(".snipcart-discount-box");
+          if (!box) return;
+
+          var old = box.querySelector(".lacci-remove-discount");
+          if (old) old.parentNode.removeChild(old);
+          if (!discounts.length) return;
+
+          var wrap = document.createElement("div");
+          wrap.className = "lacci-remove-discount";
+          discounts.forEach(function (d) {
+            var code = d.code || d.name;
+            if (!code) return;
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "lacci-rm-btn";
+            b.textContent = "Remove " + code;
+            b.onclick = function () {
+              b.disabled = true;
+              b.textContent = "Removing…";
+              Snipcart.api.cart.removeDiscount(code)["catch"](function () {
+                b.disabled = false;
+                b.textContent = "Couldn\u2019t remove — try again";
+              });
+            };
+            wrap.appendChild(b);
+          });
+          box.appendChild(wrap);
+        } catch (e) {}
+      }
+      sync();
+      if (window.Snipcart && Snipcart.store && Snipcart.store.subscribe) {
+        Snipcart.store.subscribe(sync);
+      }
+    });
   }
 
   /* ------------------------------- init ------------------------------- */

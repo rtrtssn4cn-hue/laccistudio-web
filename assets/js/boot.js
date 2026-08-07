@@ -96,7 +96,24 @@
       phone: s.phone || "",
       instagram: s.instagram || "",
       facebook: s.facebook || "",
-      etsy: s.etsy || ""
+      etsy: s.etsy || "",
+      tiktok: s.tiktok || "",
+      pinterest: s.pinterest || "",
+      youtube: s.youtube || ""
+    };
+
+    // ---- Sale banner (used by promo-banner.js) ----
+    window.LACCI_PROMO = {
+      on:        s.saleBannerOn === true,
+      message:   s.saleBanner || "",
+      code:      s.saleBannerCode || "",
+      linkText:  s.saleBannerLinkText || "",
+      linkUrl:   s.saleBannerLink || "",
+      image:     s.saleBannerImage || "",
+      start:     s.saleBannerStart || "",
+      end:       s.saleBannerEnd || "",
+      theme:     s.saleBannerTheme || "gold",
+      dismissible: s.saleBannerDismissible !== false
     };
 
     // ---- Shop (used by cart.js) ----

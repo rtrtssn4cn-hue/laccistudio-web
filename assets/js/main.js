@@ -21,8 +21,26 @@
   });
   // Hours
   // Social links (hide icon if no URL provided)
-  [['instagram', '.js-instagram'], ['facebook', '.js-facebook'], ['etsy', '.js-etsy']].forEach(function (pair) {
-    var url = cfg[pair[0]];
+  // Social links (hide icon if no URL provided).
+  // Accepts a full URL or a bare @handle / username.
+  var SOCIAL_BASE = {
+    instagram: 'https://instagram.com/',
+    facebook:  'https://facebook.com/',
+    etsy:      'https://www.etsy.com/shop/',
+    tiktok:    'https://www.tiktok.com/@',
+    pinterest: 'https://pinterest.com/',
+    youtube:   'https://youtube.com/@'
+  };
+  function socialUrl(net, val) {
+    if (!val) return '';
+    val = String(val).trim();
+    if (/^https?:\/\//i.test(val)) return val;
+    return SOCIAL_BASE[net] + val.replace(/^@/, '');
+  }
+  [['instagram', '.js-instagram'], ['facebook', '.js-facebook'], ['etsy', '.js-etsy'],
+   ['tiktok', '.js-tiktok'], ['pinterest', '.js-pinterest'], ['youtube', '.js-youtube']
+  ].forEach(function (pair) {
+    var url = socialUrl(pair[0], cfg[pair[0]]);
     document.querySelectorAll(pair[1]).forEach(function (a) {
       if (url) { a.setAttribute('href', url); a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); }
       else { a.style.display = 'none'; }
