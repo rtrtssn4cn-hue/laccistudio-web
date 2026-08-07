@@ -639,26 +639,31 @@
             bg[i] = 1;
             stack.push(x + 1, y, x - 1, y, x, y + 1, x, y - 1);
           }
-          // grow the background 2px so the soft edge/shadow ring is not tinted
-          for (var pass = 0; pass < 2; pass++) {
-            var nb = new Uint8Array(bg);
+          // feather the tint over 8px so the soft shadow edge fades instead of banding
+          var N = 8, str = new Float32Array(w * h), cur = new Uint8Array(bg);
+          for (var step = 1; step <= N; step++) {
+            var nb = new Uint8Array(cur);
             for (var yy = 0; yy < h; yy++) {
               var rw = yy * w;
               for (var xx = 0; xx < w; xx++) {
-                if (bg[rw + xx]) continue;
-                if ((xx > 0 && bg[rw + xx - 1]) || (xx < w - 1 && bg[rw + xx + 1]) ||
-                    (yy > 0 && bg[rw - w + xx]) || (yy < h - 1 && bg[rw + w + xx])) nb[rw + xx] = 1;
+                if (cur[rw + xx]) continue;
+                if ((xx > 0 && cur[rw + xx - 1]) || (xx < w - 1 && cur[rw + xx + 1]) ||
+                    (yy > 0 && cur[rw - w + xx]) || (yy < h - 1 && cur[rw + w + xx])) {
+                  nb[rw + xx] = 1; str[rw + xx] = step / N;
+                }
               }
             }
-            bg = nb;
+            cur = nb;
           }
           var r = parseInt(hex.substr(1, 2), 16) / 255,
               g = parseInt(hex.substr(3, 2), 16) / 255,
               b = parseInt(hex.substr(5, 2), 16) / 255;
           for (var k = 0; k < w * h; k++) {
             if (bg[k]) continue;
-            var q = k * 4;
-            d[q] = d[q] * r; d[q + 1] = d[q + 1] * g; d[q + 2] = d[q + 2] * b;
+            var q = k * 4, t = str[k] > 0 ? str[k] : 1;
+            d[q] = d[q] * (r * t + (1 - t));
+            d[q + 1] = d[q + 1] * (g * t + (1 - t));
+            d[q + 2] = d[q + 2] * (b * t + (1 - t));
           }
           ctx.putImageData(id, 0, 0);
           var url = cv.toDataURL("image/png");
