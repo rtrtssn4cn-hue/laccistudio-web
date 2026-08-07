@@ -557,9 +557,25 @@
     var viewMode = "Front only";
     function applyView() {
       var box = body.querySelector("#cz-mockup"); if (!box) return;
-      var sel = selectedFor("Print location") || "Front only";
-      viewMode = sel.replace(/\s*\[.*$/, "");
+      var sel = selectedFor("Print location");
+      var bi = body.querySelector("#cz-mock-baseimg");
+      var tag0 = body.querySelector("#cz-side-tag");
       box.classList.remove("cz-view-front","cz-view-back");
+      if (sel === null || sel === "") {
+        viewMode = "";
+        if (tag0) tag0.style.display = "none";
+        var u0 = body.querySelector("#cz-upload2row"), s0 = body.querySelector("#cz-sizerow2");
+        if (u0) u0.style.display = "none";
+        if (s0) s0.style.display = "none";
+        return;
+      }
+      if (tag0) tag0.style.display = "";
+      viewMode = sel.replace(/\s*\[.*$/, "");
+      if (bi && p.mockupPhoto) {
+        var suf = /^Front only/.test(viewMode) ? "-front" : (/^Back only/.test(viewMode) ? "-back" : "-both");
+        var want = p.mockupPhoto.replace(/\.png$/i, suf + ".png");
+        if (bi.getAttribute("src") !== want) bi.src = want;
+      }
       if (/^Front only/.test(viewMode)) box.classList.add("cz-view-front");
       if (/^Back only/.test(viewMode)) box.classList.add("cz-view-back");
       var both = /Front and back/.test(viewMode);
