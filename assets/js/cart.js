@@ -455,7 +455,7 @@
         }).join("") + "</select></label>";
     }).join("");
     var uploadHTML = UC ?
-      '<div class="cz-field"><span>Upload your design, photo, or logo (required)</span>' +
+      '<div class="cz-field"><span>Upload a photo, design, or logo (skip if text only)</span>' +
       '<input type="file" id="cz-file" accept="image/*,.pdf,.svg,.ai,.psd,.eps,.heic" style="display:none">' +
       '<button type="button" class="btn btn-ghost-gold" id="cz-upload" style="width:100%;justify-content:center">＋ Choose file</button>' +
       '<div class="cz-preview" id="cz-preview"></div>' +
@@ -494,7 +494,8 @@
       '<label class="cz-field"><span>Exact text colour code (optional)</span>' +
         '<input type="text" id="cz-hex" maxlength="9" placeholder="e.g. #D79D41 — sets your text colour exactly" autocapitalize="characters" spellcheck="false"></label>' +
       groupsHTML +
-      '<label class="cz-field"><span>Quantity</span><input type="number" id="cz-qty" min="1" step="1" value="1"></label>' +
+      // Coasters already have a "Quantity" (set size) dropdown; two fields both called Quantity confused buyers.
+      '<label class="cz-field"><span>' + (groups.some(function (g) { return /^quantity$/i.test(g.label); }) ? "How many of this set" : "Quantity") + '</span><input type="number" id="cz-qty" min="1" step="1" value="1"></label>' +
       uploadHTML +
       '<div class="cz-field" id="cz-upload2row" style="display:none"><span>Upload your back design (required)</span>' +
         '<input type="file" id="cz-file2" accept="image/*,.pdf,.svg,.ai,.psd,.eps,.heic" style="display:none">' +
@@ -957,17 +958,19 @@
 
     body.querySelector("#cz-add").addEventListener("click", function () {
       if (uploading) return; // design still uploading — don't let the order go through without it
-      // Require an uploaded design file (personalization text stays optional)
+      // Needs something to print: an uploaded design OR personalization text.
+      // A file used to be mandatory, which blocked every name-only coaster/mug/tumbler order.
       var warn = body.querySelector("#cz-warn");
-      if (!state.design) {
+      var persTxt = ((body.querySelector("#cz-pers") || {}).value || "").trim();
+      if (!state.design && !persTxt) {
         if (!warn) {
           warn = document.createElement("p");
           warn.id = "cz-warn";
           warn.style.cssText = "color:#b3261e;font-size:.78rem;line-height:1.3;margin:.5rem 0 0;text-align:center";
           addBtn.parentNode.insertBefore(warn, addBtn.nextSibling);
         }
-        warn.textContent = "Please upload your design file before adding to cart.";
-        var uw = body.querySelector("#cz-upload"); if (uw) uw.scrollIntoView({ behavior: "smooth", block: "center" });
+        warn.textContent = "Type the name or text you'd like, or upload a photo or design.";
+        var uw = body.querySelector("#cz-pers"); if (uw) { uw.scrollIntoView({ behavior: "smooth", block: "center" }); uw.focus(); }
         return;
       }
       if (warn) warn.remove();
