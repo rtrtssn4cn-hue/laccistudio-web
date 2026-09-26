@@ -28,6 +28,15 @@ jobs:
       - name: Build Snipcart price catalog
         run: node tools/build-snipcart-catalog.mjs
 
+      # Creates/updates the orders tables in D1 before the new code goes live. Needs the D1 database id in
+      # wrangler.toml and an API token with D1 edit permission. Migrations only add; they never delete orders.
+      - name: Apply D1 migrations
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: d1 migrations apply lacci-orders --remote
+
       - name: Publish with Wrangler
         uses: cloudflare/wrangler-action@v3
         with:

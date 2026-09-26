@@ -99,7 +99,7 @@ The website also shows 22 more products and 18 hidden ones. Whether those can be
 | 2026-09-26 | Recommended: identical prices on Etsy and website; no permanent "sale" pricing; revisit a direct-site perk when the website sells over ~$1k/month | Recommendation |
 | – | Internal costs (blanks, ink, paper, packaging, labor, reprints) | **Not yet provided.** All price recommendations are provisional. |
 
-## Commerce (read docs/COMMERCE.md)
+## Commerce (read docs/COMMERCE.md; cutover steps in docs/CUTOVER.md)
 
 The store is moving from Snipcart to **Stripe Checkout + a Cloudflare Worker** (branch `stripe-checkout`), so there's no monthly fee: only Stripe's per-sale fee.
 - Prices, options and visibility come only from `content/products.json` via `assets/js/pricing.mjs`, used by the shop, the cart **and** the server. The server never trusts a browser price.

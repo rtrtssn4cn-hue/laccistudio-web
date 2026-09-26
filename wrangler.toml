@@ -22,9 +22,9 @@ migrations_dir = "migrations"
 SITE_URL = "https://laccistudio.com"
 ADMIN_GITHUB_REPO = "rtrtssn4cn-hue/laccistudio-web"
 UPLOAD_HOSTS = "51niy1s3e7.ucarecd.net,ucarecdn.com"
-# "stripe_tax" = Stripe Tax by shipping address (0.5% per taxed order; register Texas in Stripe
-# Tax settings first). "none" = no tax. Owner decision pending; see docs/COMMERCE.md.
-TAX_MODE = "none"
+# Owner decision 2026-09-26: Stripe Tax, Texas registration only, shipping taxable where required.
+# "none" is for engineering tests only.
+TAX_MODE = "stripe_tax"
 
 # Secrets (set in the Cloudflare dashboard, never in this file):
 #   STRIPE_SECRET_KEY      sk_test_... while testing, sk_live_... after approval
