@@ -1,1420 +1,1420 @@
 {
- "products": [
-  {
-   "id": "sublimation-tumbler",
-   "weight": 450,
-   "name": "Personalized Tumbler",
-   "price": 27.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-sublimation-tumbler.png"
-   ],
-   "video": "",
-   "category": "Drinkware",
-   "description": "Keep drinks ice-cold for hours in a double-wall insulated stainless tumbler, custom-printed with your name, photo, or design. Lid & straw included — the perfect personalized gift for birthdays, bridesmaids, teachers & travel.",
-   "optionGroups": [
+  "products": [
     {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "20 oz",
-       "price": 27.99,
-       "img": "assets/img/mock/mock-sublimation-tumbler.png?v=12"
-      },
-      {
-       "name": "30 oz",
-       "price": 31.99,
-       "img": "assets/img/mock/mock-variant-tumbler-30.png?v=12"
-      },
-      {
-       "name": "40 oz",
-       "price": 34.99,
-       "img": "assets/img/mock/mock-variant-tumbler-40.png?v=12"
-      }
-     ]
+      "price": 27.99,
+      "optionGroups": [
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "20 oz",
+              "price": 27.99,
+              "img": "assets/img/mock/mock-sublimation-tumbler.png?v=12"
+            },
+            {
+              "name": "30 oz",
+              "price": 31.99,
+              "img": "assets/img/mock/mock-variant-tumbler-30.png?v=12"
+            },
+            {
+              "name": "40 oz",
+              "price": 34.99,
+              "img": "assets/img/mock/mock-variant-tumbler-40.png?v=12"
+            }
+          ]
+        },
+        {
+          "label": "Finish",
+          "choices": [
+            {
+              "name": "Glossy"
+            },
+            {
+              "name": "Matte",
+              "add": 2
+            },
+            {
+              "name": "Glitter",
+              "add": 4
+            },
+            {
+              "name": "Sparkle / Holographic",
+              "add": 5
+            }
+          ]
+        }
+      ],
+      "name": "Personalized Tumbler",
+      "mockupPhoto": "assets/img/mock/mock-sublimation-tumbler.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-sublimation-tumbler.png"
+      ],
+      "weight": 450,
+      "video": "",
+      "id": "sublimation-tumbler",
+      "description": "Keep drinks ice-cold for hours in a double-wall insulated stainless tumbler, custom-printed with your name, photo, or design. Lid & straw included — the perfect personalized gift for birthdays, bridesmaids, teachers & travel.",
+      "category": "Drinkware"
     },
     {
-     "label": "Finish",
-     "choices": [
-      {
-       "name": "Glossy"
-      },
-      {
-       "name": "Matte",
-       "add": 2
-      },
-      {
-       "name": "Glitter",
-       "add": 4
-      },
-      {
-       "name": "Sparkle / Holographic",
-       "add": 5
-      }
-     ]
+      "price": 18.99,
+      "optionGroups": [
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "11 oz",
+              "price": 18.99
+            },
+            {
+              "name": "15 oz",
+              "price": 20.99
+            }
+          ]
+        },
+        {
+          "label": "Style",
+          "choices": [
+            {
+              "name": "Standard White"
+            },
+            {
+              "name": "Colored Rim & Handle",
+              "add": 3
+            },
+            {
+              "name": "Two-Tone Inside",
+              "add": 3
+            },
+            {
+              "name": "Color-Changing Magic",
+              "add": 4
+            },
+            {
+              "name": "Glitter",
+              "add": 3
+            },
+            {
+              "name": "Enamel Camp Mug",
+              "add": 5
+            }
+          ]
+        }
+      ],
+      "name": "Personalized Mug",
+      "mockupPhoto": "assets/img/mock/mock-sublimation-mug.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-sublimation-mug.png"
+      ],
+      "weight": 600,
+      "video": "",
+      "id": "sublimation-mug",
+      "description": "Start every morning with a one-of-a-kind ceramic mug featuring your photo, pet portrait, or custom text. Dishwasher & microwave safe — a heartfelt gift for coffee lovers, holidays, Mother's & Father's Day.",
+      "category": "Drinkware"
+    },
+    {
+      "price": 26.98,
+      "optionGroups": [
+        {
+          "label": "Print location",
+          "choices": [
+            {
+              "name": "Front only"
+            },
+            {
+              "name": "Back only"
+            },
+            {
+              "name": "Front and back",
+              "add": 6
+            }
+          ]
+        },
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "XS",
+              "price": 26.98
+            },
+            {
+              "name": "S",
+              "price": 27.98
+            },
+            {
+              "name": "M",
+              "price": 29.98
+            },
+            {
+              "name": "L",
+              "price": 31.98
+            },
+            {
+              "name": "XL",
+              "price": 33.98
+            },
+            {
+              "name": "2XL",
+              "price": 35.98
+            },
+            {
+              "name": "3XL",
+              "price": 37.98
+            }
+          ]
+        }
+      ],
+      "name": "Custom T-Shirt",
+      "mockupPhoto": "assets/img/mock/mock-apparel-t-shirt.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-t-shirt.png"
+      ],
+      "weight": 200,
+      "video": "",
+      "id": "apparel-t-shirt",
+      "description": "Custom t-shirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 26.98,
+      "optionGroups": [
+        {
+          "label": "Print location",
+          "choices": [
+            {
+              "name": "Front only"
+            },
+            {
+              "name": "Back only"
+            },
+            {
+              "name": "Front and back",
+              "add": 6
+            }
+          ]
+        },
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "XS",
+              "price": 26.98
+            },
+            {
+              "name": "S",
+              "price": 27.98
+            },
+            {
+              "name": "M",
+              "price": 29.98
+            },
+            {
+              "name": "L",
+              "price": 31.98
+            },
+            {
+              "name": "XL",
+              "price": 33.98
+            },
+            {
+              "name": "2XL",
+              "price": 35.98
+            },
+            {
+              "name": "3XL",
+              "price": 37.98
+            }
+          ]
+        }
+      ],
+      "name": "Custom V-Neck Tee",
+      "mockupPhoto": "assets/img/mock/mock-apparel-v-neck-tee.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-v-neck-tee.png"
+      ],
+      "weight": 200,
+      "video": "",
+      "id": "apparel-v-neck-tee",
+      "description": "Custom v-neck tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 27.98,
+      "optionGroups": [
+        {
+          "label": "Print location",
+          "choices": [
+            {
+              "name": "Front only"
+            },
+            {
+              "name": "Back only"
+            },
+            {
+              "name": "Front and back",
+              "add": 6
+            }
+          ]
+        },
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "XS",
+              "price": 27.98
+            },
+            {
+              "name": "S",
+              "price": 28.98
+            },
+            {
+              "name": "M",
+              "price": 30.98
+            },
+            {
+              "name": "L",
+              "price": 32.98
+            },
+            {
+              "name": "XL",
+              "price": 34.98
+            },
+            {
+              "name": "2XL",
+              "price": 36.98
+            },
+            {
+              "name": "3XL",
+              "price": 38.98
+            }
+          ]
+        }
+      ],
+      "name": "Custom Ladies' Fitted Tee",
+      "mockupPhoto": "assets/img/mock/mock-apparel-ladies-fitted-tee.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-ladies-fitted-tee.png"
+      ],
+      "weight": 180,
+      "video": "",
+      "id": "apparel-ladies-fitted-tee",
+      "description": "Custom ladies' fitted tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 25.98,
+      "optionGroups": [
+        {
+          "label": "Print location",
+          "choices": [
+            {
+              "name": "Front only"
+            },
+            {
+              "name": "Back only"
+            },
+            {
+              "name": "Front and back",
+              "add": 6
+            }
+          ]
+        },
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "XS",
+              "price": 25.98
+            },
+            {
+              "name": "S",
+              "price": 26.98
+            },
+            {
+              "name": "M",
+              "price": 28.98
+            },
+            {
+              "name": "L",
+              "price": 30.98
+            },
+            {
+              "name": "XL",
+              "price": 32.98
+            },
+            {
+              "name": "2XL",
+              "price": 34.98
+            },
+            {
+              "name": "3XL",
+              "price": 36.98
+            }
+          ]
+        }
+      ],
+      "name": "Custom Tank Top",
+      "mockupPhoto": "assets/img/mock/mock-apparel-tank-top.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-tank-top.png"
+      ],
+      "weight": 140,
+      "video": "",
+      "id": "apparel-tank-top",
+      "description": "Custom tank top printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 30.98,
+      "optionGroups": [
+        {
+          "label": "Print location",
+          "choices": [
+            {
+              "name": "Front only"
+            },
+            {
+              "name": "Back only"
+            },
+            {
+              "name": "Front and back",
+              "add": 6
+            }
+          ]
+        },
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "XS",
+              "price": 30.98
+            },
+            {
+              "name": "S",
+              "price": 31.98
+            },
+            {
+              "name": "M",
+              "price": 33.98
+            },
+            {
+              "name": "L",
+              "price": 35.98
+            },
+            {
+              "name": "XL",
+              "price": 37.98
+            },
+            {
+              "name": "2XL",
+              "price": 39.98
+            },
+            {
+              "name": "3XL",
+              "price": 41.98
+            }
+          ]
+        }
+      ],
+      "name": "Custom Long-Sleeve Tee",
+      "mockupPhoto": "assets/img/mock/mock-apparel-long-sleeve-tee.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-long-sleeve-tee.png"
+      ],
+      "weight": 260,
+      "video": "",
+      "id": "apparel-long-sleeve-tee",
+      "description": "Custom long-sleeve tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 21.98,
+      "optionGroups": [
+        {
+          "label": "Print location",
+          "choices": [
+            {
+              "name": "Front only"
+            },
+            {
+              "name": "Back only"
+            },
+            {
+              "name": "Front and back",
+              "add": 6
+            }
+          ]
+        },
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "Youth XS",
+              "price": 21.98
+            },
+            {
+              "name": "Youth S",
+              "price": 22.98
+            },
+            {
+              "name": "Youth M",
+              "price": 23.98
+            },
+            {
+              "name": "Youth L",
+              "price": 24.98
+            },
+            {
+              "name": "Youth XL",
+              "price": 25.98
+            }
+          ]
+        }
+      ],
+      "name": "Custom Youth Tee",
+      "mockupPhoto": "assets/img/mock/mock-apparel-youth-tee.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-youth-tee.png"
+      ],
+      "weight": 130,
+      "video": "",
+      "id": "apparel-youth-tee",
+      "description": "Custom youth tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 19.98,
+      "optionGroups": [
+        {
+          "label": "Print location",
+          "choices": [
+            {
+              "name": "Front only"
+            },
+            {
+              "name": "Back only"
+            },
+            {
+              "name": "Front and back",
+              "add": 6
+            }
+          ]
+        },
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "Newborn",
+              "price": 19.98
+            },
+            {
+              "name": "0-3 months",
+              "price": 19.98
+            },
+            {
+              "name": "3-6 months",
+              "price": 19.98
+            },
+            {
+              "name": "6-12 months",
+              "price": 20.98
+            },
+            {
+              "name": "12-18 months",
+              "price": 20.98
+            },
+            {
+              "name": "18-24 months",
+              "price": 21.98
+            }
+          ]
+        }
+      ],
+      "name": "Custom Baby Onesie",
+      "mockupPhoto": "assets/img/mock/mock-apparel-baby-onesie.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-baby-onesie.png"
+      ],
+      "weight": 100,
+      "video": "",
+      "id": "apparel-baby-onesie",
+      "description": "Custom baby onesie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 36.98,
+      "optionGroups": [
+        {
+          "label": "Print location",
+          "choices": [
+            {
+              "name": "Front only"
+            },
+            {
+              "name": "Back only"
+            },
+            {
+              "name": "Front and back",
+              "add": 6
+            }
+          ]
+        },
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "XS",
+              "price": 36.98
+            },
+            {
+              "name": "S",
+              "price": 37.98
+            },
+            {
+              "name": "M",
+              "price": 39.98
+            },
+            {
+              "name": "L",
+              "price": 41.98
+            },
+            {
+              "name": "XL",
+              "price": 43.98
+            },
+            {
+              "name": "2XL",
+              "price": 45.98
+            },
+            {
+              "name": "3XL",
+              "price": 47.98
+            }
+          ]
+        }
+      ],
+      "name": "Custom Crewneck Sweatshirt",
+      "mockupPhoto": "assets/img/mock/mock-apparel-crewneck-sweatshirt.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-crewneck-sweatshirt.png"
+      ],
+      "weight": 560,
+      "video": "",
+      "id": "apparel-crewneck-sweatshirt",
+      "description": "Custom crewneck sweatshirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 39.98,
+      "optionGroups": [
+        {
+          "label": "Print location",
+          "choices": [
+            {
+              "name": "Front only"
+            },
+            {
+              "name": "Back only"
+            },
+            {
+              "name": "Front and back",
+              "add": 6
+            }
+          ]
+        },
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "XS",
+              "price": 39.98
+            },
+            {
+              "name": "S",
+              "price": 40.98
+            },
+            {
+              "name": "M",
+              "price": 42.98
+            },
+            {
+              "name": "L",
+              "price": 44.98
+            },
+            {
+              "name": "XL",
+              "price": 46.98
+            },
+            {
+              "name": "2XL",
+              "price": 48.98
+            },
+            {
+              "name": "3XL",
+              "price": 50.98
+            }
+          ]
+        }
+      ],
+      "name": "Custom Hoodie",
+      "mockupPhoto": "assets/img/mock/mock-apparel-hoodie.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-hoodie.png"
+      ],
+      "weight": 700,
+      "video": "",
+      "id": "apparel-hoodie",
+      "description": "Custom hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 44.98,
+      "optionGroups": [
+        {
+          "label": "Print location",
+          "choices": [
+            {
+              "name": "Front only"
+            },
+            {
+              "name": "Back only"
+            },
+            {
+              "name": "Front and back",
+              "add": 6
+            }
+          ]
+        },
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "XS",
+              "price": 44.98
+            },
+            {
+              "name": "S",
+              "price": 45.98
+            },
+            {
+              "name": "M",
+              "price": 47.98
+            },
+            {
+              "name": "L",
+              "price": 49.98
+            },
+            {
+              "name": "XL",
+              "price": 51.98
+            },
+            {
+              "name": "2XL",
+              "price": 53.98
+            },
+            {
+              "name": "3XL",
+              "price": 55.98
+            }
+          ]
+        }
+      ],
+      "name": "Custom Zip-Up Hoodie",
+      "mockupPhoto": "assets/img/mock/mock-apparel-zip-up-hoodie.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-zip-up-hoodie.png"
+      ],
+      "weight": 780,
+      "video": "",
+      "id": "apparel-zip-up-hoodie",
+      "description": "Custom zip-up hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 22.99,
+      "optionGroups": [],
+      "name": "Custom Dad Cap",
+      "mockupPhoto": "assets/img/mock/mock-apparel-dad-cap.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-dad-cap.png"
+      ],
+      "weight": 120,
+      "video": "",
+      "id": "apparel-dad-cap",
+      "description": "Custom dad cap printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 22.99,
+      "optionGroups": [],
+      "name": "Custom Trucker Hat",
+      "mockupPhoto": "assets/img/mock/mock-apparel-trucker-hat.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-trucker-hat.png"
+      ],
+      "weight": 110,
+      "video": "",
+      "id": "apparel-trucker-hat",
+      "description": "Custom trucker hat printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 21.99,
+      "optionGroups": [],
+      "name": "Custom Beanie",
+      "mockupPhoto": "assets/img/mock/mock-apparel-beanie.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-beanie.png"
+      ],
+      "weight": 100,
+      "video": "",
+      "id": "apparel-beanie",
+      "description": "Custom beanie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 20.99,
+      "optionGroups": [],
+      "name": "Custom Tote Bag",
+      "mockupPhoto": "assets/img/mock/mock-apparel-tote-bag.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-tote-bag.png"
+      ],
+      "weight": 170,
+      "video": "",
+      "id": "apparel-tote-bag",
+      "description": "Custom tote bag printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 26.99,
+      "optionGroups": [],
+      "name": "Custom Apron",
+      "mockupPhoto": "assets/img/mock/mock-apparel-apron.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-apron.png"
+      ],
+      "weight": 270,
+      "video": "",
+      "id": "apparel-apron",
+      "description": "Custom apron printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
+    },
+    {
+      "price": 14.99,
+      "optionGroups": [
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "3 inch",
+              "price": 14.99
+            },
+            {
+              "name": "4 inch",
+              "price": 16.99
+            },
+            {
+              "name": "5 inch",
+              "price": 19.99
+            }
+          ]
+        },
+        {
+          "label": "Shape",
+          "choices": [
+            {
+              "name": "Round"
+            },
+            {
+              "name": "Heart"
+            },
+            {
+              "name": "Star"
+            },
+            {
+              "name": "Snowflake"
+            },
+            {
+              "name": "Oval"
+            },
+            {
+              "name": "Bauble"
+            },
+            {
+              "name": "Arrowhead"
+            }
+          ]
+        }
+      ],
+      "name": "Personalized Ornament",
+      "mockupPhoto": "assets/img/mock/mock-personalized-ornament.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-personalized-ornament.png"
+      ],
+      "weight": 70,
+      "video": "",
+      "id": "personalized-ornament",
+      "description": "Capture the memory with a custom keepsake ornament featuring names, dates, or a favorite photo. Ceramic, in multiple shapes and sizes — a cherished holiday gift and yearly tradition.",
+      "category": "Gifts"
+    },
+    {
+      "price": 6.99,
+      "optionGroups": [],
+      "name": "Personalized Bookmark",
+      "mockupPhoto": "assets/img/mock/mock-gift-bookmark.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-gift-bookmark.png"
+      ],
+      "weight": 25,
+      "video": "",
+      "id": "gift-bookmark",
+      "description": "Personalized bookmark made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 7.99,
+      "optionGroups": [],
+      "name": "Personalized Fridge Magnet",
+      "mockupPhoto": "assets/img/mock/mock-gift-fridge-magnet.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-gift-fridge-magnet.png"
+      ],
+      "weight": 30,
+      "video": "",
+      "id": "gift-fridge-magnet",
+      "description": "Personalized fridge magnet made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 8.99,
+      "optionGroups": [],
+      "name": "Personalized Can Cooler",
+      "mockupPhoto": "assets/img/mock/mock-gift-can-cooler-koozie.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-gift-can-cooler-koozie.png"
+      ],
+      "weight": 45,
+      "video": "",
+      "id": "gift-can-cooler-koozie",
+      "description": "Personalized can cooler made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 8.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Shot Glass",
+      "mockupPhoto": "assets/img/mock/mock-gift-shot-glass.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-gift-shot-glass.png"
+      ],
+      "weight": 190,
+      "video": "",
+      "id": "gift-shot-glass",
+      "description": "Personalized shot glass made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 9.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Keychain",
+      "mockupPhoto": "assets/img/mock/mock-gift-keychain.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-gift-keychain.png"
+      ],
+      "weight": 30,
+      "video": "",
+      "id": "gift-keychain",
+      "description": "Personalized keychain made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 9.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Photo Print",
+      "images": [
+        "assets/img/product-gifts.jpg",
+        "assets/img/gal-gifts.jpg"
+      ],
+      "weight": 45,
+      "video": "",
+      "id": "gift-photo-print",
+      "description": "Personalized photo print made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 9.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Pet ID Tag",
+      "images": [
+        "assets/img/product-gifts.jpg",
+        "assets/img/gal-gifts.jpg"
+      ],
+      "weight": 25,
+      "video": "",
+      "id": "gift-pet-id-tag",
+      "description": "Personalized pet id tag made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 10.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Bag Charm",
+      "mockupPhoto": "assets/img/mock/mock-gift-bag-charm.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-gift-bag-charm.png"
+      ],
+      "weight": 35,
+      "video": "",
+      "id": "gift-bag-charm",
+      "description": "Personalized bag charm made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 10.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Luggage Tag",
+      "mockupPhoto": "assets/img/mock/mock-gift-luggage-tag.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-gift-luggage-tag.png"
+      ],
+      "weight": 40,
+      "video": "",
+      "id": "gift-luggage-tag",
+      "description": "Personalized luggage tag made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 10.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Lanyard",
+      "images": [
+        "assets/img/product-gifts.jpg",
+        "assets/img/gal-gifts.jpg"
+      ],
+      "weight": 40,
+      "video": "",
+      "id": "gift-lanyard",
+      "description": "Personalized lanyard made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 11.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Compact Mirror",
+      "images": [
+        "assets/img/product-gifts.jpg",
+        "assets/img/gal-gifts.jpg"
+      ],
+      "weight": 95,
+      "video": "",
+      "id": "gift-compact-mirror",
+      "description": "Personalized compact mirror made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 12.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Bottle Opener",
+      "images": [
+        "assets/img/product-gifts.jpg",
+        "assets/img/gal-gifts.jpg"
+      ],
+      "weight": 65,
+      "video": "",
+      "id": "gift-bottle-opener",
+      "description": "Personalized bottle opener made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 12.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Pot Holder",
+      "images": [
+        "assets/img/product-gifts.jpg",
+        "assets/img/gal-gifts.jpg"
+      ],
+      "weight": 75,
+      "video": "",
+      "id": "gift-pot-holder",
+      "description": "Personalized pot holder made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 13.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Tea Towel",
+      "images": [
+        "assets/img/product-gifts.jpg",
+        "assets/img/gal-gifts.jpg"
+      ],
+      "weight": 95,
+      "video": "",
+      "id": "gift-tea-towel",
+      "description": "Personalized tea towel made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 14.99,
+      "optionGroups": [],
+      "name": "Personalized Socks",
+      "mockupPhoto": "assets/img/mock/mock-gift-socks.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-gift-socks.png"
+      ],
+      "weight": 75,
+      "video": "",
+      "id": "gift-socks",
+      "description": "Personalized socks made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 14.99,
+      "optionGroups": [],
+      "name": "Personalized Mouse Pad",
+      "mockupPhoto": "assets/img/mock/mock-gift-mouse-pad.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-gift-mouse-pad.png"
+      ],
+      "weight": 140,
+      "video": "",
+      "id": "gift-mouse-pad",
+      "description": "Personalized mouse pad made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 16.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Notebook",
+      "mockupPhoto": "assets/img/mock/mock-gift-notebook-journal.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-gift-notebook-journal.png"
+      ],
+      "weight": 280,
+      "video": "",
+      "id": "gift-notebook-journal",
+      "description": "Personalized notebook made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 16.99,
+      "optionGroups": [],
+      "name": "Personalized Zip Pouch",
+      "mockupPhoto": "assets/img/mock/mock-gift-zip-pouch.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-gift-zip-pouch.png"
+      ],
+      "weight": 85,
+      "video": "",
+      "id": "gift-zip-pouch",
+      "description": "Personalized zip pouch made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 16.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Makeup Bag",
+      "images": [
+        "assets/img/product-gifts.jpg",
+        "assets/img/gal-gifts.jpg"
+      ],
+      "weight": 110,
+      "video": "",
+      "id": "gift-makeup-bag",
+      "description": "Personalized makeup bag made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 16.99,
+      "optionGroups": [],
+      "name": "Personalized License Plate",
+      "mockupPhoto": "assets/img/mock/mock-gift-license-plate.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-gift-license-plate.png"
+      ],
+      "weight": 170,
+      "video": "",
+      "id": "gift-license-plate",
+      "description": "Personalized license plate made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 21.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Jigsaw Puzzle",
+      "images": [
+        "assets/img/product-gifts.jpg",
+        "assets/img/gal-gifts.jpg"
+      ],
+      "weight": 430,
+      "video": "",
+      "id": "gift-jigsaw-puzzle",
+      "description": "Personalized jigsaw puzzle made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 21.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Garden Flag",
+      "images": [
+        "assets/img/product-gifts.jpg",
+        "assets/img/gal-gifts.jpg"
+      ],
+      "weight": 100,
+      "video": "",
+      "id": "gift-garden-flag",
+      "description": "Personalized garden flag made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 22.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Water Bottle",
+      "images": [
+        "assets/img/product-gifts.jpg",
+        "assets/img/gal-gifts.jpg"
+      ],
+      "weight": 430,
+      "video": "",
+      "id": "gift-water-bottle",
+      "description": "Personalized water bottle made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 24.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Pillow Cover",
+      "mockupPhoto": "assets/img/mock/mock-gift-pillow-cover.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-gift-pillow-cover.png"
+      ],
+      "weight": 170,
+      "video": "",
+      "id": "gift-pillow-cover",
+      "description": "Personalized pillow cover made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 26.99,
+      "optionGroups": [],
+      "hidden": true,
+      "name": "Personalized Wine Tumbler",
+      "images": [
+        "assets/img/product-gifts.jpg",
+        "assets/img/gal-gifts.jpg"
+      ],
+      "weight": 330,
+      "video": "",
+      "id": "gift-wine-tumbler",
+      "description": "Personalized wine tumbler made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "category": "Gifts"
+    },
+    {
+      "price": 6.99,
+      "optionGroups": [
+        {
+          "label": "Quantity",
+          "choices": [
+            {
+              "name": "Single",
+              "price": 8.99
+            },
+            {
+              "name": "Set of 4",
+              "price": 24.99
+            },
+            {
+              "name": "Set of 6",
+              "price": 34.99
+            },
+            {
+              "name": "Set of 8",
+              "price": 44.99
+            },
+            {
+              "name": "Set of 10",
+              "price": 52.99
+            },
+            {
+              "name": "Set of 12",
+              "price": 60.99
+            }
+          ]
+        },
+        {
+          "label": "Material",
+          "choices": [
+            {
+              "name": "Ceramic"
+            },
+            {
+              "name": "Sandstone"
+            },
+            {
+              "name": "Cork-Backed"
+            },
+            {
+              "name": "Neoprene"
+            },
+            {
+              "name": "Acrylic",
+              "add": 1
+            },
+            {
+              "name": "Slate",
+              "add": 2
+            }
+          ]
+        },
+        {
+          "label": "Shape",
+          "choices": [
+            {
+              "name": "Round",
+              "img": "assets/img/mock/mock-ceramic-coasters.png?v=12"
+            },
+            {
+              "name": "Square",
+              "img": "assets/img/mock/mock-variant-coaster-square.png?v=12"
+            }
+          ]
+        }
+      ],
+      "name": "Personalized Coasters",
+      "mockupPhoto": "assets/img/mock/mock-ceramic-coasters.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-ceramic-coasters.png"
+      ],
+      "weight": 260,
+      "video": "",
+      "id": "ceramic-coasters",
+      "description": "Protect your table in style with personalized coasters made from your design or photo. Singles or gift sets in ceramic, sandstone, cork, neoprene, acrylic or slate — a thoughtful housewarming & wedding gift.",
+      "category": "Home"
+    },
+    {
+      "price": 3.99,
+      "optionGroups": [
+        {
+          "label": "Size",
+          "choices": [
+            {
+              "name": "2 inch",
+              "price": 3.99
+            },
+            {
+              "name": "3 inch",
+              "price": 4.99
+            },
+            {
+              "name": "4 inch",
+              "price": 5.99
+            },
+            {
+              "name": "5 inch",
+              "price": 7.99
+            },
+            {
+              "name": "6 inch",
+              "price": 9.99
+            }
+          ]
+        },
+        {
+          "label": "Type",
+          "choices": [
+            {
+              "name": "Die-Cut"
+            },
+            {
+              "name": "Kiss-Cut"
+            },
+            {
+              "name": "Sticker Sheet"
+            },
+            {
+              "name": "Clear / Transparent"
+            },
+            {
+              "name": "Waterproof Vinyl"
+            },
+            {
+              "name": "Holographic",
+              "add": 1
+            },
+            {
+              "name": "Glitter",
+              "add": 1
+            },
+            {
+              "name": "Car Decal",
+              "add": 2
+            },
+            {
+              "name": "Laptop Decal"
+            },
+            {
+              "name": "Tumbler / Cup Decal"
+            },
+            {
+              "name": "Water-Bottle Decal"
+            }
+          ]
+        },
+        {
+          "label": "Pack",
+          "choices": [
+            {
+              "name": "Single"
+            },
+            {
+              "name": "Pack of 3",
+              "add": 7
+            },
+            {
+              "name": "Pack of 5",
+              "add": 12
+            },
+            {
+              "name": "Pack of 10",
+              "add": 22
+            },
+            {
+              "name": "Pack of 25",
+              "add": 45
+            },
+            {
+              "name": "Pack of 50",
+              "add": 80
+            }
+          ]
+        }
+      ],
+      "name": "Custom Stickers & Decals",
+      "mockupPhoto": "assets/img/mock/mock-custom-stickers.png?v=12",
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-custom-stickers.png"
+      ],
+      "weight": 15,
+      "video": "",
+      "id": "custom-stickers",
+      "description": "Bring your artwork to life with durable die-cut vinyl stickers & decals — waterproof options and finishes like holographic & glitter. Sizes 2\"–6\", singles or packs — perfect for tumblers, laptops, cars, water bottles & small-business branding.",
+      "category": "Stickers"
     }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-sublimation-tumbler.png?v=12"
-  },
-  {
-   "id": "sublimation-mug",
-   "weight": 600,
-   "name": "Personalized Mug",
-   "price": 18.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-sublimation-mug.png"
-   ],
-   "video": "",
-   "category": "Drinkware",
-   "description": "Start every morning with a one-of-a-kind ceramic mug featuring your photo, pet portrait, or custom text. Dishwasher & microwave safe — a heartfelt gift for coffee lovers, holidays, Mother's & Father's Day.",
-   "optionGroups": [
-    {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "11 oz",
-       "price": 18.99
-      },
-      {
-       "name": "15 oz",
-       "price": 20.99
-      }
-     ]
-    },
-    {
-     "label": "Style",
-     "choices": [
-      {
-       "name": "Standard White"
-      },
-      {
-       "name": "Colored Rim & Handle",
-       "add": 3
-      },
-      {
-       "name": "Two-Tone Inside",
-       "add": 3
-      },
-      {
-       "name": "Color-Changing Magic",
-       "add": 4
-      },
-      {
-       "name": "Glitter",
-       "add": 3
-      },
-      {
-       "name": "Enamel Camp Mug",
-       "add": 5
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-sublimation-mug.png?v=12"
-  },
-  {
-   "id": "apparel-t-shirt",
-   "weight": 200,
-   "name": "Custom T-Shirt",
-   "price": 26.98,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-t-shirt.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom t-shirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [
-    {
-     "label": "Print location",
-     "choices": [
-      {
-       "name": "Front only"
-      },
-      {
-       "name": "Back only"
-      },
-      {
-       "name": "Front and back",
-       "add": 6
-      }
-     ]
-    },
-    {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "XS",
-       "price": 26.98
-      },
-      {
-       "name": "S",
-       "price": 27.98
-      },
-      {
-       "name": "M",
-       "price": 29.98
-      },
-      {
-       "name": "L",
-       "price": 31.98
-      },
-      {
-       "name": "XL",
-       "price": 33.98
-      },
-      {
-       "name": "2XL",
-       "price": 35.98
-      },
-      {
-       "name": "3XL",
-       "price": 37.98
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-apparel-t-shirt.png?v=12"
-  },
-  {
-   "id": "apparel-v-neck-tee",
-   "weight": 200,
-   "name": "Custom V-Neck Tee",
-   "price": 26.98,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-v-neck-tee.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom v-neck tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [
-    {
-     "label": "Print location",
-     "choices": [
-      {
-       "name": "Front only"
-      },
-      {
-       "name": "Back only"
-      },
-      {
-       "name": "Front and back",
-       "add": 6
-      }
-     ]
-    },
-    {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "XS",
-       "price": 26.98
-      },
-      {
-       "name": "S",
-       "price": 27.98
-      },
-      {
-       "name": "M",
-       "price": 29.98
-      },
-      {
-       "name": "L",
-       "price": 31.98
-      },
-      {
-       "name": "XL",
-       "price": 33.98
-      },
-      {
-       "name": "2XL",
-       "price": 35.98
-      },
-      {
-       "name": "3XL",
-       "price": 37.98
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-apparel-v-neck-tee.png?v=12"
-  },
-  {
-   "id": "apparel-ladies-fitted-tee",
-   "weight": 180,
-   "name": "Custom Ladies' Fitted Tee",
-   "price": 27.98,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-ladies-fitted-tee.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom ladies' fitted tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [
-    {
-     "label": "Print location",
-     "choices": [
-      {
-       "name": "Front only"
-      },
-      {
-       "name": "Back only"
-      },
-      {
-       "name": "Front and back",
-       "add": 6
-      }
-     ]
-    },
-    {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "XS",
-       "price": 27.98
-      },
-      {
-       "name": "S",
-       "price": 28.98
-      },
-      {
-       "name": "M",
-       "price": 30.98
-      },
-      {
-       "name": "L",
-       "price": 32.98
-      },
-      {
-       "name": "XL",
-       "price": 34.98
-      },
-      {
-       "name": "2XL",
-       "price": 36.98
-      },
-      {
-       "name": "3XL",
-       "price": 38.98
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-apparel-ladies-fitted-tee.png?v=12"
-  },
-  {
-   "id": "apparel-tank-top",
-   "weight": 140,
-   "name": "Custom Tank Top",
-   "price": 25.98,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-tank-top.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom tank top printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [
-    {
-     "label": "Print location",
-     "choices": [
-      {
-       "name": "Front only"
-      },
-      {
-       "name": "Back only"
-      },
-      {
-       "name": "Front and back",
-       "add": 6
-      }
-     ]
-    },
-    {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "XS",
-       "price": 25.98
-      },
-      {
-       "name": "S",
-       "price": 26.98
-      },
-      {
-       "name": "M",
-       "price": 28.98
-      },
-      {
-       "name": "L",
-       "price": 30.98
-      },
-      {
-       "name": "XL",
-       "price": 32.98
-      },
-      {
-       "name": "2XL",
-       "price": 34.98
-      },
-      {
-       "name": "3XL",
-       "price": 36.98
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-apparel-tank-top.png?v=12"
-  },
-  {
-   "id": "apparel-long-sleeve-tee",
-   "weight": 260,
-   "name": "Custom Long-Sleeve Tee",
-   "price": 30.98,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-long-sleeve-tee.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom long-sleeve tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [
-    {
-     "label": "Print location",
-     "choices": [
-      {
-       "name": "Front only"
-      },
-      {
-       "name": "Back only"
-      },
-      {
-       "name": "Front and back",
-       "add": 6
-      }
-     ]
-    },
-    {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "XS",
-       "price": 30.98
-      },
-      {
-       "name": "S",
-       "price": 31.98
-      },
-      {
-       "name": "M",
-       "price": 33.98
-      },
-      {
-       "name": "L",
-       "price": 35.98
-      },
-      {
-       "name": "XL",
-       "price": 37.98
-      },
-      {
-       "name": "2XL",
-       "price": 39.98
-      },
-      {
-       "name": "3XL",
-       "price": 41.98
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-apparel-long-sleeve-tee.png?v=12"
-  },
-  {
-   "id": "apparel-youth-tee",
-   "weight": 130,
-   "name": "Custom Youth Tee",
-   "price": 21.98,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-youth-tee.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom youth tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [
-    {
-     "label": "Print location",
-     "choices": [
-      {
-       "name": "Front only"
-      },
-      {
-       "name": "Back only"
-      },
-      {
-       "name": "Front and back",
-       "add": 6
-      }
-     ]
-    },
-    {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "Youth XS",
-       "price": 21.98
-      },
-      {
-       "name": "Youth S",
-       "price": 22.98
-      },
-      {
-       "name": "Youth M",
-       "price": 23.98
-      },
-      {
-       "name": "Youth L",
-       "price": 24.98
-      },
-      {
-       "name": "Youth XL",
-       "price": 25.98
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-apparel-youth-tee.png?v=12"
-  },
-  {
-   "id": "apparel-baby-onesie",
-   "weight": 100,
-   "name": "Custom Baby Onesie",
-   "price": 19.98,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-baby-onesie.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom baby onesie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [
-    {
-     "label": "Print location",
-     "choices": [
-      {
-       "name": "Front only"
-      },
-      {
-       "name": "Back only"
-      },
-      {
-       "name": "Front and back",
-       "add": 6
-      }
-     ]
-    },
-    {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "Newborn",
-       "price": 19.98
-      },
-      {
-       "name": "0-3 months",
-       "price": 19.98
-      },
-      {
-       "name": "3-6 months",
-       "price": 19.98
-      },
-      {
-       "name": "6-12 months",
-       "price": 20.98
-      },
-      {
-       "name": "12-18 months",
-       "price": 20.98
-      },
-      {
-       "name": "18-24 months",
-       "price": 21.98
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-apparel-baby-onesie.png?v=12"
-  },
-  {
-   "id": "apparel-crewneck-sweatshirt",
-   "weight": 560,
-   "name": "Custom Crewneck Sweatshirt",
-   "price": 36.98,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-crewneck-sweatshirt.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom crewneck sweatshirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [
-    {
-     "label": "Print location",
-     "choices": [
-      {
-       "name": "Front only"
-      },
-      {
-       "name": "Back only"
-      },
-      {
-       "name": "Front and back",
-       "add": 6
-      }
-     ]
-    },
-    {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "XS",
-       "price": 36.98
-      },
-      {
-       "name": "S",
-       "price": 37.98
-      },
-      {
-       "name": "M",
-       "price": 39.98
-      },
-      {
-       "name": "L",
-       "price": 41.98
-      },
-      {
-       "name": "XL",
-       "price": 43.98
-      },
-      {
-       "name": "2XL",
-       "price": 45.98
-      },
-      {
-       "name": "3XL",
-       "price": 47.98
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-apparel-crewneck-sweatshirt.png?v=12"
-  },
-  {
-   "id": "apparel-hoodie",
-   "weight": 700,
-   "name": "Custom Hoodie",
-   "price": 39.98,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-hoodie.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [
-    {
-     "label": "Print location",
-     "choices": [
-      {
-       "name": "Front only"
-      },
-      {
-       "name": "Back only"
-      },
-      {
-       "name": "Front and back",
-       "add": 6
-      }
-     ]
-    },
-    {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "XS",
-       "price": 39.98
-      },
-      {
-       "name": "S",
-       "price": 40.98
-      },
-      {
-       "name": "M",
-       "price": 42.98
-      },
-      {
-       "name": "L",
-       "price": 44.98
-      },
-      {
-       "name": "XL",
-       "price": 46.98
-      },
-      {
-       "name": "2XL",
-       "price": 48.98
-      },
-      {
-       "name": "3XL",
-       "price": 50.98
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-apparel-hoodie.png?v=12"
-  },
-  {
-   "id": "apparel-zip-up-hoodie",
-   "weight": 780,
-   "name": "Custom Zip-Up Hoodie",
-   "price": 44.98,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-zip-up-hoodie.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom zip-up hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [
-    {
-     "label": "Print location",
-     "choices": [
-      {
-       "name": "Front only"
-      },
-      {
-       "name": "Back only"
-      },
-      {
-       "name": "Front and back",
-       "add": 6
-      }
-     ]
-    },
-    {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "XS",
-       "price": 44.98
-      },
-      {
-       "name": "S",
-       "price": 45.98
-      },
-      {
-       "name": "M",
-       "price": 47.98
-      },
-      {
-       "name": "L",
-       "price": 49.98
-      },
-      {
-       "name": "XL",
-       "price": 51.98
-      },
-      {
-       "name": "2XL",
-       "price": 53.98
-      },
-      {
-       "name": "3XL",
-       "price": 55.98
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-apparel-zip-up-hoodie.png?v=12"
-  },
-  {
-   "id": "apparel-dad-cap",
-   "weight": 120,
-   "name": "Custom Dad Cap",
-   "price": 22.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-dad-cap.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom dad cap printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-apparel-dad-cap.png?v=12"
-  },
-  {
-   "id": "apparel-trucker-hat",
-   "weight": 110,
-   "name": "Custom Trucker Hat",
-   "price": 22.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-trucker-hat.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom trucker hat printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-apparel-trucker-hat.png?v=12"
-  },
-  {
-   "id": "apparel-beanie",
-   "weight": 100,
-   "name": "Custom Beanie",
-   "price": 21.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-beanie.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom beanie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-apparel-beanie.png?v=12"
-  },
-  {
-   "id": "apparel-tote-bag",
-   "weight": 170,
-   "name": "Custom Tote Bag",
-   "price": 20.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-tote-bag.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom tote bag printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-apparel-tote-bag.png?v=12"
-  },
-  {
-   "id": "apparel-apron",
-   "weight": 270,
-   "name": "Custom Apron",
-   "price": 26.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-apparel-apron.png"
-   ],
-   "video": "",
-   "category": "Apparel",
-   "description": "Custom apron printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-apparel-apron.png?v=12"
-  },
-  {
-   "id": "personalized-ornament",
-   "weight": 70,
-   "name": "Personalized Ornament",
-   "price": 14.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-personalized-ornament.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Capture the memory with a custom keepsake ornament featuring names, dates, or a favorite photo. Ceramic, in multiple shapes and sizes — a cherished holiday gift and yearly tradition.",
-   "optionGroups": [
-    {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "3 inch",
-       "price": 14.99
-      },
-      {
-       "name": "4 inch",
-       "price": 16.99
-      },
-      {
-       "name": "5 inch",
-       "price": 19.99
-      }
-     ]
-    },
-    {
-     "label": "Shape",
-     "choices": [
-      {
-       "name": "Round"
-      },
-      {
-       "name": "Heart"
-      },
-      {
-       "name": "Star"
-      },
-      {
-       "name": "Snowflake"
-      },
-      {
-       "name": "Oval"
-      },
-      {
-       "name": "Bauble"
-      },
-      {
-       "name": "Arrowhead"
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-personalized-ornament.png?v=12"
-  },
-  {
-   "id": "gift-bookmark",
-   "weight": 25,
-   "name": "Personalized Bookmark",
-   "price": 6.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-bookmark.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized bookmark made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-bookmark.png?v=12"
-  },
-  {
-   "id": "gift-fridge-magnet",
-   "weight": 30,
-   "name": "Personalized Fridge Magnet",
-   "price": 7.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-fridge-magnet.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized fridge magnet made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-fridge-magnet.png?v=12"
-  },
-  {
-   "id": "gift-can-cooler-koozie",
-   "weight": 45,
-   "name": "Personalized Can Cooler",
-   "price": 8.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-can-cooler-koozie.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized can cooler made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-can-cooler-koozie.png?v=12"
-  },
-  {
-   "id": "gift-shot-glass",
-   "weight": 190,
-   "name": "Personalized Shot Glass",
-   "price": 8.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-shot-glass.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized shot glass made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-shot-glass.png?v=12",
-   "hidden": true
-  },
-  {
-   "id": "gift-keychain",
-   "weight": 30,
-   "name": "Personalized Keychain",
-   "price": 9.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-keychain.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized keychain made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-keychain.png?v=12",
-   "hidden": true
-  },
-  {
-   "id": "gift-photo-print",
-   "weight": 45,
-   "name": "Personalized Photo Print",
-   "price": 9.99,
-   "images": [
-    "assets/img/product-gifts.jpg",
-    "assets/img/gal-gifts.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized photo print made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "hidden": true
-  },
-  {
-   "id": "gift-pet-id-tag",
-   "weight": 25,
-   "name": "Personalized Pet ID Tag",
-   "price": 9.99,
-   "images": [
-    "assets/img/product-gifts.jpg",
-    "assets/img/gal-gifts.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized pet id tag made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "hidden": true
-  },
-  {
-   "id": "gift-bag-charm",
-   "weight": 35,
-   "name": "Personalized Bag Charm",
-   "price": 10.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-bag-charm.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized bag charm made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-bag-charm.png?v=12",
-   "hidden": true
-  },
-  {
-   "id": "gift-luggage-tag",
-   "weight": 40,
-   "name": "Personalized Luggage Tag",
-   "price": 10.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-luggage-tag.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized luggage tag made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-luggage-tag.png?v=12",
-   "hidden": true
-  },
-  {
-   "id": "gift-lanyard",
-   "weight": 40,
-   "name": "Personalized Lanyard",
-   "price": 10.99,
-   "images": [
-    "assets/img/product-gifts.jpg",
-    "assets/img/gal-gifts.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized lanyard made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "hidden": true
-  },
-  {
-   "id": "gift-compact-mirror",
-   "weight": 95,
-   "name": "Personalized Compact Mirror",
-   "price": 11.99,
-   "images": [
-    "assets/img/product-gifts.jpg",
-    "assets/img/gal-gifts.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized compact mirror made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "hidden": true
-  },
-  {
-   "id": "gift-bottle-opener",
-   "weight": 65,
-   "name": "Personalized Bottle Opener",
-   "price": 12.99,
-   "images": [
-    "assets/img/product-gifts.jpg",
-    "assets/img/gal-gifts.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized bottle opener made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "hidden": true
-  },
-  {
-   "id": "gift-pot-holder",
-   "weight": 75,
-   "name": "Personalized Pot Holder",
-   "price": 12.99,
-   "images": [
-    "assets/img/product-gifts.jpg",
-    "assets/img/gal-gifts.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized pot holder made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "hidden": true
-  },
-  {
-   "id": "gift-tea-towel",
-   "weight": 95,
-   "name": "Personalized Tea Towel",
-   "price": 13.99,
-   "images": [
-    "assets/img/product-gifts.jpg",
-    "assets/img/gal-gifts.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized tea towel made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "hidden": true
-  },
-  {
-   "id": "gift-socks",
-   "weight": 75,
-   "name": "Personalized Socks",
-   "price": 14.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-socks.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized socks made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-socks.png?v=12"
-  },
-  {
-   "id": "gift-mouse-pad",
-   "weight": 140,
-   "name": "Personalized Mouse Pad",
-   "price": 14.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-mouse-pad.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized mouse pad made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-mouse-pad.png?v=12"
-  },
-  {
-   "id": "gift-notebook-journal",
-   "weight": 280,
-   "name": "Personalized Notebook",
-   "price": 16.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-notebook-journal.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized notebook made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-notebook-journal.png?v=12",
-   "hidden": true
-  },
-  {
-   "id": "gift-zip-pouch",
-   "weight": 85,
-   "name": "Personalized Zip Pouch",
-   "price": 16.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-zip-pouch.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized zip pouch made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-zip-pouch.png?v=12"
-  },
-  {
-   "id": "gift-makeup-bag",
-   "weight": 110,
-   "name": "Personalized Makeup Bag",
-   "price": 16.99,
-   "images": [
-    "assets/img/product-gifts.jpg",
-    "assets/img/gal-gifts.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized makeup bag made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "hidden": true
-  },
-  {
-   "id": "gift-license-plate",
-   "weight": 170,
-   "name": "Personalized License Plate",
-   "price": 16.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-license-plate.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized license plate made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-license-plate.png?v=12"
-  },
-  {
-   "id": "gift-jigsaw-puzzle",
-   "weight": 430,
-   "name": "Personalized Jigsaw Puzzle",
-   "price": 21.99,
-   "images": [
-    "assets/img/product-gifts.jpg",
-    "assets/img/gal-gifts.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized jigsaw puzzle made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "hidden": true
-  },
-  {
-   "id": "gift-garden-flag",
-   "weight": 100,
-   "name": "Personalized Garden Flag",
-   "price": 21.99,
-   "images": [
-    "assets/img/product-gifts.jpg",
-    "assets/img/gal-gifts.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized garden flag made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "hidden": true
-  },
-  {
-   "id": "gift-water-bottle",
-   "weight": 430,
-   "name": "Personalized Water Bottle",
-   "price": 22.99,
-   "images": [
-    "assets/img/product-gifts.jpg",
-    "assets/img/gal-gifts.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized water bottle made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "hidden": true
-  },
-  {
-   "id": "gift-pillow-cover",
-   "weight": 170,
-   "name": "Personalized Pillow Cover",
-   "price": 24.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-gift-pillow-cover.png"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized pillow cover made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "mockupPhoto": "assets/img/mock/mock-gift-pillow-cover.png?v=12",
-   "hidden": true
-  },
-  {
-   "id": "gift-wine-tumbler",
-   "weight": 330,
-   "name": "Personalized Wine Tumbler",
-   "price": 26.99,
-   "images": [
-    "assets/img/product-gifts.jpg",
-    "assets/img/gal-gifts.jpg"
-   ],
-   "video": "",
-   "category": "Gifts",
-   "description": "Personalized wine tumbler made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-   "optionGroups": [],
-   "hidden": true
-  },
-  {
-   "id": "ceramic-coasters",
-   "weight": 260,
-   "name": "Personalized Coasters",
-   "price": 8.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-ceramic-coasters.png"
-   ],
-   "video": "",
-   "category": "Home",
-   "description": "Protect your table in style with personalized coasters made from your design or photo. Singles or gift sets in ceramic, sandstone, cork, neoprene, acrylic or slate — a thoughtful housewarming & wedding gift.",
-   "optionGroups": [
-    {
-     "label": "Quantity",
-     "choices": [
-      {
-       "name": "Single",
-       "price": 8.99
-      },
-      {
-       "name": "Set of 4",
-       "price": 24.99
-      },
-      {
-       "name": "Set of 6",
-       "price": 34.99
-      },
-      {
-       "name": "Set of 8",
-       "price": 44.99
-      },
-      {
-       "name": "Set of 10",
-       "price": 52.99
-      },
-      {
-       "name": "Set of 12",
-       "price": 60.99
-      }
-     ]
-    },
-    {
-     "label": "Material",
-     "choices": [
-      {
-       "name": "Ceramic"
-      },
-      {
-       "name": "Sandstone"
-      },
-      {
-       "name": "Cork-Backed"
-      },
-      {
-       "name": "Neoprene"
-      },
-      {
-       "name": "Acrylic",
-       "add": 1
-      },
-      {
-       "name": "Slate",
-       "add": 2
-      }
-     ]
-    },
-    {
-     "label": "Shape",
-     "choices": [
-      {
-       "name": "Round",
-       "img": "assets/img/mock/mock-ceramic-coasters.png?v=12"
-      },
-      {
-       "name": "Square",
-       "img": "assets/img/mock/mock-variant-coaster-square.png?v=12"
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-ceramic-coasters.png?v=12"
-  },
-  {
-   "id": "custom-stickers",
-   "weight": 15,
-   "name": "Custom Stickers & Decals",
-   "price": 3.99,
-   "images": [
-    "https://laccistudio.com/assets/img/mock/mock-custom-stickers.png"
-   ],
-   "video": "",
-   "category": "Stickers",
-   "description": "Bring your artwork to life with durable die-cut vinyl stickers & decals — waterproof options and finishes like holographic & glitter. Sizes 2\"–6\", singles or packs — perfect for tumblers, laptops, cars, water bottles & small-business branding.",
-   "optionGroups": [
-    {
-     "label": "Size",
-     "choices": [
-      {
-       "name": "2 inch",
-       "price": 3.99
-      },
-      {
-       "name": "3 inch",
-       "price": 4.99
-      },
-      {
-       "name": "4 inch",
-       "price": 5.99
-      },
-      {
-       "name": "5 inch",
-       "price": 7.99
-      },
-      {
-       "name": "6 inch",
-       "price": 9.99
-      }
-     ]
-    },
-    {
-     "label": "Type",
-     "choices": [
-      {
-       "name": "Die-Cut"
-      },
-      {
-       "name": "Kiss-Cut"
-      },
-      {
-       "name": "Sticker Sheet"
-      },
-      {
-       "name": "Clear / Transparent"
-      },
-      {
-       "name": "Waterproof Vinyl"
-      },
-      {
-       "name": "Holographic",
-       "add": 1
-      },
-      {
-       "name": "Glitter",
-       "add": 1
-      },
-      {
-       "name": "Car Decal",
-       "add": 2
-      },
-      {
-       "name": "Laptop Decal"
-      },
-      {
-       "name": "Tumbler / Cup Decal"
-      },
-      {
-       "name": "Water-Bottle Decal"
-      }
-     ]
-    },
-    {
-     "label": "Pack",
-     "choices": [
-      {
-       "name": "Single"
-      },
-      {
-       "name": "Pack of 3",
-       "add": 7
-      },
-      {
-       "name": "Pack of 5",
-       "add": 12
-      },
-      {
-       "name": "Pack of 10",
-       "add": 22
-      },
-      {
-       "name": "Pack of 25",
-       "add": 45
-      },
-      {
-       "name": "Pack of 50",
-       "add": 80
-      }
-     ]
-    }
-   ],
-   "mockupPhoto": "assets/img/mock/mock-custom-stickers.png?v=12"
-  }
- ]
+  ]
 }
