@@ -154,19 +154,23 @@ await test("12. Shipping: owner's Snipcart bands chosen by weight", async () => 
   let f = stripeState.created.at(-1).params;
   eq(Number(f["shipping_options[0][shipping_rate_data][fixed_amount][amount]"]), 895, "Ground <=454 g");
   eq(Number(f["shipping_options[1][shipping_rate_data][fixed_amount][amount]"]), 1295, "Priority <=454 g");
-  eq(Number(f["shipping_options[2][shipping_rate_data][fixed_amount][amount]"]), 0, "Local delivery");
+  eq(f["shipping_options[2][shipping_rate_data][display_name]"], undefined, "Local delivery not offered (hidden for launch)");
+  ok(!Object.entries(f).some(([k, v]) => k.includes("display_name") && /Local/.test(v)), "no local delivery option at all");
   await checkout([line("sublimation-mug", { Size: "11 oz", Style: "Standard White" }, { qty: 3 })]); // 1800 g
   f = stripeState.created.at(-1).params;
   eq(Number(f["shipping_options[0][shipping_rate_data][fixed_amount][amount]"]), 1495, "Ground 1362-2268 g");
   eq(Number(f["shipping_options[1][shipping_rate_data][fixed_amount][amount]"]), 1995, "Priority 1362-2268 g");
   eq(f["shipping_address_collection[allowed_countries][0]"], "US", "US only");
+  eq(f["payment_method_types[0]"], "card", "cards only"); eq(f["payment_method_types[1]"], undefined, "no other payment methods");
 });
-await test("13. Tax: TX 8.25% rate attached to every line, created once", async () => {
-  await checkout([line("sublimation-mug", { Size: "11 oz", Style: "Standard White" }), line("sublimation-tumbler", { Size: "20 oz", Finish: "Glossy" })]);
-  const f = stripeState.created.at(-1).params;
-  ok(f["line_items[0][dynamic_tax_rates][0]"] && f["line_items[1][dynamic_tax_rates][0]"], "both lines have the tax rate");
-  eq(stripeState.taxRates.length, 1, "one tax rate created");
-  eq(stripeState.taxRates[0].percentage, 8.25, "8.25%"); eq(stripeState.taxRates[0].state, "TX", "Texas");
+await test("13. Tax: Stripe Tax switched on only when TAX_MODE is stripe_tax", async () => {
+  await checkout([line("sublimation-mug", { Size: "11 oz", Style: "Standard White" })]);
+  eq(stripeState.created.at(-1).params["automatic_tax[enabled]"], undefined, "off by default");
+  env.TAX_MODE = "stripe_tax";
+  await checkout([line("sublimation-mug", { Size: "11 oz", Style: "Standard White" })]);
+  eq(stripeState.created.at(-1).params["automatic_tax[enabled]"], "true", "on with stripe_tax");
+  env.TAX_MODE = "none";
+  ok(!Object.keys(stripeState.created.at(-1).params).some((k) => k.includes("dynamic_tax_rates")), "no deprecated dynamic_tax_rates");
 });
 await test("14. Price tampering: browser says $1.00 for the tumbler", async () => {
   const before = stripeState.created.length;
@@ -233,7 +237,7 @@ await test("20. Declined card: order stays unpaid; failed async payment and expi
 });
 await test("21. Confirmation page before the webhook: server asks Stripe, then confirms", async () => {
   const { s } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })], [699]);
-  pay(s.id, { shipping: 0, zip: "77020", method: "Local delivery — Houston area ZIP codes only (free)" });
+  pay(s.id, { shipping: 895, zip: "77020" });
   const r = await call("/api/order-status?session_id=" + s.id);
   eq(r.body.status, "paid", "paid via server-side Stripe lookup"); eq(r.body.email, "b…@example.com", "email masked");
   ok(!("shippingAddress" in r.body) && !JSON.stringify(r.body).includes("1 Test St"), "no address on the public status");
@@ -241,11 +245,11 @@ await test("21. Confirmation page before the webhook: server asks Stripe, then c
   eq(repeat.body.orderNumber, r.body.orderNumber, "refresh shows the same order");
   eq(await env.DB.prepare("SELECT COUNT(*) AS n FROM orders WHERE session_id = ?").bind(s.id).first().then((x) => x.n), 1, "no duplicate on refresh");
 });
-await test("22. Local delivery chosen outside Houston is flagged for the owner", async () => {
-  const { s } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })], [699]);
-  pay(s.id, { shipping: 0, zip: "10001", method: "Local delivery — Houston area ZIP codes only (free)" });
-  await webhook({ id: "evt_local", type: "checkout.session.completed", data: { object: s } });
-  ok(/OUTSIDE AREA/.test((await order(s.id)).notes || ""), "flag in notes");
+await test("22. Free local delivery is not offered to anyone while it cannot be limited by ZIP", async () => {
+  await checkout([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })]);
+  const f = stripeState.created.at(-1).params;
+  ok(!Object.entries(f).some(([k, v]) => k.includes("display_name") && /Local/i.test(v)), "no local delivery option");
+  ok(!Object.entries(f).some(([k, v]) => k.endsWith("[fixed_amount][amount]") && v === "0"), "no free shipping option");
 });
 await test("23. Unknown session ids and malformed ids are not found", async () => {
   eq((await call("/api/order-status?session_id=cs_test_nope")).status, 404, "unknown");

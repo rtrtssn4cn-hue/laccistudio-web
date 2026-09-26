@@ -64,7 +64,7 @@ function packingFor(catalog, lines) {
 // Shipping: the owner's Snipcart methods and weight bands (content/shipping.json), applied to
 // order weight = product weight x quantity (the rule Snipcart used). No method, no checkout.
 function shippingOptions(catalog, grams) {
-  const methods = (catalog.shipping.methods || []).filter((m) => m && m.name && Array.isArray(m.bands) && m.bands.length);
+  const methods = (catalog.shipping.methods || []).filter((m) => m && m.enabled !== false && m.name && Array.isArray(m.bands) && m.bands.length);
   const opts = methods.slice(0, 5).map((m) => {
     const band = m.bands.find((b) => b.maxGrams === null || b.maxGrams === undefined || grams <= b.maxGrams);
     if (!band || !Number.isFinite(Number(band.amount))) return null;
@@ -74,24 +74,10 @@ function shippingOptions(catalog, grams) {
   return opts.length ? opts : null;
 }
 
-// Tax: the owner's Snipcart rule (TX 8.25% on items) as Stripe tax rates applied by shipping
-// address ("dynamic tax rates"). Free: this is not Stripe Tax. Rates are created once per Stripe
-// account and found again by metadata.
-let taxRateCache = null;
-async function taxRateIds(env, catalog) {
-  const wanted = (catalog.shipping.tax && catalog.shipping.tax.rates) || [];
-  if (!wanted.length || env.TAX_MODE === "none") return [];
-  if (taxRateCache && taxRateCache.until > Date.now()) return taxRateCache.ids;
-  const existing = await stripe(env, "GET", "tax_rates", { active: true, limit: 100 });
-  const ids = [];
-  for (const w of wanted) {
-    let r = (existing.data || []).find((x) => x.metadata && x.metadata.lacci_id === w.id && Number(x.percentage) === Number(w.percentage) && x.state === w.state);
-    if (!r) r = await stripe(env, "POST", "tax_rates", { display_name: w.displayName, percentage: w.percentage, inclusive: false, country: w.country, state: w.state, jurisdiction: w.state, metadata: { lacci_id: w.id } }, `taxrate-${w.id}-${w.percentage}`);
-    ids.push(r.id);
-  }
-  taxRateCache = { ids, until: Date.now() + 10 * 60_000 };
-  return ids;
-}
+// Tax: Stripe's hosted Checkout can only apply tax by the customer's address through Stripe Tax
+// (TAX_MODE = "stripe_tax": 0.5% of the order where tax is collected, no monthly fee; Texas must be
+// registered in Stripe Tax settings). "none" collects no tax. Per-address tax rates
+// ("dynamic_tax_rates") were tried first and are rejected by Stripe as deprecated.
 
 // ---------------------------------------------------------------- checkout
 async function validateCart(env, body) {
@@ -147,8 +133,6 @@ async function handleCheckout(request, env) {
   const grams = v.lines.reduce((s, l) => s + l.grams, 0);
   const shipping = shippingOptions(v.catalog, grams);
   if (!shipping) return json({ error: "Online checkout isn't open yet. Please contact us to order." }, 503);
-  let taxRates = [];
-  try { taxRates = await taxRateIds(env, v.catalog); } catch (e) { return json({ error: "We couldn't start checkout. Please try again in a moment." }, 502); }
 
   const subtotal = v.lines.reduce((s, l) => s + l.lineCents, 0);
   const packing = packingFor(v.catalog, v.lines);
@@ -167,16 +151,19 @@ async function handleCheckout(request, env) {
     cancel_url: `${origin}/shop.html?checkout=cancelled`,
     line_items: v.lines.map((l) => ({
       quantity: l.qty,
-      ...(taxRates.length ? { dynamic_tax_rates: taxRates } : {}),
       price_data: { currency: "usd", unit_amount: l.unitCents, product_data: { name: l.name, description: lineDescription(l), metadata: { product_id: l.productId } } },
     })),
     shipping_address_collection: { allowed_countries: v.catalog.shipping.allowedCountries || ["US"] },
     shipping_options: shipping,
     phone_number_collection: { enabled: true },
     allow_promotion_codes: true,
+    // Cards only (Apple Pay / Google Pay appear as card wallets). Link, Cash App Pay, bank debits and
+    // buy-now-pay-later (Affirm, Klarna) stay off until the owner approves them.
+    payment_method_types: ["card"],
     metadata: { order_number: orderNumber },
     payment_intent_data: { metadata: { order_number: orderNumber }, description: `Lacci Studio order ${orderNumber}` },
   };
+  if (env.TAX_MODE === "stripe_tax") params.automatic_tax = { enabled: true };
   try {
     const session = await stripe(env, "POST", "checkout/sessions", params, `create-${orderNumber}`);
     await env.DB.prepare("UPDATE orders SET session_id = ? WHERE order_number = ?").bind(session.id, orderNumber).run();
@@ -199,7 +186,7 @@ async function markPaid(env, session) {
   if (session.amount_subtotal !== row.subtotal_cents) notes.push(`AMOUNT CHECK: Stripe subtotal ${session.amount_subtotal} vs order ${row.subtotal_cents}`);
   // Free local delivery is offered to everyone (hosted Checkout cannot hide it by address): flag it outside the area.
   const catalog = await loadCatalog(env);
-  const local = (catalog.shipping.methods || []).find((m) => m.postalCodePattern);
+  const local = (catalog.shipping.methods || []).find((m) => m.postalCodePattern && m.enabled !== false);
   const postal = ship && ship.address && ship.address.postal_code;
   const rateName = session.shipping_cost && session.shipping_cost.shipping_rate && typeof session.shipping_cost.shipping_rate === "object" ? session.shipping_cost.shipping_rate.display_name : null;
   const choseLocal = rateName ? rateName === (local && local.name) : (td.amount_shipping === 0 && !!local);

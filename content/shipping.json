@@ -1,5 +1,5 @@
 {
-  "note": "Shipping methods and weight bands copied exactly from the owner's Snipcart configuration (2026-09-26). Order weight = product 'weight' (grams, content/products.json) x quantity, the same rule Snipcart used. Those weights are unverified and do not grow with coaster set size; replace them with real packed weights when measured.",
+  "note": "PROVISIONAL: legacy rates for migration testing only, until real packed weights are measured. Shipping methods and weight bands copied exactly from the owner's Snipcart configuration (2026-09-26). Order weight = product 'weight' (grams, content/products.json) x quantity, the same rule Snipcart used. Those weights are unverified and do not grow with coaster set size; replace them with real packed weights when measured.",
   "allowedCountries": ["US"],
   "methods": [
     {
@@ -28,6 +28,8 @@
     },
     {
       "id": "local-delivery",
+      "enabled": false,
+      "disabledReason": "Hidden for the Stripe launch: hosted Checkout cannot limit it to Houston ZIP codes before payment.",
       "name": "Local delivery — Houston area ZIP codes only (free)",
       "maxDays": 5,
       "postalCodePattern": "^77([0-4][0-9]{2}|5(0[0-9]|1[0-8]|2[0-3]|3[0-9]|4[0-9]|7[0-9]|8[0-9]|9[0-9]))",
@@ -35,7 +37,7 @@
     }
   ],
   "tax": {
-    "note": "Copied from Snipcart: 'TX SALES TAX' 8.25% for US-TX addresses, charged on items after discounts (not on shipping).",
+    "note": "Record of the Snipcart setting only, not used by the Stripe checkout: Snipcart 'TX SALES TAX' 8.25% for US-TX addresses. SNIP-1001 shows it charged on items after the discount; that order had $0 shipping, so whether Snipcart also taxed shipping is unknown. Production tax approach is an open owner decision (docs/COMMERCE.md).",
     "rates": [{ "id": "tx-sales-tax", "displayName": "TX sales tax", "percentage": 8.25, "country": "US", "state": "TX" }]
   },
   "packaging": {
