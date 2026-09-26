@@ -65,7 +65,8 @@ async function sign(payload, secret = WEBHOOK_SECRET, t = Math.floor(Date.now() 
 }
 
 // ---------------------------------------------------------------- harness
-const env = makeEnv({ STRIPE_SECRET_KEY: "sk_test_local_simulated", STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET });
+// Fixed values so the suite never depends on a local .dev.vars.
+const env = makeEnv({ STRIPE_SECRET_KEY: "sk_test_local_simulated", STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, TAX_MODE: "none" });
 const call = (path, opts = {}) => worker.fetch(new Request("http://localhost:8787" + path, opts), env).then(async (r) => ({ status: r.status, body: await r.json() }));
 const checkout = (lines) => call("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lines }) });
 const webhook = async (event, secret) => { const raw = JSON.stringify(event); return call("/api/stripe/webhook", { method: "POST", headers: { "stripe-signature": await sign(raw, secret) }, body: raw }); };
@@ -162,6 +163,7 @@ await test("12. Shipping: owner's Snipcart bands chosen by weight", async () => 
   eq(Number(f["shipping_options[1][shipping_rate_data][fixed_amount][amount]"]), 1995, "Priority 1362-2268 g");
   eq(f["shipping_address_collection[allowed_countries][0]"], "US", "US only");
   eq(f["payment_method_types[0]"], "card", "cards only"); eq(f["payment_method_types[1]"], undefined, "no other payment methods");
+  eq(f["wallet_options[link][display]"], "never", "Link hidden");
 });
 await test("13. Tax: Stripe Tax switched on only when TAX_MODE is stripe_tax", async () => {
   await checkout([line("sublimation-mug", { Size: "11 oz", Style: "Standard White" })]);

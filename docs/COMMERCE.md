@@ -199,6 +199,15 @@ Sources and details: `research/texas-tax-stripe-fees-2026-09.md`. This is a summ
 
 Other fees: disputes $15 (+$15 counter fee, refunded if won). Refunds cost nothing extra, but the original fee isn't returned. No extra fee for Checkout itself.
 
+## 9c. Owner decisions (2026-09-26) and sandbox configuration
+
+- **Tax:** Stripe Tax, Texas registration only, shipping taxable where required; no collection outside Texas until an obligation exists. Worker `TAX_MODE=stripe_tax`; items use tax code `txcd_99999999` (general tangible goods), shipping `txcd_92010001`, both tax-exclusive.
+- **Sandbox registration:** Texas, state sales tax, entered by the owner in the sandbox dashboard. **Stripe can't backdate a registration** (API and dashboard both allow only "now" or a future date), so the sandbox registration starts on the test date. That's Stripe's collection-start date, not the permit's effective date. The live registration must reflect the owner's real registration information and is added only at launch, with the owner's approval.
+- **Sandbox preset product tax code** still shows "Downloadable Software" in the dashboard. It doesn't affect this checkout (every item and shipping carries its own code). Recommended: change it to "General – Tangible Goods" before launch.
+- **Payments:** cards only, which includes Apple Pay and Google Pay wallets (`payment_method_types: ["card"]`). **Link hidden** with `wallet_options.link.display = "never"`. Without that, Stripe still showed Link sign-up, "Link instant debit" **and Klarna through Link**, even with cards only. Cash App Pay, Affirm, Klarna and bank payments are off.
+- **Shipping:** legacy Ground/Priority bands remain **PROVISIONAL** until real packed weights. Local Delivery hidden.
+- **Automatic tax filing** (Stripe's paid filing add-on) isn't set up; the owner decides separately.
+
 ## 10. Test results (2026-09-26)
 
 ### Automated suite, simulated Stripe (`node tools/test-commerce.mjs`): 27 passed, 0 failed
@@ -248,3 +257,17 @@ The suite catches regressions. With the price check and the signature check deli
 
 ### Not yet run (needs the sandbox key, then deployment)
 Real sandbox payment with success and decline test cards; real webhook delivery; real tax calculation on a Texas address; promo code; customer receipt email; admin page against real D1; production smoke test.
+
+### Stripe Tax sandbox pass (2026-09-26, real sandbox, tax on)
+| Test | Result | Evidence |
+|---|---|---|
+| Texas shipping address → tax | **PASS** | LS-1007: coaster $6.99 → $0.58, T-shirt $31.98 → $2.63, shipping $11.95 → $0.99; 8.25% Texas "standard_rated"; tax $4.20, total $55.12 |
+| Tax on products and shipping | **PASS** | Shipping taxed ($0.99), as Texas Rule 3.303 requires; items-only would have been $3.22 |
+| Non-Texas address → $0 | **PASS** | LS-1008 (Colorado test address): tax $0.00; Stripe reason "not_collecting" for item and shipping |
+| Cards | **PASS** | Success test card paid LS-1007 and LS-1008 |
+| Apple Pay / Google Pay | **Configured correctly** | Apple Pay button shown by Checkout on the real session in this browser (Chromium on macOS). Google Pay not shown here: this browser has no Google Pay wallet. Needs a Chrome profile with a saved Google Pay card or an Android phone to see it. Hosted Checkout runs on Stripe's domain, so no domain registration is needed |
+| Disabled methods | **PASS** | Only Card (+ Apple Pay) offered; no Link, Klarna, Affirm, Cash App Pay or bank |
+| Declined payment | **PASS** | Decline test card refused; LS-1009 stays pending; cart kept ("Decline test" mug, $18.99) |
+| Successful payment → one paid order | **PASS** | One row per paid session |
+| Duplicate webhook | **PASS** | Each real sandbox event delivered twice: second marked duplicate; 3 events, 3 paid orders |
+| Totals identical | **PASS** | Cart $38.97 → server 3897 → Stripe subtotal 3897, shipping 1195, tax 420, total 5512 → order record identical |

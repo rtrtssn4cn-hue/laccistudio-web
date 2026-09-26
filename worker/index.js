@@ -169,6 +169,8 @@ async function handleCheckout(request, env) {
     // Cards only (Apple Pay / Google Pay appear as card wallets). Link, Cash App Pay, bank debits and
     // buy-now-pay-later (Affirm, Klarna) stay off until the owner approves them.
     payment_method_types: ["card"],
+    // Link would otherwise still appear (saved-card sign-up and "Pay with Bank"); owner has not approved it.
+    wallet_options: { link: { display: "never" } },
     metadata: { order_number: orderNumber },
     payment_intent_data: { metadata: { order_number: orderNumber }, description: `Lacci Studio order ${orderNumber}` },
   };
