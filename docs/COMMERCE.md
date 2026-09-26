@@ -38,7 +38,7 @@ Browser: shop.html → customizer (cart.js) → cart drawer (checkout.mjs, price
 Cloudflare Worker (worker/index.js, same "laccistudio" worker that serves the site)
     ├─ loads content/products.json, colors.json, shipping.json from its own deployed files
     ├─ re-prices every line with pricing.mjs; refuses hidden products/options/colours, bad quantities, foreign file links
-    ├─ writes a 'pending' order to D1 (order number LS-1001, LS-1002, …)
+    ├─ writes a 'pending' order to D1 (live: LS-1001, LS-1002, …; sandbox: TEST-LS-1001, … from a separate sequence)
     └─ creates a Stripe Checkout Session (server-side secret key) → redirect to Stripe
 Stripe Checkout (hosted) → customer pays → /order-confirmed.html?session_id=…
     ├─ Stripe webhook → /api/stripe/webhook (signature checked; event ids stored; order updates guarded) → order 'paid'
@@ -56,8 +56,10 @@ Admin: /admin/orders.html → /api/admin/orders (GitHub login; repo write access
 | `assets/js/pricing.mjs` | Pricing and availability rules (browser + server) |
 | `assets/js/checkout.mjs` | Cart drawer and checkout call (Stripe mode only) |
 | `order-confirmed.html` | Customer confirmation page |
-| `admin/orders.html` | Owner's order list: items, personalization, artwork links, address, amounts, suggested box, fulfil/notes |
+| `admin/orders.html` | Owner's order list: items, personalization, artwork links, address, amounts, suggested box, fulfil/notes. Sandbox orders only appear in the "Sandbox tests" tab, labelled TEST · SANDBOX |
 | `migrations/0001_orders.sql` | D1 tables `orders`, `stripe_events` |
+| `migrations/0002_order_sequences.sql` | Separate live / sandbox order-number sequences; relabels existing sandbox orders `TEST-LS-…` (kept, not deleted) |
+| `tools/set-dev-vars.mjs` | Puts the current sandbox key and webhook secret into `.dev.vars` with typing hidden; refuses live keys |
 | `content/shipping.json` | Shipping methods and bands, TX tax rate, packaging rules, real shipping history |
 | `tools/worker-local.mjs` | Run the worker on this computer (SQLite instead of D1) |
 | `tools/test-commerce.mjs` | Automated test suite (simulated Stripe) |
@@ -210,7 +212,7 @@ Other fees: disputes $15 (+$15 counter fee, refunded if won). Refunds cost nothi
 
 ## 10. Test results (2026-09-26)
 
-### Automated suite, simulated Stripe (`node tools/test-commerce.mjs`): 27 passed, 0 failed
+### Automated suite, simulated Stripe (`node tools/test-commerce.mjs`): 29 passed, 0 failed
 | # | Test | Result |
 |---|---|---|
 | 1 | Single coaster $6.99 with text | PASS |
@@ -240,6 +242,8 @@ Other fees: disputes $15 (+$15 counter fee, refunded if won). Refunds cost nothi
 | 25 | Site files still served; worker source and secrets not served | PASS |
 | 26 | Cart captured from the real browser flow → server → Stripe → paid order, all amounts equal | PASS |
 | 27 | Public order status exposes no file links, personalization or address | PASS |
+| 28 | Live and sandbox orders use separate sequences (LS-1001, LS-1002 not skipped by a sandbox order); To make & ship and All show live orders only; Sandbox tab shows sandbox only; SNIP- numbers never served | PASS |
+| 29 | Upgrade: an existing sandbox LS-1001 is relabelled TEST-LS-1001 and kept (status, total unchanged, old number noted); migration safe to re-run; next live order is LS-1001 | PASS |
 
 The suite catches regressions. With the price check and the signature check deliberately broken, tests 14, 15 and 17 fail.
 

@@ -4,7 +4,7 @@
 // order status, and the admin order API. Real Stripe test-mode runs are separate (see docs/COMMERCE.md).
 
 import worker from "../worker/index.js";
-import { makeEnv } from "./worker-local.mjs";
+import { makeEnv, localD1 } from "./worker-local.mjs";
 import pricing from "../assets/js/pricing.mjs";
 import { readFileSync } from "node:fs";
 
@@ -23,16 +23,17 @@ globalThis.fetch = async (input, init = {}) => {
   if (url.startsWith("https://api.stripe.com/v1/")) {
     const path = url.slice("https://api.stripe.com/v1/".length).split("?")[0];
     stripeState.calls.push(`${init.method} ${path}`);
-    if (!/^Bearer sk_test_/.test(init.headers.Authorization)) return reply({ error: { message: "bad key" } }, 401);
+    const liveKey = /^Bearer (sk|rk)_live_/.test(init.headers.Authorization);
+    if (!liveKey && !/^Bearer sk_test_/.test(init.headers.Authorization)) return reply({ error: { message: "bad key" } }, 401);
     if (path === "tax_rates" && init.method === "GET") return reply({ data: stripeState.taxRates });
     if (path === "tax_rates" && init.method === "POST") { const f = parseForm(init.body); const r = { id: "txr_test_" + (stripeState.taxRates.length + 1), percentage: Number(f.percentage), state: f.state, metadata: { lacci_id: f["metadata[lacci_id]"] } }; stripeState.taxRates.push(r); return reply(r); }
     if (path === "checkout/sessions" && init.method === "POST") {
-      const f = parseForm(init.body); const id = "cs_test_" + (stripeState.created.length + 1) + "abc";
+      const f = parseForm(init.body); const id = (liveKey ? "cs_live_" : "cs_test_") + (stripeState.created.length + 1) + "abc";
       let subtotal = 0; for (let i = 0; f[`line_items[${i}][quantity]`]; i++) subtotal += Number(f[`line_items[${i}][price_data][unit_amount]`]) * Number(f[`line_items[${i}][quantity]`]);
-      const s = { id, url: "https://checkout.stripe.test/" + id, params: f, amount_subtotal: subtotal, payment_status: "unpaid", livemode: false };
+      const s = { id, url: "https://checkout.stripe.test/" + id, params: f, amount_subtotal: subtotal, payment_status: "unpaid", livemode: liveKey };
       stripeState.sessions[id] = s; stripeState.created.push(s); return reply(s);
     }
-    const m = path.match(/^checkout\/sessions\/(cs_test_\w+)$/);
+    const m = path.match(/^checkout\/sessions\/(cs_(?:test|live)_\w+)$/);
     if (m && init.method === "GET") return reply(stripeState.sessions[m[1]] || {}, stripeState.sessions[m[1]] ? 200 : 404);
     return reply({ error: { message: "unhandled " + path } }, 400);
   }
@@ -107,7 +108,7 @@ async function chain(lines, expectUnits) {
 // ---------------------------------------------------------------- tests
 await test("1. Single coaster $6.99 with text", async () => {
   const { r } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })], [699]);
-  ok(/^LS-\d+$/.test(r.body.orderNumber), "order number format");
+  ok(/^TEST-LS-\d+$/.test(r.body.orderNumber), "sandbox order number format");
 });
 await test("2. Coaster quantities: Set of 4 x2, Set of 8 x1, Single x3", async () => {
   await chain([
@@ -265,13 +266,13 @@ await test("23. Unknown session ids and malformed ids are not found", async () =
 await test("24. Admin orders: login required, write access required, fulfil flow", async () => {
   eq((await call("/api/admin/orders")).status, 401, "no token");
   eq((await call("/api/admin/orders", { headers: { Authorization: "Bearer readonly" } })).status, 401, "read-only GitHub user");
-  const list = await call("/api/admin/orders?status=paid", { headers: { Authorization: "Bearer good" } });
+  const list = await call("/api/admin/orders?status=paid&mode=test", { headers: { Authorization: "Bearer good" } });
   eq(list.status, 200, "editor can list"); ok(list.body.orders.length >= 3, "paid orders listed");
   const o = list.body.orders[0];
   ok(o.lines[0].personalization && o.shippingAddress, "detail includes personalization and address");
   const done = await call("/api/admin/orders/" + o.orderNumber, { method: "POST", headers: { Authorization: "Bearer good", "Content-Type": "application/json" }, body: JSON.stringify({ status: "fulfilled", notes: "Shipped USPS" }) });
   eq(done.body.order.status, "fulfilled", "fulfilled"); eq(done.body.order.notes, "Shipped USPS", "note saved");
-  const pend = (await call("/api/admin/orders?status=pending", { headers: { Authorization: "Bearer good" } })).body.orders[0];
+  const pend = (await call("/api/admin/orders?status=pending&mode=test", { headers: { Authorization: "Bearer good" } })).body.orders[0];
   eq((await call("/api/admin/orders/" + pend.orderNumber, { method: "POST", headers: { Authorization: "Bearer good", "Content-Type": "application/json" }, body: JSON.stringify({ status: "fulfilled" }) })).status, 400, "cannot fulfil an unpaid order");
 });
 await test("25. Static files still served; worker source and secrets are not", async () => {
@@ -303,6 +304,45 @@ await test("27. Public order status never exposes artwork links, personalization
   const r = await call("/api/order-status?session_id=" + s.id);
   const text = JSON.stringify(r.body);
   ok(!/ucarecd|ucarecdn/.test(text), "no file links"); ok(!text.includes("Smith") && !text.includes("Team"), "no personalization text"); ok(!text.includes("1 Test St"), "no address");
+});
+
+await test("28. Live and sandbox orders use separate number sequences and admin lists", async () => {
+  // Same database, a simulated live key: live orders are LS-####, sandbox orders TEST-LS-####.
+  const liveEnv = { ...env, STRIPE_SECRET_KEY: "rk_live_local_simulated" };
+  const at = (e) => (lines) => worker.fetch(new Request("http://localhost:8787/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lines }) }), e).then((r) => r.json());
+  const one = [line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })];
+  const testsBefore = (await env.DB.prepare("SELECT last FROM order_sequences WHERE mode = 'test'").first()).last;
+  const l1 = await at(liveEnv)(one), t1 = await at(env)(one), l2 = await at(liveEnv)(one);
+  eq(l1.orderNumber, "LS-1001", "first live order"); eq(l2.orderNumber, "LS-1002", "second live order is not skipped by a sandbox order");
+  eq(t1.orderNumber, "TEST-LS-" + (testsBefore + 1), "sandbox order continues the sandbox sequence");
+  eq((await env.DB.prepare("SELECT livemode FROM orders WHERE order_number = 'LS-1001'").first()).livemode, 1, "live order stored as live");
+  const liveSession = stripeState.created.find((x) => x.id.startsWith("cs_live_"));
+  pay(liveSession.id); await webhook({ id: "evt_live_1", type: "checkout.session.completed", data: { object: liveSession } });
+  const auth = { headers: { Authorization: "Bearer good" } };
+  const toMake = (await call("/api/admin/orders?status=paid", auth)).body;
+  ok(toMake.orders.length >= 1 && toMake.orders.every((o) => o.livemode && /^LS-/.test(o.orderNumber)), "To make & ship shows live orders only");
+  ok(toMake.sandboxCount > 0, "admin is told how many sandbox orders are hidden");
+  const all = (await call("/api/admin/orders?status=all", auth)).body.orders;
+  ok(all.every((o) => o.livemode), "All tab hides sandbox orders");
+  const sandbox = (await call("/api/admin/orders?status=all&mode=test", auth)).body.orders;
+  ok(sandbox.length && sandbox.every((o) => !o.livemode && /^TEST-LS-/.test(o.orderNumber)), "Sandbox tab shows sandbox orders only");
+  eq((await call("/api/admin/orders/" + t1.orderNumber, auth)).status, 200, "sandbox order detail opens");
+  eq((await call("/api/admin/orders/SNIP-1001", auth)).status, 404, "Snipcart numbers are never served from this database");
+});
+await test("29. Upgrade: existing sandbox LS- order is relabelled and kept; live numbering starts at LS-1001", async () => {
+  const db = localD1(":memory:", ["0001_orders.sql"]);
+  db.raw.prepare("INSERT INTO orders (order_number, session_id, status, created_at, livemode, subtotal_cents, total_cents, lines_json) VALUES ('LS-1001', 'cs_test_old', 'paid', '2026-09-26T05:00:00Z', 0, 699, 1726, '[]')").run();
+  const up = readFileSync(new URL("../migrations/0002_order_sequences.sql", import.meta.url), "utf8");
+  db.raw.exec(up); db.raw.exec(up); // twice: must be safe to re-run
+  const rows = db.raw.prepare("SELECT order_number, status, total_cents, notes FROM orders").all();
+  eq(rows.length, 1, "sandbox order kept"); eq(rows[0].order_number, "TEST-LS-1001", "relabelled"); eq(rows[0].status, "paid", "status unchanged"); eq(rows[0].total_cents, 1726, "total unchanged");
+  eq((rows[0].notes.match(/Renumbered from LS-1001/g) || []).length, 1, "one note recording the old number");
+  const upEnv = { ...env, DB: db };
+  const liveEnv = { ...upEnv, STRIPE_SECRET_KEY: "rk_live_local_simulated" };
+  const one = JSON.stringify({ lines: [line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })] });
+  const go = (e) => worker.fetch(new Request("http://localhost:8787/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: one }), e).then((r) => r.json());
+  eq((await go(liveEnv)).orderNumber, "LS-1001", "first live order after upgrade");
+  eq((await go(upEnv)).orderNumber, "TEST-LS-1002", "next sandbox order after upgrade");
 });
 
 for (const [r, n] of results) console.log(`${r}  ${n}`);

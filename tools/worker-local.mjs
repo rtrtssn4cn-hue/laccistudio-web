@@ -4,7 +4,7 @@
 // .dev.vars (never committed). Also imported by tools/test-commerce.mjs.
 
 import { DatabaseSync } from "node:sqlite";
-import { readFileSync, existsSync, mkdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync, mkdirSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize } from "node:path";
 import worker from "../worker/index.js";
@@ -14,9 +14,12 @@ const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", "
 const HIDDEN = [/^\/worker\//, /^\/migrations\//, /^\/tools\//, /^\/docs\//, /^\/\.git/, /^\/\.dev\.vars/, /^\/\.wrangler\//, /^\/\.[^/]+\//];
 
 // Minimal D1 stand-in over node:sqlite (prepare/bind/run/first/all).
-export function localD1(file = ":memory:") {
+// Applies every file in migrations/ in order, or only the ones named (used to test an upgrade).
+export function localD1(file = ":memory:", only = null) {
   const db = new DatabaseSync(file);
-  db.exec(readFileSync(join(ROOT, "migrations/0001_orders.sql"), "utf8"));
+  for (const f of readdirSync(join(ROOT, "migrations")).filter((f) => f.endsWith(".sql")).sort()) {
+    if (!only || only.includes(f)) db.exec(readFileSync(join(ROOT, "migrations", f), "utf8"));
+  }
   const norm = (a) => a.map((v) => (v === undefined ? null : typeof v === "boolean" ? (v ? 1 : 0) : v));
   const stmt = (sql, args = []) => ({
     bind: (...a) => stmt(sql, norm(a)),

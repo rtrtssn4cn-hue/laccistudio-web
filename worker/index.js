@@ -130,6 +130,15 @@ function lineDescription(l) {
   return parts.join(" · ").slice(0, 480) || undefined;
 }
 
+// Live and sandbox orders are numbered from separate sequences (order_sequences, migrations/0002), so
+// sandbox checkouts never use up production numbers: live LS-1001, LS-1002…; sandbox TEST-LS-1001…
+async function nextOrderNumber(env, live) {
+  const row = await env.DB.prepare(
+    "INSERT INTO order_sequences (mode, last) VALUES (?, 1001) ON CONFLICT(mode) DO UPDATE SET last = last + 1 RETURNING last"
+  ).bind(live ? "live" : "test").first();
+  return (live ? "LS-" : "TEST-LS-") + row.last;
+}
+
 async function handleCheckout(request, env) {
   const len = Number(request.headers.get("content-length") || 0);
   if (len > LIMITS.body) return json({ error: "Request too large." }, 413);
@@ -145,11 +154,11 @@ async function handleCheckout(request, env) {
   const subtotal = v.lines.reduce((s, l) => s + l.lineCents, 0);
   const packing = packingFor(v.catalog, v.lines);
   const created = nowIso();
-  const ins = await env.DB.prepare(
-    "INSERT INTO orders (status, created_at, livemode, subtotal_cents, lines_json, packing_json) VALUES ('pending', ?, ?, ?, ?, ?)"
-  ).bind(created, isTestKey(env) ? 0 : 1, subtotal, JSON.stringify(v.lines), JSON.stringify(packing)).run();
-  const orderNumber = "LS-" + String(1000 + Number(ins.meta.last_row_id));
-  await env.DB.prepare("UPDATE orders SET order_number = ? WHERE id = ?").bind(orderNumber, ins.meta.last_row_id).run();
+  const live = !isTestKey(env);
+  const orderNumber = await nextOrderNumber(env, live);
+  await env.DB.prepare(
+    "INSERT INTO orders (order_number, status, created_at, livemode, subtotal_cents, lines_json, packing_json) VALUES (?, 'pending', ?, ?, ?, ?, ?)"
+  ).bind(orderNumber, created, live ? 1 : 0, subtotal, JSON.stringify(v.lines), JSON.stringify(packing)).run();
 
   const origin = siteOrigin(env, request);
   const params = {
@@ -296,16 +305,19 @@ function orderView(o, full) {
 async function handleAdmin(request, env, url) {
   const user = await adminUser(request, env);
   if (!user) return json({ error: "Please log in to the Lacci admin first." }, 401);
-  const m = url.pathname.match(/^\/api\/admin\/orders(?:\/(LS-\d+))?$/);
+  const m = url.pathname.match(/^\/api\/admin\/orders(?:\/((?:TEST-)?LS-\d+))?$/);
   if (url.pathname === "/api/admin/whoami") return json({ user });
   if (!m) return json({ error: "Not found." }, 404);
   if (request.method === "GET" && !m[1]) {
+    // Sandbox orders stay out of the normal lists: mode "live" (default), "test" (sandbox only) or "all".
     const status = url.searchParams.get("status");
-    const q = status && status !== "all"
-      ? env.DB.prepare("SELECT * FROM orders WHERE status = ? ORDER BY id DESC LIMIT 200").bind(status)
-      : env.DB.prepare("SELECT * FROM orders WHERE status != 'cancelled' ORDER BY id DESC LIMIT 200");
-    const { results } = await q.all();
-    return json({ orders: results.map((o) => orderView(o, true)) });
+    const mode = url.searchParams.get("mode") || "live";
+    const where = [], args = [];
+    if (status && status !== "all") { where.push("status = ?"); args.push(status); } else where.push("status != 'cancelled'");
+    if (mode !== "all") { where.push("livemode = ?"); args.push(mode === "test" ? 0 : 1); }
+    const { results } = await env.DB.prepare(`SELECT * FROM orders WHERE ${where.join(" AND ")} ORDER BY id DESC LIMIT 200`).bind(...args).all();
+    const tests = await env.DB.prepare("SELECT COUNT(*) AS n FROM orders WHERE livemode = 0 AND status != 'cancelled'").first();
+    return json({ orders: results.map((o) => orderView(o, true)), sandboxCount: tests ? tests.n : 0 });
   }
   if (!m[1]) return json({ error: "Not found." }, 404);
   const order = await env.DB.prepare("SELECT * FROM orders WHERE order_number = ?").bind(m[1]).first();
