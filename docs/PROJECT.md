@@ -107,7 +107,7 @@ The website also shows 22 more products and 18 hidden ones. Whether those can be
 
 ## Images with generated-image credentials
 
-9 PNGs in `assets/img` carry embedded content credentials (C2PA) naming OpenAI as the generator. **Never strip this metadata.** Converting them to JPEG did, and was reverted.
+9 PNGs in `assets/img` carry embedded content credentials (C2PA) that identify them as produced by a generative image tool. **Never strip this metadata.** Converting them to JPEG did, and was reverted.
 
 | File | Where it appears |
 |---|---|
