@@ -161,6 +161,42 @@ Every photo currently in the Gallery is one of these. The owner will choose repl
 6. No tool or vendor names, provenance statements or machine paths in files or commits. **Don't add tool-specific instruction files to the repo**; this document is the entry point. Keep third-party licence notices. Never strip content-provenance metadata (C2PA) from images: 9 images in `assets/img` carry it. Ask the owner first.
 7. Never commit customer data. Order details stay in Snipcart and Etsy.
 
+## Queued next project (do not start early)
+
+A complete professional UX/UI and functionality overhaul, followed by the visual admin rebuild. **It starts only after:**
+1. Stripe is live and verified in production.
+2. Snipcart is removed and cancelled.
+3. Checkout is stable.
+
+The owner's order of work:
+1. Fix the current checkout.
+2. Complete the Stripe migration.
+3. Verify it in production.
+4. Remove Snipcart safely.
+5. Stabilize.
+6. UX/UI audit.
+7. Customer-facing improvements.
+8. QA.
+9. Visual admin.
+10. QA.
+
+The first deliverable is `docs/UX-AUDIT.md`:
+- findings sorted FIX NOW / HIGH IMPACT / IMPROVEMENT / KEEP;
+- current vs proposed journeys for ten customer types (new visitor, TikTok coaster buyer, pet gift, Christmas, one coaster, a set of four different designs, own artwork, custom project, phone, non-technical);
+- proposals for the design system, navigation, homepage, shop, product page, customizer, cart, mobile and admin.
+
+Show the direction before making major changes. Standing rules:
+- never redraw the logo;
+- never invent reviews, sales or urgency;
+- use specific call-to-action labels;
+- keep one button system;
+- visual design selector for coasters;
+- clear quantity pricing;
+- friendly errors and loading states;
+- accessible and mobile-first;
+- one source of truth for prices;
+- reusable VISIBLE/HIDDEN controls in the admin.
+
 ## Outstanding tasks
 
 See `AUDIT-2026-09.md` §8 (decisions), §9 (bugs), §10 (next steps), §15 (information needed), and `ADMIN_AUDIT.md` §5 (admin phases A–F).
