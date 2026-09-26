@@ -10,11 +10,53 @@ Sources:
 
 ---
 
+## 0. Owner decisions (2026-09-26)
+
+- **$6.99 = ONE ceramic coaster. It is not a set of four.** The single coaster stays at $6.99. It is *not* moving to $8.99 for now. (On the work branch the "Single" option is corrected from $8.99 to $6.99, so the website matches the price the owner set.)
+- Quantity options wanted eventually: 1–8, or 1 / 2 / 4 / 6 / 8 if that shops more cleanly. **Quantity discounts are not final until material, packaging and labor costs are entered and margins calculated.** Current website set prices (4 / 6 / 8 / 10 / 12) are unchanged.
+- Website and Etsy prices are **not** to be aligned automatically. Every discrepancy is reported (§0.2); nothing changes without approval.
+- Competitor prices inform the decision but do not set the price.
+
+### 0.1 Shipping packaging (owner-supplied, 2026-09-26)
+
+| Coasters in order | Box |
+|---|---|
+| 1–3 | 6 × 6 × 2 in |
+| 4 | 9 × 6 × 2 in |
+| 5–8 | 9 × 6 × 4 in |
+
+**Real historical data point:** a previous Etsy order of **8 ceramic coasters** shipped USPS on an Etsy-generated label in a **6 × 6 × 6 in box** for **$10.69**. That's the only actual shipping cost on record, so keep it.
+
+Packed weights are **not yet known**. Don't estimate them. The website's `weight` values (e.g. 260 g per coaster line, whatever the set size) are unverified, and they don't scale with set size.
+
+### 0.2 Website vs Etsy — discrepancy report
+
+Website prices are the work-branch values; live differs only for the single coaster (live charges $8.99). Website shipping comes from rates in the Snipcart dashboard, which can't be read from here. The Snipcart cart itself is currently disabled (see AUDIT).
+
+| Product | Website price | Etsy price | Difference | Website shipping | Etsy shipping | Recommendation | Reason |
+|---|---|---|---|---|---|---|---|
+| Coaster, single | $6.99 | $6.99 | $0 | unknown (Snipcart dashboard) | $8.07 | Keep $6.99 on both until margins are known | Owner decision. Shipping is 115% of the item price |
+| Coaster, set of 4 | $24.99 | $19.99 | **+$5.00 website** | unknown | $8.07 | Decide after the margin calculation; then set both the same | Etsy $19.99 is below market core ($23–34); website sits in core |
+| Coaster, sets of 6 / 8 / 10 / 12 | $34.99 / $44.99 / $52.99 / $60.99 | not offered | – | unknown | – | Keep off Etsy until the quantity ladder is final | Etsy offers only 1 and 4 |
+| Coaster materials: sandstone, cork, neoprene, acrylic (+$1), slate (+$2) | website only | Etsy: ceramic with cork back only | – | – | – | **Hide any material you can't make** | Advertised options must be real |
+| Coaster shape round/square | both | both | $0 | – | – | Keep | Matches |
+| 20 oz tumbler (name or pet photo) | $27.99 | $19.99 | **+$8.00 website** | unknown | $6.54 | Align. Provisional $24.99 on both, pending costs | Buyers who compare will buy on Etsy. Etsy shipping looks below USPS cost |
+| Tumbler 30 oz (+$4) / 40 oz (+$7); finishes matte / glitter / holographic | website only | not offered | – | – | – | Hide until confirmed | Not sold on Etsy |
+| 11 oz mug | $18.99 | $19.99 (pet photo) | **−$1.00 website** | unknown | $8.07 | Align after costs | Small gap |
+| Mug 15 oz (+$2); styles (rim, two-tone, magic, glitter, enamel) | website only | not offered | – | – | – | Hide until confirmed | Not sold on Etsy |
+| Sublimation tee XS | $26.98 | $25.98 | **+$1.00 website** | unknown | $5.68 | Align | Only size that differs |
+| Tee S / M / L / XL / 2XL | $27.98 / $29.98 / $31.98 / $33.98 / $35.98 | same | $0 | unknown | $5.68 | Keep | Match |
+| Tee 3XL | $37.98 | not offered | – | – | – | Confirm you stock 3XL | Website only |
+| Tee "Front and back" (+$6) | website only | not offered | – | – | – | Confirm | Website only |
+| Tee colours | White only (other 16 hidden) | White polyester | – | – | – | Keep White only | Owner decision 2026-09-26 |
+
+---
+
 ## 1. What Lacci charges today
 
 | Product | Etsy price | Etsy shipping | Etsy delivered | Website price | Notes |
 |---|---|---|---|---|---|
-| Ceramic coaster, single | $6.99 | $8.07 | $15.06 | **$8.99** (card says "from $8.99") | Base changed to $6.99 in /admin on 2026-09-26, but the "Single" option still sets $8.99 |
+| Ceramic coaster, single | $6.99 | $8.07 | $15.06 | live **$8.99**; work branch $6.99 | Base changed to $6.99 in /admin on 2026-09-26, but the "Single" option still set $8.99. Corrected on the branch (owner-approved) |
 | Ceramic coaster, set of 4 | $19.99 | $8.07 | $28.06 | $24.99 | Website also sells 6/8/10/12 ($34.99–$60.99) |
 | 20 oz name tumbler | $19.99 | $6.54 | $26.53 | **$27.99** | Website also lists 30 oz and 40 oz, which are not on Etsy |
 | 20 oz pet photo tumbler | $19.99 | $6.54 | $26.53 | same product as above | |
@@ -126,7 +168,7 @@ Principle: same retail price on Etsy and the website. Compete on preview, proof,
 
 | Product | Current | Competitor core | Rec. website | Rec. Etsy | Rec. sale (seasonal) | Rationale |
 |---|---|---|---|---|---|---|
-| Coaster ×1 | Etsy $6.99 / site $8.99 | $9–12 | **$8.99** (or keep $6.99, see below) | $8.99 | none | $6.99 is below market core, and more than half a single-coaster order is shipping. Keep the single as a door-opener, but push sets. |
+| Coaster ×1 | $6.99 both (branch) | $9–12 | **$6.99 — owner decision; revisit after margins** | $6.99 | none | $6.99 is below market core, and more than half a single-coaster order is shipping. Keep the single as a door-opener, but push sets. |
 | Coasters ×2 | not offered | $17–22 | **$16.99** | $16.99 | – | Fills the gap between 1 and 4, a common couples/pet size |
 | Coasters ×4 | Etsy $19.99 / site $24.99 | $23–34 | **$27.99** ($7.00 each) | $27.99 | $23.99 | Lacci's $19.99 is near the bottom; $27.99 is the middle of the core |
 | Coasters ×6 | site $34.99 | $36–51 | **$38.99** ($6.50 each) | $38.99 | $33.99 | |

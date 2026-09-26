@@ -40,6 +40,8 @@ Owner ──► laccistudio.com/admin  (Decap CMS 3.x, one static page)
 
 ## 2. What is broken or confusing
 
+> **Update 2026-09-26 (work branch):** the admin can now edit product options (with a per-choice "Hidden from customers" switch), hide or show whole products, and turn garment colours on or off per product from a shared colour library. See §7. Items 1 and 3 below are fixed on the branch; the rest stand.
+
 ### Broken
 1. **Product options are invisible in the admin.** Every product's sizes, set sizes and their prices live in `optionGroups`, which the admin schema doesn't define. The admin shows an older "Choices" field that no product uses. Result: on 2026-09-26 the coaster price was edited to $6.99, but the "Single" option kept its own $8.99, so the shop still shows "from $8.99".
 2. **Editing a price broke checkout.** Snipcart re-checks prices against `snipcart-products.html`, a hand-made file the admin can't touch. The same edit left it at $8.99, so Snipcart would reject coaster orders. **Fixed on the working branch:** the file is now generated from `products.json` on every deploy.
@@ -148,3 +150,34 @@ Add:
 | Reuse | Replace |
 |---|---|
 | GitHub storage, GitHub login and OAuth Worker, deploy Action, Snipcart, Uploadcare, `boot.js` loading pattern, `cart.js` customizer, CSS | Hand-copied nav, footer and sections in 6 HTML files; the form-only admin as the main editing tool (kept as "advanced"); the mixed settings form |
+
+## 7. Visibility architecture (built 2026-09-26; the visual editor must keep it)
+
+One reusable rule: **hiding never deletes.** Three levels, same idea:
+
+| Level | Data | Admin control today | Visual editor (future) |
+|---|---|---|---|
+| Product | `products[].hidden` | "Hide this product from the shop" switch | Product card 👁 / ⊘ |
+| Option choice (size, quantity, finish, set…) | `optionGroups[].choices[].hidden` (`visible: false` also accepted) | "Hidden from customers" switch per choice | PRODUCT → OPTIONS → choice 👁 / ⊘ |
+| Garment colour | library `content/colors.json` `garmentColors[] {id, name, hex, method}` + per product `colors[] {id, visible}` in display order | Garment Colours library screen; per product a colour list with drag-to-reorder and a "Visible to customers" switch | PRODUCT → OPTIONS → COLOURS: ☰ reorder, swatch, 👁 Visible / ⊘ Hidden, add or edit colour |
+
+Why the switches differ in sense: the admin's on/off widget shows "off" for a missing field. Option choices use `hidden` (missing = visible) so existing data can't be hidden by accident. Every colour entry stores `visible` explicitly, and new ones start hidden.
+
+What customers get:
+- Only visible products, choices and colours are shown.
+- 1 visible colour is shown as plain text; 2 or more as swatches.
+- The Snipcart catalog (`tools/build-snipcart-catalog.mjs`, run on every deploy) lists only visible choices and colours.
+- Add-to-cart re-checks the chosen values against current data.
+- Carts restored from an earlier visit lose lines whose option is no longer offered, with a message.
+
+Tested 2026-09-26 in the editor itself, run locally in its offline test mode with the real content files:
+- the T-shirt shows 17 named colours, White on;
+- switching Black on and publishing changed exactly 1 value in `products.json` (all 45 products otherwise identical);
+- the site then offered White + Black swatches and the preview recoloured to black;
+- switching it back restored `products.json` and the Snipcart catalog byte-identically.
+
+Found and fixed during that test: summary lines using `{{#if}}` aren't supported by the editor and showed raw template text. They now use its `ternary` / `default` filters.
+
+Still to verify once Snipcart's account works: that Snipcart's server rejects an order carrying a hidden, non-priced value such as a colour. Price-bearing options are covered, because a hidden choice is missing from the catalog.
+
+**Requirement for the rebuild:** the visual editor writes these same fields, previews through the same `boot.js` filtering, and keeps "hide" separate from "delete". The same pattern should later cover sizes, quantities, personalization options, seasonal designs and collections.
