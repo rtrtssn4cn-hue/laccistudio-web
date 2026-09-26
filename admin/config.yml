@@ -40,17 +40,59 @@ collections:
               - { name: "category", label: "Category", widget: "string", hint: "Type your own — e.g. Drinkware, Apparel, Gifts. This makes the filter buttons. Spell it the same across products to group them." }
               - { name: "subcategory", label: "Subcategory (optional)", widget: "string", required: false, hint: "Optional second-level filter, e.g. Tumblers under Drinkware. Appears after you click its category." }
               - { name: "description", label: "Short description", widget: "text" }
-              - { name: "optionLabel", label: "Options label", widget: "string", required: false, hint: "e.g. Size, Color, Item. Leave blank if the product has no choices." }
-              - name: "choices"
-                label: "Choices (size / color / item)"
+              - { name: "hidden", label: "Hide this product from the shop", widget: "boolean", required: false, hint: "Hidden products keep all their details and come back when you switch this off." }
+              - name: "optionGroups"
+                label: "Options (sizes, quantities, finishes…)"
+                label_singular: "Option"
                 widget: "list"
                 required: false
-                summary: "{{fields.name}}{{#if fields.price}} — ${{fields.price}}{{/if}}"
+                summary: "{{fields.label}}"
+                hint: "Drag to reorder. Each choice has either a full price or an extra charge."
                 fields:
-                  - { name: "name", label: "Choice", widget: "string" }
-                  - { name: "price", label: "Price for this choice ($)", widget: "number", value_type: "float", required: false, min: 0, hint: "Leave blank to use the product's base price." }
+                  - { name: "label", label: "Option name (e.g. Size, Quantity)", widget: "string" }
+                  - name: "choices"
+                    label: "Choices"
+                    label_singular: "Choice"
+                    widget: "list"
+                    summary: "{{fields.name}}   price {{fields.price | default('–')}}   extra {{fields.add | default('–')}}{{fields.hidden | ternary('   — HIDDEN', '')}}"
+                    fields:
+                      - { name: "name", label: "Choice", widget: "string" }
+                      - { name: "price", label: "Full price for this choice ($)", widget: "number", value_type: "float", required: false, min: 0, hint: "e.g. Set of 4 = 24.99. Leave blank if you use an extra charge instead." }
+                      - { name: "add", label: "Extra charge ($)", widget: "number", value_type: "float", required: false, min: 0, hint: "Added on top, e.g. Glitter +3. Leave blank if you set a full price." }
+                      - { name: "hidden", label: "Hidden from customers", widget: "boolean", required: false, hint: "Keeps the choice and its price; customers just can't pick it." }
+                      - { name: "img", label: "Preview image (optional)", widget: "string", required: false }
+              - name: "colors"
+                label: "Garment colours for this product"
+                label_singular: "Colour"
+                widget: "list"
+                required: false
+                summary: "{{fields.id}} — {{fields.visible | ternary('VISIBLE ✓', 'hidden')}}"
+                hint: "Drag to reorder. Switch Visible on to sell a colour; off hides it without deleting anything. Colours themselves are defined under Garment Colours."
+                fields:
+                  - { name: "id", label: "Colour", widget: "relation", collection: "colors", file: "garmentColors", search_fields: ["garmentColors.*.name"], display_fields: ["garmentColors.*.name"], value_field: "garmentColors.*.id" }
+                  - { name: "visible", label: "Visible to customers", widget: "boolean", default: false, required: false }
               - { name: "id", label: "Internal ID (leave as-is)", widget: "string", hint: "Unique tag used behind the scenes — don't change on existing products." }
               - { name: "weight", label: "Shipping weight (grams)", widget: "number", value_type: "int", required: false, hint: "Product + packaging, in grams. Snipcart multiplies this by quantity to pick the shipping rate. 1 oz = 28g." }
+
+  # ---------------- Garment colour library ----------------
+  - name: "colors"
+    label: "Garment Colours"
+    files:
+      - name: "garmentColors"
+        label: "All garment colours"
+        file: "content/colors.json"
+        description: "Every colour you can offer. Which ones customers see is set per product (Shop → product → Garment colours)."
+        fields:
+          - name: "garmentColors"
+            label: "Colours"
+            label_singular: "Colour"
+            widget: "list"
+            summary: "{{fields.name}} — {{fields.method}}"
+            fields:
+              - { name: "id", label: "Internal ID (lowercase, no spaces; don't change once used)", widget: "string" }
+              - { name: "name", label: "Colour name shown to customers", widget: "string" }
+              - { name: "hex", label: "Swatch colour", widget: "color" }
+              - { name: "method", label: "Decoration method", widget: "select", options: ["sublimation", "vinyl"], hint: "vinyl = dark garments (heat-transfer vinyl); the customizer shows a note." }
 
   # ---------------- Gallery (Our Work) ----------------
   - name: "gallery"

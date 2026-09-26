@@ -1,0 +1,106 @@
+{
+  "garmentColors": [
+    {
+      "id": "white",
+      "name": "White",
+      "hex": "#FFFFFF",
+      "method": "sublimation"
+    },
+    {
+      "id": "natural",
+      "name": "Natural",
+      "hex": "#F2EADF",
+      "method": "sublimation"
+    },
+    {
+      "id": "light-grey",
+      "name": "Light Grey",
+      "hex": "#DCDCDC",
+      "method": "sublimation"
+    },
+    {
+      "id": "athletic-heather",
+      "name": "Athletic Heather",
+      "hex": "#C9C9C9",
+      "method": "sublimation"
+    },
+    {
+      "id": "light-blue",
+      "name": "Light Blue",
+      "hex": "#BBD7EA",
+      "method": "sublimation"
+    },
+    {
+      "id": "light-pink",
+      "name": "Light Pink",
+      "hex": "#F3C9D4",
+      "method": "sublimation"
+    },
+    {
+      "id": "butter-yellow",
+      "name": "Butter Yellow",
+      "hex": "#F5E6A8",
+      "method": "sublimation"
+    },
+    {
+      "id": "sage",
+      "name": "Sage",
+      "hex": "#C9D6C2",
+      "method": "sublimation"
+    },
+    {
+      "id": "lilac",
+      "name": "Lilac",
+      "hex": "#D5C9E6",
+      "method": "sublimation"
+    },
+    {
+      "id": "peach",
+      "name": "Peach",
+      "hex": "#F7CFB4",
+      "method": "sublimation"
+    },
+    {
+      "id": "charcoal",
+      "name": "Charcoal",
+      "hex": "#3F3F3F",
+      "method": "vinyl"
+    },
+    {
+      "id": "black",
+      "name": "Black",
+      "hex": "#1B1B1B",
+      "method": "vinyl"
+    },
+    {
+      "id": "navy",
+      "name": "Navy",
+      "hex": "#20304F",
+      "method": "vinyl"
+    },
+    {
+      "id": "maroon",
+      "name": "Maroon",
+      "hex": "#5C2233",
+      "method": "vinyl"
+    },
+    {
+      "id": "forest",
+      "name": "Forest",
+      "hex": "#264334",
+      "method": "vinyl"
+    },
+    {
+      "id": "royal-blue",
+      "name": "Royal Blue",
+      "hex": "#22357F",
+      "method": "vinyl"
+    },
+    {
+      "id": "red",
+      "name": "Red",
+      "hex": "#9B1C1C",
+      "method": "vinyl"
+    }
+  ]
+}

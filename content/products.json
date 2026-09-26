@@ -172,7 +172,77 @@
       "video": "",
       "id": "apparel-t-shirt",
       "description": "Custom t-shirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel"
+      "category": "Apparel",
+      "colors": [
+        {
+          "id": "white",
+          "visible": true
+        },
+        {
+          "id": "natural",
+          "visible": false
+        },
+        {
+          "id": "light-grey",
+          "visible": false
+        },
+        {
+          "id": "athletic-heather",
+          "visible": false
+        },
+        {
+          "id": "light-blue",
+          "visible": false
+        },
+        {
+          "id": "light-pink",
+          "visible": false
+        },
+        {
+          "id": "butter-yellow",
+          "visible": false
+        },
+        {
+          "id": "sage",
+          "visible": false
+        },
+        {
+          "id": "lilac",
+          "visible": false
+        },
+        {
+          "id": "peach",
+          "visible": false
+        },
+        {
+          "id": "charcoal",
+          "visible": false
+        },
+        {
+          "id": "black",
+          "visible": false
+        },
+        {
+          "id": "navy",
+          "visible": false
+        },
+        {
+          "id": "maroon",
+          "visible": false
+        },
+        {
+          "id": "forest",
+          "visible": false
+        },
+        {
+          "id": "royal-blue",
+          "visible": false
+        },
+        {
+          "id": "red",
+          "visible": false
+        }
+      ]
     },
     {
       "price": 26.98,
@@ -235,7 +305,77 @@
       "video": "",
       "id": "apparel-v-neck-tee",
       "description": "Custom v-neck tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel"
+      "category": "Apparel",
+      "colors": [
+        {
+          "id": "white",
+          "visible": true
+        },
+        {
+          "id": "natural",
+          "visible": false
+        },
+        {
+          "id": "light-grey",
+          "visible": false
+        },
+        {
+          "id": "athletic-heather",
+          "visible": false
+        },
+        {
+          "id": "light-blue",
+          "visible": false
+        },
+        {
+          "id": "light-pink",
+          "visible": false
+        },
+        {
+          "id": "butter-yellow",
+          "visible": false
+        },
+        {
+          "id": "sage",
+          "visible": false
+        },
+        {
+          "id": "lilac",
+          "visible": false
+        },
+        {
+          "id": "peach",
+          "visible": false
+        },
+        {
+          "id": "charcoal",
+          "visible": false
+        },
+        {
+          "id": "black",
+          "visible": false
+        },
+        {
+          "id": "navy",
+          "visible": false
+        },
+        {
+          "id": "maroon",
+          "visible": false
+        },
+        {
+          "id": "forest",
+          "visible": false
+        },
+        {
+          "id": "royal-blue",
+          "visible": false
+        },
+        {
+          "id": "red",
+          "visible": false
+        }
+      ]
     },
     {
       "price": 27.98,
@@ -298,7 +438,77 @@
       "video": "",
       "id": "apparel-ladies-fitted-tee",
       "description": "Custom ladies' fitted tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel"
+      "category": "Apparel",
+      "colors": [
+        {
+          "id": "white",
+          "visible": true
+        },
+        {
+          "id": "natural",
+          "visible": false
+        },
+        {
+          "id": "light-grey",
+          "visible": false
+        },
+        {
+          "id": "athletic-heather",
+          "visible": false
+        },
+        {
+          "id": "light-blue",
+          "visible": false
+        },
+        {
+          "id": "light-pink",
+          "visible": false
+        },
+        {
+          "id": "butter-yellow",
+          "visible": false
+        },
+        {
+          "id": "sage",
+          "visible": false
+        },
+        {
+          "id": "lilac",
+          "visible": false
+        },
+        {
+          "id": "peach",
+          "visible": false
+        },
+        {
+          "id": "charcoal",
+          "visible": false
+        },
+        {
+          "id": "black",
+          "visible": false
+        },
+        {
+          "id": "navy",
+          "visible": false
+        },
+        {
+          "id": "maroon",
+          "visible": false
+        },
+        {
+          "id": "forest",
+          "visible": false
+        },
+        {
+          "id": "royal-blue",
+          "visible": false
+        },
+        {
+          "id": "red",
+          "visible": false
+        }
+      ]
     },
     {
       "price": 25.98,
@@ -361,7 +571,77 @@
       "video": "",
       "id": "apparel-tank-top",
       "description": "Custom tank top printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel"
+      "category": "Apparel",
+      "colors": [
+        {
+          "id": "white",
+          "visible": true
+        },
+        {
+          "id": "natural",
+          "visible": false
+        },
+        {
+          "id": "light-grey",
+          "visible": false
+        },
+        {
+          "id": "athletic-heather",
+          "visible": false
+        },
+        {
+          "id": "light-blue",
+          "visible": false
+        },
+        {
+          "id": "light-pink",
+          "visible": false
+        },
+        {
+          "id": "butter-yellow",
+          "visible": false
+        },
+        {
+          "id": "sage",
+          "visible": false
+        },
+        {
+          "id": "lilac",
+          "visible": false
+        },
+        {
+          "id": "peach",
+          "visible": false
+        },
+        {
+          "id": "charcoal",
+          "visible": false
+        },
+        {
+          "id": "black",
+          "visible": false
+        },
+        {
+          "id": "navy",
+          "visible": false
+        },
+        {
+          "id": "maroon",
+          "visible": false
+        },
+        {
+          "id": "forest",
+          "visible": false
+        },
+        {
+          "id": "royal-blue",
+          "visible": false
+        },
+        {
+          "id": "red",
+          "visible": false
+        }
+      ]
     },
     {
       "price": 30.98,
@@ -424,7 +704,77 @@
       "video": "",
       "id": "apparel-long-sleeve-tee",
       "description": "Custom long-sleeve tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel"
+      "category": "Apparel",
+      "colors": [
+        {
+          "id": "white",
+          "visible": true
+        },
+        {
+          "id": "natural",
+          "visible": false
+        },
+        {
+          "id": "light-grey",
+          "visible": false
+        },
+        {
+          "id": "athletic-heather",
+          "visible": false
+        },
+        {
+          "id": "light-blue",
+          "visible": false
+        },
+        {
+          "id": "light-pink",
+          "visible": false
+        },
+        {
+          "id": "butter-yellow",
+          "visible": false
+        },
+        {
+          "id": "sage",
+          "visible": false
+        },
+        {
+          "id": "lilac",
+          "visible": false
+        },
+        {
+          "id": "peach",
+          "visible": false
+        },
+        {
+          "id": "charcoal",
+          "visible": false
+        },
+        {
+          "id": "black",
+          "visible": false
+        },
+        {
+          "id": "navy",
+          "visible": false
+        },
+        {
+          "id": "maroon",
+          "visible": false
+        },
+        {
+          "id": "forest",
+          "visible": false
+        },
+        {
+          "id": "royal-blue",
+          "visible": false
+        },
+        {
+          "id": "red",
+          "visible": false
+        }
+      ]
     },
     {
       "price": 21.98,
@@ -479,7 +829,77 @@
       "video": "",
       "id": "apparel-youth-tee",
       "description": "Custom youth tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel"
+      "category": "Apparel",
+      "colors": [
+        {
+          "id": "white",
+          "visible": true
+        },
+        {
+          "id": "natural",
+          "visible": false
+        },
+        {
+          "id": "light-grey",
+          "visible": false
+        },
+        {
+          "id": "athletic-heather",
+          "visible": false
+        },
+        {
+          "id": "light-blue",
+          "visible": false
+        },
+        {
+          "id": "light-pink",
+          "visible": false
+        },
+        {
+          "id": "butter-yellow",
+          "visible": false
+        },
+        {
+          "id": "sage",
+          "visible": false
+        },
+        {
+          "id": "lilac",
+          "visible": false
+        },
+        {
+          "id": "peach",
+          "visible": false
+        },
+        {
+          "id": "charcoal",
+          "visible": false
+        },
+        {
+          "id": "black",
+          "visible": false
+        },
+        {
+          "id": "navy",
+          "visible": false
+        },
+        {
+          "id": "maroon",
+          "visible": false
+        },
+        {
+          "id": "forest",
+          "visible": false
+        },
+        {
+          "id": "royal-blue",
+          "visible": false
+        },
+        {
+          "id": "red",
+          "visible": false
+        }
+      ]
     },
     {
       "price": 19.98,
@@ -538,7 +958,77 @@
       "video": "",
       "id": "apparel-baby-onesie",
       "description": "Custom baby onesie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel"
+      "category": "Apparel",
+      "colors": [
+        {
+          "id": "white",
+          "visible": true
+        },
+        {
+          "id": "natural",
+          "visible": false
+        },
+        {
+          "id": "light-grey",
+          "visible": false
+        },
+        {
+          "id": "athletic-heather",
+          "visible": false
+        },
+        {
+          "id": "light-blue",
+          "visible": false
+        },
+        {
+          "id": "light-pink",
+          "visible": false
+        },
+        {
+          "id": "butter-yellow",
+          "visible": false
+        },
+        {
+          "id": "sage",
+          "visible": false
+        },
+        {
+          "id": "lilac",
+          "visible": false
+        },
+        {
+          "id": "peach",
+          "visible": false
+        },
+        {
+          "id": "charcoal",
+          "visible": false
+        },
+        {
+          "id": "black",
+          "visible": false
+        },
+        {
+          "id": "navy",
+          "visible": false
+        },
+        {
+          "id": "maroon",
+          "visible": false
+        },
+        {
+          "id": "forest",
+          "visible": false
+        },
+        {
+          "id": "royal-blue",
+          "visible": false
+        },
+        {
+          "id": "red",
+          "visible": false
+        }
+      ]
     },
     {
       "price": 36.98,
@@ -601,7 +1091,77 @@
       "video": "",
       "id": "apparel-crewneck-sweatshirt",
       "description": "Custom crewneck sweatshirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel"
+      "category": "Apparel",
+      "colors": [
+        {
+          "id": "white",
+          "visible": true
+        },
+        {
+          "id": "natural",
+          "visible": false
+        },
+        {
+          "id": "light-grey",
+          "visible": false
+        },
+        {
+          "id": "athletic-heather",
+          "visible": false
+        },
+        {
+          "id": "light-blue",
+          "visible": false
+        },
+        {
+          "id": "light-pink",
+          "visible": false
+        },
+        {
+          "id": "butter-yellow",
+          "visible": false
+        },
+        {
+          "id": "sage",
+          "visible": false
+        },
+        {
+          "id": "lilac",
+          "visible": false
+        },
+        {
+          "id": "peach",
+          "visible": false
+        },
+        {
+          "id": "charcoal",
+          "visible": false
+        },
+        {
+          "id": "black",
+          "visible": false
+        },
+        {
+          "id": "navy",
+          "visible": false
+        },
+        {
+          "id": "maroon",
+          "visible": false
+        },
+        {
+          "id": "forest",
+          "visible": false
+        },
+        {
+          "id": "royal-blue",
+          "visible": false
+        },
+        {
+          "id": "red",
+          "visible": false
+        }
+      ]
     },
     {
       "price": 39.98,
@@ -664,7 +1224,77 @@
       "video": "",
       "id": "apparel-hoodie",
       "description": "Custom hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel"
+      "category": "Apparel",
+      "colors": [
+        {
+          "id": "white",
+          "visible": true
+        },
+        {
+          "id": "natural",
+          "visible": false
+        },
+        {
+          "id": "light-grey",
+          "visible": false
+        },
+        {
+          "id": "athletic-heather",
+          "visible": false
+        },
+        {
+          "id": "light-blue",
+          "visible": false
+        },
+        {
+          "id": "light-pink",
+          "visible": false
+        },
+        {
+          "id": "butter-yellow",
+          "visible": false
+        },
+        {
+          "id": "sage",
+          "visible": false
+        },
+        {
+          "id": "lilac",
+          "visible": false
+        },
+        {
+          "id": "peach",
+          "visible": false
+        },
+        {
+          "id": "charcoal",
+          "visible": false
+        },
+        {
+          "id": "black",
+          "visible": false
+        },
+        {
+          "id": "navy",
+          "visible": false
+        },
+        {
+          "id": "maroon",
+          "visible": false
+        },
+        {
+          "id": "forest",
+          "visible": false
+        },
+        {
+          "id": "royal-blue",
+          "visible": false
+        },
+        {
+          "id": "red",
+          "visible": false
+        }
+      ]
     },
     {
       "price": 44.98,
@@ -727,7 +1357,77 @@
       "video": "",
       "id": "apparel-zip-up-hoodie",
       "description": "Custom zip-up hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel"
+      "category": "Apparel",
+      "colors": [
+        {
+          "id": "white",
+          "visible": true
+        },
+        {
+          "id": "natural",
+          "visible": false
+        },
+        {
+          "id": "light-grey",
+          "visible": false
+        },
+        {
+          "id": "athletic-heather",
+          "visible": false
+        },
+        {
+          "id": "light-blue",
+          "visible": false
+        },
+        {
+          "id": "light-pink",
+          "visible": false
+        },
+        {
+          "id": "butter-yellow",
+          "visible": false
+        },
+        {
+          "id": "sage",
+          "visible": false
+        },
+        {
+          "id": "lilac",
+          "visible": false
+        },
+        {
+          "id": "peach",
+          "visible": false
+        },
+        {
+          "id": "charcoal",
+          "visible": false
+        },
+        {
+          "id": "black",
+          "visible": false
+        },
+        {
+          "id": "navy",
+          "visible": false
+        },
+        {
+          "id": "maroon",
+          "visible": false
+        },
+        {
+          "id": "forest",
+          "visible": false
+        },
+        {
+          "id": "royal-blue",
+          "visible": false
+        },
+        {
+          "id": "red",
+          "visible": false
+        }
+      ]
     },
     {
       "price": 22.99,

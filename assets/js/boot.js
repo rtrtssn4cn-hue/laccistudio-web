@@ -83,12 +83,14 @@
     getJSON("/content/settings.json"),
     getJSON("/content/products.json"),
     getJSON("/content/home.json"),
-    getJSON("/content/gallery.json")
+    getJSON("/content/gallery.json"),
+    getJSON("/content/colors.json")
   ]).then(function (res) {
     var s = res[0] || {};
     var p = res[1] || {};
     var h = res[2] || {};
     var g = res[3] || {};
+    var colorLib = (res[4] && res[4].garmentColors) || [];
 
     // ---- Contact / site settings (used by main.js) ----
     window.LACCI_CONFIG = {
@@ -130,7 +132,19 @@
       if (c.img) o.img = c.img;
       return o;
     }
-    function mapGroup(g) { return { label: g.label || "Option", choices: (g.choices || []).map(mapChoice) }; }
+    // Visibility: an option choice marked "hidden": true (or "visible": false) stays in products.json
+    // with its name, price and image, but is not offered to customers. The Snipcart catalog applies the same rule.
+    function isVisible(c) { return !(c && typeof c === "object" && (c.hidden === true || c.visible === false)); }
+    function mapGroup(g) { return { label: g.label || "Option", choices: (g.choices || []).filter(isVisible).map(mapChoice) }; }
+    // Garment colours: content/colors.json is the library; each product lists which library colours
+    // it uses, in display order, with its own visible flag. Only visible ones reach the customizer.
+    function productColors(pr) {
+      if (!pr.colors || !pr.colors.length) return null;
+      return pr.colors.filter(function (c) { return c && c.visible === true; }).map(function (c) {
+        var lib = colorLib.find(function (x) { return x.id === c.id; });
+        return lib ? { id: lib.id, name: lib.name, hex: lib.hex, vinyl: lib.method === "vinyl" } : null;
+      }).filter(Boolean);
+    }
     var products = (p.products || []).filter(function (pr) { return !pr.hidden; }).map(function (pr) {
       var groups = [];
       if (pr.optionGroups && pr.optionGroups.length) {
@@ -144,7 +158,8 @@
         image: imgs[0] || "", images: imgs, video: pr.video || "",
         category: pr.category, description: pr.description,
         mockupPhoto: pr.mockupPhoto || "",
-        options: groups[0] || null, optionGroups: groups
+        options: groups[0] || null, optionGroups: groups,
+        colors: productColors(pr)
       };
     });
     window.LACCI_SHOP = {

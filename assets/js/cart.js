@@ -58,6 +58,18 @@
     var m = choiceMod(p, c);
     return choiceName(c) + (m ? "[" + (m > 0 ? "+" : "") + m.toFixed(2) + "]" : "");
   }
+  function colorsOf(p) { return (p && Array.isArray(p.colors)) ? p.colors : null; }
+  // True when every dropdown value on a cart line is still offered for that product (hidden
+  // colours/options and removed products fail). Used on add-to-cart and on carts restored later.
+  function lineStillOrderable(id, fields) {
+    var p = findProduct(id); if (!p) return false;
+    var defs = customFieldDefs(p), ok = true;
+    (fields || []).forEach(function (f) {
+      var d = defs.find(function (x) { return x.name === f.name; });
+      if (d && d.type === "dropdown" && f.value && d.options.split("|").indexOf(f.value) < 0) ok = false;
+    });
+    return ok;
+  }
   function groupsOf(p) { return (p && p.optionGroups && p.optionGroups.length) ? p.optionGroups : (p && p.options ? [p.options] : []); }
 
   function addItem(id, opt) {
@@ -300,18 +312,8 @@
   var FONTS = ["No preference", "Script / Cursive", "Serif / Classic", "Sans-serif / Modern", "Handwritten", "Bold / Block", "Monogram", "Match my sample (note below)"];
   var COLORS = ["No preference", "White", "Black", "Gold", "Silver", "Rose Gold", "Red", "Navy", "Pink", "Green", "Custom (note below)"];
   var PROOF = ["Yes — send me a proof before production (recommended)", "No proof needed — produce as submitted"];
-  // Sublimation-safe garment colours. Dark shades are vinyl-only, so they are not offered here.
-  var GARMENT = [
-    { name: "White", hex: "#FFFFFF" }, { name: "Natural", hex: "#F2EADF" },
-    { name: "Light Grey", hex: "#DCDCDC" }, { name: "Athletic Heather", hex: "#C9C9C9" },
-    { name: "Light Blue", hex: "#BBD7EA" }, { name: "Light Pink", hex: "#F3C9D4" },
-    { name: "Butter Yellow", hex: "#F5E6A8" }, { name: "Sage", hex: "#C9D6C2" },
-    { name: "Lilac", hex: "#D5C9E6" }, { name: "Peach", hex: "#F7CFB4" },
-    { name: "Charcoal", hex: "#3F3F3F", vinyl: 1 }, { name: "Black", hex: "#1B1B1B", vinyl: 1 },
-    { name: "Navy", hex: "#20304F", vinyl: 1 }, { name: "Maroon", hex: "#5C2233", vinyl: 1 },
-    { name: "Forest", hex: "#264334", vinyl: 1 }, { name: "Royal Blue", hex: "#22357F", vinyl: 1 },
-    { name: "Red", hex: "#9B1C1C", vinyl: 1 }
-  ];
+  // Garment colours come from content/colors.json + each product's "colors" list (see boot.js).
+  // Only colours marked visible for that product reach p.colors.
   var TIMELINE = ["USPS Priority Mail — 5–7 business days", "USPS Ground Advantage — 7–10 business days"];
   var GLOBAL_PRE = [{ name: "Font style", options: FONTS }, { name: "Color", options: COLORS }];
   var GLOBAL_POST = [{ name: "Proof approval", options: PROOF }];
@@ -371,7 +373,8 @@
     });
     defs.push({ name: "Design file", type: "hidden" });
     defs.push({ name: "Back design file", type: "hidden" });
-    defs.push({ name: "Garment colour", type: "hidden" });
+    if (colorsOf(p)) defs.push({ name: "Garment colour", type: "dropdown", options: colorsOf(p).map(function (c) { return c.name; }).join("|") });
+    else defs.push({ name: "Garment colour", type: "hidden" });
     defs.push({ name: "Text colour code", type: "hidden" });
     defs.push({ name: "Placement", type: "hidden" });
     defs.push({ name: "Text styling", type: "hidden" });
@@ -478,12 +481,14 @@
         '</div>' +
         '<div class="cz-zoom"><button type="button" id="cz-zoom-out" aria-label="Zoom out">–</button><button type="button" id="cz-zoom-in" aria-label="Zoom in">+</button></div>' +
       "</div>" +
-      (hasFB ?
+      (colorsOf(p) && colorsOf(p).length === 1 ?
+        '<div class="cz-field"><span>Garment colour</span><span class="cz-sw-name" id="cz-sw-name">' + esc(colorsOf(p)[0].name) + '</span></div>' : "") +
+      (colorsOf(p) && colorsOf(p).length > 1 ?
         '<div class="cz-field"><span>Garment colour</span><div class="cz-swatches" id="cz-swatches">' +
-        GARMENT.map(function (g, i) {
+        colorsOf(p).map(function (g, i) {
           return '<button type="button" class="cz-sw' + (i === 0 ? " on" : "") + '" data-hex="' + g.hex +
                  '" data-name="' + esc(g.name) + '" data-vinyl="' + (g.vinyl ? "1" : "") + '" title="' + esc(g.name) + '" style="background:' + g.hex + '"></button>';
-        }).join("") + '</div><span class="cz-sw-name" id="cz-sw-name">White</span>' +
+        }).join("") + '</div><span class="cz-sw-name" id="cz-sw-name">' + esc(colorsOf(p)[0].name) + '</span>' +
         '<p class="cz-vinyl-note" id="cz-vinyl-note" style="display:none">Dark garments are decorated with heat-transfer vinyl rather than sublimation. Best for logos, text, and solid-colour artwork &mdash; photographs and gradients are not suitable on dark fabric.</p></div>' : "") +
       '<div class="cz-sizerow" id="cz-sizerow" style="display:none"><span>Front size</span><input type="range" id="cz-mock-size" min="12" max="92" value="34"><span>Rotate</span><input type="range" id="cz-mock-rot" min="-180" max="180" value="0"></div>' +
       '<div class="cz-textrow"><span>Text</span>' +
@@ -617,7 +622,7 @@
       var tag = body.querySelector("#cz-side-tag");
       if (tag) tag.textContent = both ? "Front & back" : viewMode;
     }
-    var garment = { name: "White", hex: "#FFFFFF" };
+    var garment = (colorsOf(p) && colorsOf(p)[0]) || { name: "", hex: "#FFFFFF" };
     var tintCache = {};
     function tintBase(src, hex, cb) {
       if (!src) return;
@@ -711,7 +716,7 @@
       btn.addEventListener("click", function () {
         body.querySelectorAll(".cz-sw").forEach(function (b) { b.classList.remove("on"); });
         btn.classList.add("on");
-        garment = { name: btn.getAttribute("data-name"), hex: btn.getAttribute("data-hex"), vinyl: !!btn.getAttribute("data-vinyl") };
+        garment = colorsOf(p).find(function (c) { return c.name === btn.getAttribute("data-name"); }) || garment;
         var lbl = body.querySelector("#cz-sw-name"); if (lbl) lbl.textContent = garment.name;
         var note = body.querySelector("#cz-vinyl-note"); if (note) note.style.display = garment.vinyl ? "block" : "none";
         applyView();
@@ -977,6 +982,15 @@
         var uw = body.querySelector("#cz-pers"); if (uw) { uw.scrollIntoView({ behavior: "smooth", block: "center" }); uw.focus(); }
         return;
       }
+      // Re-check against current data: a colour or option hidden since the page loaded, or
+      // edited in the page, is refused here (and again by the Snipcart catalog at checkout).
+      var chosen = [{ name: "Garment colour", value: colorsOf(p) ? garment.name : "" }];
+      var toks = selectedTokens(); Object.keys(toks).forEach(function (k) { chosen.push({ name: k, value: toks[k] }); });
+      if ((colorsOf(p) && !colorsOf(p).length) || !lineStillOrderable(p.id, chosen)) {
+        if (!warn) { warn = document.createElement("p"); warn.id = "cz-warn"; warn.style.cssText = "color:#b3261e;font-size:.78rem;line-height:1.3;margin:.5rem 0 0;text-align:center"; addBtn.parentNode.insertBefore(warn, addBtn.nextSibling); }
+        warn.textContent = "That option isn't available right now. Please refresh the page and choose again.";
+        return;
+      }
       if (warn) warn.remove();
       var qv = parseInt((body.querySelector("#cz-qty") || {}).value, 10); if (!qv || qv < 1) qv = 1;
       var placeTxt = placementText();
@@ -992,7 +1006,7 @@
         proof: (body.querySelector("#cz-proof") || {}).value || "",
         timeline: (body.querySelector("#cz-timeline") || {}).value || "",
         comments: (body.querySelector("#cz-comments") || {}).value || "",
-        garment: (hasFB ? garment.name + " (" + garment.hex + ")" + (garment.vinyl ? " \u2014 HTV vinyl" : "") : ""),
+        garment: (colorsOf(p) ? garment.name : ""),
         hex: ((body.querySelector("#cz-hex") || {}).value || "").trim(),
         placement: placeTxt,
         textStyle: textStyleText(),
@@ -1211,7 +1225,22 @@
        Snipcart's default theme has no reliable way for a customer to clear a
        code once entered, which blocks them swapping to a better one. */
     document.addEventListener("snipcart.ready", function () {
+      // A cart saved on an earlier visit can hold a colour or option that has since been hidden.
+      // Remove those lines before checkout and tell the customer why.
+      var removing = {};
+      function dropUnavailable() {
+        try {
+          var items = (Snipcart.store.getState().cart.items.items) || [];
+          var gone = items.filter(function (it) { return !removing[it.uniqueId] && !lineStillOrderable(it.id, it.customFields); });
+          if (!gone.length) return;
+          gone.forEach(function (it) { removing[it.uniqueId] = 1; Snipcart.api.cart.items.remove(it.uniqueId); });
+          alert(gone.map(function (it) { return it.name; }).join(", ") + (gone.length > 1 ? " were" : " was") +
+            " removed from your cart because the option you chose is no longer available. Please add it again.");
+        } catch (e) {}
+      }
+      dropUnavailable();
       function sync() {
+        dropUnavailable();
         try {
           var state = Snipcart.store.getState();
           var discounts = (state && state.cart && state.cart.discounts &&

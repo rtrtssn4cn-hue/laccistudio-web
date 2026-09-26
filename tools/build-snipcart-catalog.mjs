@@ -28,8 +28,11 @@ function mapChoice(c) {
   if (c.add !== undefined && c.add !== null && c.add !== "") o.add = Number(c.add);
   return o;
 }
+// Choices marked "hidden": true (or "visible": false) are not offered, so they are left out here too:
+// Snipcart then refuses an order that carries one (from a stale cart or an edited page).
+const isVisible = (c) => !(c && typeof c === "object" && (c.hidden === true || c.visible === false));
 function groupsOf(pr) {
-  if (pr.optionGroups && pr.optionGroups.length) return pr.optionGroups.map((g) => ({ label: g.label || "Option", choices: (g.choices || []).map(mapChoice) }));
+  if (pr.optionGroups && pr.optionGroups.length) return pr.optionGroups.map((g) => ({ label: g.label || "Option", choices: (g.choices || []).filter(isVisible).map(mapChoice) }));
   if (pr.choices && pr.choices.length) return [{ label: pr.optionLabel || "Option", choices: pr.choices.map(mapChoice) }];
   return [];
 }
@@ -45,13 +48,25 @@ function snipToken(price, c) {
   return c.name + (m ? "[" + (m > 0 ? "+" : "") + m.toFixed(2) + "]" : "");
 }
 
+// Visible garment colours for a product, in its own order (mirrors productColors() in boot.js)
+const colorLib = JSON.parse(readFileSync("content/colors.json", "utf8")).garmentColors || [];
+function productColors(pr) {
+  if (!pr.colors || !pr.colors.length) return null;
+  return pr.colors.filter((c) => c && c.visible === true).map((c) => colorLib.find((x) => x.id === c.id)).filter(Boolean);
+}
+
 // Mirrors customFieldDefs() in cart.js
 function customFieldDefs(pr) {
   const defs = [{ name: "Personalization", type: "textarea" }];
   defs.push({ name: "Font style", options: FONTS.join("|") });
   defs.push({ name: "Color", options: COLORS.join("|") });
   for (const g of groupsOf(pr)) defs.push({ name: g.label, options: g.choices.map((c) => snipToken(pr.price, c)).join("|") });
-  for (const n of ["Design file", "Back design file", "Garment colour", "Text colour code", "Placement", "Text styling", "Placement preview"]) defs.push({ name: n, type: "hidden" });
+  defs.push({ name: "Design file", type: "hidden" });
+  defs.push({ name: "Back design file", type: "hidden" });
+  const colors = productColors(pr);
+  if (colors) defs.push({ name: "Garment colour", options: colors.map((c) => c.name).join("|") });
+  else defs.push({ name: "Garment colour", type: "hidden" });
+  for (const n of ["Text colour code", "Placement", "Text styling", "Placement preview"]) defs.push({ name: n, type: "hidden" });
   defs.push({ name: "Proof approval", options: PROOF.join("|") });
   defs.push({ name: "Comments", type: "textarea" });
   return defs;
@@ -65,6 +80,7 @@ const buttons = products.map((pr) => {
   if (!pr.id) problems.push(`product "${pr.name}" has no id`);
   const price = Number(pr.price);
   if (!Number.isFinite(price)) problems.push(`product "${pr.id}" has no valid price`);
+  for (const c of pr.colors || []) if (!colorLib.some((x) => x.id === c.id)) problems.push(`product "${pr.id}" uses colour "${c.id}", which is not in content/colors.json`);
   const imgs = pr.images && pr.images.length ? pr.images : pr.image ? [pr.image] : [];
   const attrs = [
     ["data-item-id", pr.id],
