@@ -31,7 +31,7 @@ Sensitive values are typed only into Stripe or Cloudflare by the owner. They nev
 | # | Where | What | Sensitive? |
 |---|---|---|---|
 | C1 | Workers & Pages → D1 → Create database `lacci-orders` | Send the **database id** (not secret); it goes into `wrangler.toml` | No |
-| C2 | Workers & Pages → `laccistudio` → Settings → Variables and Secrets → Add → **Secret** `STRIPE_SECRET_KEY` | Live restricted key from S9 (use the sandbox key first for the rehearsal in §3) | **Yes: owner only** |
+| C2 | Workers & Pages → `laccistudio` → Settings → **Runtime variables and secrets** (the first section on the page, not the "Variables and secrets" box under Build) → Add → **Secret** `STRIPE_SECRET_KEY` | Live restricted key from S9 (use the sandbox key first for the rehearsal in §3) | **Yes: owner only** |
 | C3 | Same place → **Secret** `STRIPE_WEBHOOK_SECRET` | Signing secret from S8 | **Yes: owner only** |
 | C4 | ~~API token for GitHub Actions~~ | **Not needed.** Deploys come from Cloudflare's own Git connection (Workers Builds). The GitHub workflow was removed 2026-09-26 | — |
 

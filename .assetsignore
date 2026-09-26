@@ -17,3 +17,5 @@ worker/**
 migrations
 migrations/**
 .dev.vars
+.wrangler
+.wrangler/**
