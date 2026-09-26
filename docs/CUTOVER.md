@@ -33,7 +33,7 @@ Sensitive values are typed only into Stripe or Cloudflare by the owner. They nev
 | C1 | Workers & Pages → D1 → Create database `lacci-orders` | Send the **database id** (not secret); it goes into `wrangler.toml` | No |
 | C2 | Workers & Pages → `laccistudio` → Settings → Variables and Secrets → Add → **Secret** `STRIPE_SECRET_KEY` | Live restricted key from S9 (use the sandbox key first for the rehearsal in §3) | **Yes: owner only** |
 | C3 | Same place → **Secret** `STRIPE_WEBHOOK_SECRET` | Signing secret from S8 | **Yes: owner only** |
-| C4 | My Profile → API Tokens → the token used by GitHub Actions | Must include **Workers Scripts: Edit** and **D1: Edit** for the account (the migration step needs D1) | Token value stays in GitHub secrets |
+| C4 | ~~API token for GitHub Actions~~ | **Not needed.** Deploys come from Cloudflare's own Git connection (Workers Builds). The GitHub workflow was removed 2026-09-26 | — |
 
 `TAX_MODE = "stripe_tax"`, `SITE_URL`, `ADMIN_GITHUB_REPO` and `UPLOAD_HOSTS` are already set in `wrangler.toml` (not secret).
 
@@ -59,7 +59,7 @@ This merge also publishes the **stabilization changes** approved earlier in the 
 | Content | `content/products.json`, `content/colors.json` (new), `content/shipping.json` (new), `content/gallery.json`, `content/home.json` |
 | Checkout backend (not served) | `worker/index.js`, `worker/stripe.js`, `migrations/0001_orders.sql`, `wrangler.toml` |
 | Snipcart (kept for rollback) | `snipcart-products.html` (generated) |
-| Build and deploy | `.github/workflows/deploy.yml` (secret check, Snipcart catalog, D1 migration, publish), `.assetsignore`, `.gitignore` |
+| Build and deploy | Cloudflare Workers Builds, build command `node tools/predeploy.mjs` (secret check, then Snipcart catalog); deploy command `npx wrangler deploy`. `.assetsignore`, `.gitignore` |
 | SEO | `robots.txt`, `sitemap.xml` |
 | Images | 33 new shop thumbnails (`assets/img/card/`), 23 mockups resized; originals of provenance-tagged images untouched |
 | Not published | `docs/`, `tools/`, `worker/`, `migrations/`, `.github/` (excluded by `.assetsignore`) |
@@ -71,7 +71,7 @@ This merge also publishes the **stabilization changes** approved earlier in the 
 | Step | Action | Check |
 |---|---|---|
 | D0 | Owner completes C1–C4 (sandbox key in C2 first), S8 in **sandbox**, N1–N2 | D1 id in `wrangler.toml`; secrets listed in Cloudflare (values hidden) |
-| D1 | Merge `stripe-checkout` → `main`, push. GitHub Action: secret check → Snipcart catalog → D1 migration → publish | Action green; `live-2026-09-26` tag remains the pre-audit snapshot |
+| D1 | Merge `stripe-checkout` → `main`, push; Cloudflare Workers Builds publishes. **Done 2026-09-26.** Order tables created by hand in the D1 console (Cloudflare's build doesn't run migrations) | Live version = the merge; 0% errors |
 | D2 | Live site still on **Snipcart**: browse all pages, add a coaster in Snipcart, open cart | No regressions; the coaster price validates |
 | D3 | **Production rehearsal in sandbox mode:** on laccistudio.com with `?checkout=stripe`, place one order with Stripe's success test card and a Texas test address | Real webhook delivered to production; order in `/admin/orders.html` shows paid with tax; totals match |
 | D4 | Owner switches Cloudflare secrets to **live** values (C2 live restricted key, C3 live signing secret from S8 in live) and completes S1–S4, S7 in live | Nothing customer-facing changes yet (still Snipcart) |
@@ -115,7 +115,7 @@ See `COMMERCE.md` §9. In short:
 ## 7. Final pre-launch checklist
 
 - [ ] C1 D1 database created; id in `wrangler.toml`
-- [ ] C4 GitHub Actions token has D1 edit
+- [x] C4 not needed (Cloudflare Git deploys)
 - [ ] C2/C3 secrets set (sandbox for D3, live for D4 onward)
 - [ ] S8 webhook endpoint created (sandbox, then live) with the four events
 - [ ] S1–S4 live Stripe Tax: head office, Texas registration (collect immediately), General – Tangible Goods, exclusive
@@ -134,3 +134,11 @@ See `COMMERCE.md` §9. In short:
 - Local Delivery is unavailable.
 - Artwork stays on Uploadcare (unguessable links; not private-by-authentication).
 - No automatic owner email per order beyond Stripe's payment notification (Stripe → Settings → Communication preferences).
+
+## 9. Deploy pipeline (as found on 2026-09-26)
+- Deploys come from **Cloudflare Workers Builds**: Cloudflare's Git connection to `rtrtssn4cn-hue/laccistudio-web`, production branch `main`.
+- Build command: `node tools/predeploy.mjs`. It runs the secret check first, then rebuilds the Snipcart catalog, and any failure stops the deploy.
+- Deploy command: `npx wrangler deploy`.
+- The GitHub Actions workflow never had a Cloudflare token and failed on every push, so it was removed.
+- Database migrations aren't run by the build. New tables or columns are applied once in the D1 console (Workers & Pages → D1 → lacci-orders → Console) using the SQL in `migrations/`.
+

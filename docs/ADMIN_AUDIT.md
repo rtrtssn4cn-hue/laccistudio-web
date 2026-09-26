@@ -17,7 +17,7 @@ Owner ──► laccistudio.com/admin  (Decap CMS 3.x, one static page)
         GitHub repo rtrtssn4cn-hue/laccistudio-web, branch main
             │ every Save = a commit straight to main
             ▼
-        GitHub Action "Deploy to Cloudflare"
+        Cloudflare Workers Builds (Git connection; build command node tools/predeploy.mjs)
             │ builds snipcart-products.html from products.json (added 2026-09), then wrangler deploy
             ▼
         Cloudflare Worker "laccistudio" serving static files ──► laccistudio.com (live in ~1–2 min)
@@ -77,7 +77,7 @@ Owner ──► laccistudio.com/admin  (Decap CMS 3.x, one static page)
 | `/admin` is public | Expected. Nothing is editable without a GitHub login that has write access. | none |
 | Editor script | Loaded from unpkg with a floating `^3.6.0` version and no integrity check, on the page that holds a repo-write token | **Fixed:** pinned to 3.16.3 with an integrity hash |
 | Keys in `settings.json` | Snipcart public key, PayPal client ID, Uploadcare public key. All three are publishable by design, not secrets. | none |
-| Secrets | Cloudflare API token and account ID live in GitHub Actions secrets, not in code | none |
+| Secrets | Stripe keys live only as Cloudflare secrets; the build stops if a secret is ever committed (`tools/predeploy.mjs`) | none |
 | `.github/` was served publicly | Workflow file visible at laccistudio.com/.github/… | **Fixed:** excluded from deploy |
 | OAuth Worker | Code not in this repo. It should only send the token back to `https://laccistudio.com`. | **Owner to share the Worker code** for review |
 | Customer uploads (Uploadcare) | Anyone with the public key can upload to the account. That's how it works, but it's open to abuse. | In Uploadcare: turn on signed uploads, or at least file-type and size limits |

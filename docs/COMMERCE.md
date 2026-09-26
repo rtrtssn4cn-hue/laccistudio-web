@@ -148,7 +148,7 @@ Then `node tools/worker-local.mjs` (it refuses to start with a live key). Planne
 | Snipcart CSS overrides (`#snipcart`, `.snipcart-*`) | `assets/css/styles.css` (about lines 524–540 and 727) |
 | `snipcartApiKey`, `checkoutMode: "snipcart"` | `content/settings.json`, `assets/js/boot.js`, `admin/config.yml` |
 | Price-validation page | `snipcart-products.html` |
-| Generator and deploy step | `tools/build-snipcart-catalog.mjs`, `.github/workflows/deploy.yml` step "Build Snipcart price catalog" |
+| Generator and build step | `tools/build-snipcart-catalog.mjs`, and its call in `tools/predeploy.mjs` (keep the secret check) |
 | robots entry | `robots.txt` `Disallow: /snipcart-products.html` |
 | Admin wording | `HOW-TO-EDIT.md` ("leave checkout mode set to snipcart") |
 | Snipcart dashboard: domain laccistudio.com, shipping methods, TX tax, discounts, email templates | Snipcart account (cancel after export) |

@@ -22,7 +22,7 @@ content/*.json ──► assets/js/boot.js (fetches JSON on every page) ──�
                                                                   ├─► main.js (contact, social, menu, forms)
                                                                   └─► promo-banner.js (announcement)
 /admin (Decap CMS) ── GitHub login via Cloudflare Worker lacci-oauth ──► commits to main
-main ──► .github/workflows/deploy.yml ──► node tools/build-snipcart-catalog.mjs ──► wrangler deploy ──► Cloudflare Worker "laccistudio"
+main ──► Cloudflare Workers Builds (Git connection) ──► node tools/predeploy.mjs (secret check + Snipcart catalog) ──► wrangler deploy ──► Cloudflare Worker "laccistudio"
 ```
 
 | Thing | Where |
