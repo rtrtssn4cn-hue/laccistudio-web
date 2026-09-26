@@ -168,7 +168,12 @@ await test("13. Tax: Stripe Tax switched on only when TAX_MODE is stripe_tax", a
   eq(stripeState.created.at(-1).params["automatic_tax[enabled]"], undefined, "off by default");
   env.TAX_MODE = "stripe_tax";
   await checkout([line("sublimation-mug", { Size: "11 oz", Style: "Standard White" })]);
-  eq(stripeState.created.at(-1).params["automatic_tax[enabled]"], "true", "on with stripe_tax");
+  const f = stripeState.created.at(-1).params;
+  eq(f["automatic_tax[enabled]"], "true", "on with stripe_tax");
+  eq(f["line_items[0][price_data][tax_behavior]"], "exclusive", "item tax added on top");
+  eq(f["line_items[0][price_data][product_data][tax_code]"], "txcd_99999999", "item tax code");
+  eq(f["shipping_options[0][shipping_rate_data][tax_code]"], "txcd_92010001", "shipping taxable code");
+  eq(f["shipping_options[0][shipping_rate_data][tax_behavior]"], "exclusive", "shipping tax added on top");
   env.TAX_MODE = "none";
   ok(!Object.keys(stripeState.created.at(-1).params).some((k) => k.includes("dynamic_tax_rates")), "no deprecated dynamic_tax_rates");
 });

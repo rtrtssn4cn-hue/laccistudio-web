@@ -17,6 +17,12 @@ jobs:
         with:
           node-version: 20
 
+      # Stop the deploy if a Stripe secret ever lands in the repository (values are not printed).
+      - name: Check for committed secrets
+        run: |
+          if git ls-files | grep -qE '(^|/)\.dev\.vars$'; then echo "::error::.dev.vars is committed"; exit 1; fi
+          if git grep -qE '(sk|rk)_(test|live)_[A-Za-z0-9]{16,}|whsec_[A-Za-z0-9]{16,}'; then echo "::error::A Stripe secret appears in the repository"; exit 1; fi
+
       # Snipcart checks prices against this page; rebuild it from products.json so
       # a price edited in /admin can never disagree with it. Fails the deploy on bad data.
       - name: Build Snipcart price catalog

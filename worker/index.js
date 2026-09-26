@@ -63,12 +63,19 @@ function packingFor(catalog, lines) {
 
 // Shipping: the owner's Snipcart methods and weight bands (content/shipping.json), applied to
 // order weight = product weight x quantity (the rule Snipcart used). No method, no checkout.
-function shippingOptions(catalog, grams) {
+// Stripe Tax codes, sent only when TAX_MODE is "stripe_tax". Items: general tangible goods
+// (personalized printed products are taxed like other goods in Texas, Rule 3.300). Shipping: Stripe's
+// shipping code, so shipping is taxed wherever the rules require it (Texas: Rule 3.303).
+const TAX_CODE_GOODS = "txcd_99999999";
+const TAX_CODE_SHIPPING = "txcd_92010001";
+
+function shippingOptions(catalog, grams, withTax) {
   const methods = (catalog.shipping.methods || []).filter((m) => m && m.enabled !== false && m.name && Array.isArray(m.bands) && m.bands.length);
   const opts = methods.slice(0, 5).map((m) => {
     const band = m.bands.find((b) => b.maxGrams === null || b.maxGrams === undefined || grams <= b.maxGrams);
     if (!band || !Number.isFinite(Number(band.amount))) return null;
     return { shipping_rate_data: { type: "fixed_amount", display_name: m.name, fixed_amount: { amount: Math.round(Number(band.amount) * 100), currency: "usd" }, metadata: { method_id: m.id || "" },
+      ...(withTax ? { tax_behavior: "exclusive", tax_code: TAX_CODE_SHIPPING } : {}),
       ...(m.maxDays ? { delivery_estimate: { maximum: { unit: "business_day", value: m.maxDays } } } : {}) } };
   }).filter(Boolean);
   return opts.length ? opts : null;
@@ -131,7 +138,8 @@ async function handleCheckout(request, env) {
   const v = await validateCart(env, body);
   if (v.error) return json({ error: v.error, fresh: v.fresh, productId: v.productId }, v.status);
   const grams = v.lines.reduce((s, l) => s + l.grams, 0);
-  const shipping = shippingOptions(v.catalog, grams);
+  const withTax = env.TAX_MODE === "stripe_tax";
+  const shipping = shippingOptions(v.catalog, grams, withTax);
   if (!shipping) return json({ error: "Online checkout isn't open yet. Please contact us to order." }, 503);
 
   const subtotal = v.lines.reduce((s, l) => s + l.lineCents, 0);
@@ -151,7 +159,8 @@ async function handleCheckout(request, env) {
     cancel_url: `${origin}/shop.html?checkout=cancelled`,
     line_items: v.lines.map((l) => ({
       quantity: l.qty,
-      price_data: { currency: "usd", unit_amount: l.unitCents, product_data: { name: l.name, description: lineDescription(l), metadata: { product_id: l.productId } } },
+      price_data: { currency: "usd", unit_amount: l.unitCents, ...(withTax ? { tax_behavior: "exclusive" } : {}),
+        product_data: { name: l.name, description: lineDescription(l), metadata: { product_id: l.productId }, ...(withTax ? { tax_code: TAX_CODE_GOODS } : {}) } },
     })),
     shipping_address_collection: { allowed_countries: v.catalog.shipping.allowedCountries || ["US"] },
     shipping_options: shipping,
@@ -163,7 +172,7 @@ async function handleCheckout(request, env) {
     metadata: { order_number: orderNumber },
     payment_intent_data: { metadata: { order_number: orderNumber }, description: `Lacci Studio order ${orderNumber}` },
   };
-  if (env.TAX_MODE === "stripe_tax") params.automatic_tax = { enabled: true };
+  if (withTax) params.automatic_tax = { enabled: true };
   try {
     const session = await stripe(env, "POST", "checkout/sessions", params, `create-${orderNumber}`);
     await env.DB.prepare("UPDATE orders SET session_id = ? WHERE order_number = ?").bind(session.id, orderNumber).run();
