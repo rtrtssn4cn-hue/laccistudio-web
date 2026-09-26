@@ -103,7 +103,7 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .nav-links a:hover::after,.nav-links a.active::after{width:100%}
 .nav-links a.active{color:var(--gold-deep)}
 .nav .btn{padding:.7rem 1.3rem}
-.nav-toggle{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px}
+.nav-toggle{display:none;background:none;border:none;cursor:pointer;flex-direction:column;justify-content:center;align-items:center;gap:5px;min-width:44px;min-height:44px;padding:0}
 .nav-toggle span{width:26px;height:2px;background:var(--walnut);transition:.3s}
 
 /* ---------- Hero ---------- */
@@ -738,3 +738,10 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .cz-sw-name{font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--taupe)}
 
 .cz-vinyl-note{margin:.35rem 0 0;font-size:.72rem;line-height:1.5;color:var(--taupe);padding:.5rem .6rem;background:var(--linen);border-left:3px solid var(--gold-deep)}
+
+/* Anything marked hidden (e.g. services not launched yet) stays out of view even where a class sets display */
+[hidden]{display:none!important}
+/* Visible keyboard focus */
+a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+/* Footer links were 18px tall on phones; give them a comfortable tap area */
+@media (max-width:760px){.site-footer li a{display:inline-block;padding:.35rem 0}}

@@ -172,6 +172,8 @@
     var ggrid = document.querySelector("#gallery-grid");
     if (ggrid) {
       if (g.intro) document.querySelectorAll('[data-c="galleryIntro"]').forEach(function (el) { el.textContent = g.intro; });
+      // Items with no photo/video stay in gallery.json but are not shown (they rendered as empty boxes).
+      g.items = (g.items || []).filter(function (it) { return (it.images && it.images.length) || it.image || it.video; });
       ggrid.innerHTML = (g.items || []).map(function (it) {
         var imgs = (it.images && it.images.length) ? it.images : (it.image ? [it.image] : []);
         var slides = imgs.map(function (src, i) {

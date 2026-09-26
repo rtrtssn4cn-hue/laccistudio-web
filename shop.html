@@ -3,8 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shop — Lacci Studio</title>
-<meta name="description" content="Shop personalized products from Lacci Studio — tumblers, coasters, apparel, and more. Add to cart and check out securely.">
+<title>Shop Personalized Gifts — Coasters, Tumblers, Mugs &amp; Tees | Lacci Studio</title>
+<meta name="description" content="Personalize a ceramic coaster, tumbler, mug or tee with a name or photo, preview it live, and check out securely. Made to order in Houston, Texas.">
+<link rel="canonical" href="https://laccistudio.com/shop">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lacci Studio">
+<meta property="og:title" content="Shop Personalized Gifts — Coasters, Tumblers, Mugs &amp; Tees | Lacci Studio">
+<meta property="og:description" content="Personalize a ceramic coaster, tumbler, mug or tee with a name or photo, preview it live, and check out securely. Made to order in Houston, Texas.">
+<meta property="og:url" content="https://laccistudio.com/shop">
+<meta property="og:image" content="https://laccistudio.com/assets/logo/lacci-primary.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/logo/favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,6 +33,7 @@
       <li><a href="gallery.html">Gallery</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="contact.html">Contact</a></li>
+      <li><a href="shop.html" class="btn btn-gold">Shop Gifts</a></li>
     </ul>
   </div>
 </header>
@@ -41,7 +50,7 @@
   <div class="wrap">
     <div id="shop-filters" class="shop-filters"><!-- category filters render here --></div>
     <div id="shop-grid" class="shop-grid">
-      <!-- Products render here from assets/js/shop-config.js -->
+      <!-- Products render here from content/products.json (via boot.js + cart.js) -->
       <noscript><p style="text-align:center;color:var(--mocha)">Please enable JavaScript to view the shop, or <a href="contact.html">contact us</a> to order.</p></noscript>
     </div>
   </div>
@@ -66,7 +75,7 @@
     <div class="foot-grid">
       <div class="foot-brand"><img src="assets/logo/lacci-primary-gold.png" alt="Lacci Studio"><p>Premium personalized products crafted from your designs, photos, logos, and memories.</p></div>
       <div><h4>Explore</h4><ul><li><a href="index.html">Home</a></li><li><a href="shop.html">Shop</a></li><li><a href="services.html">Services</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="about.html">About Us</a></li><li><a href="contact.html">Contact</a></li></ul></div>
-      <div><h4>Services</h4><ul><li><a href="services.html">Sublimation</a></li><li><a href="services.html">Embroidery</a></li><li><a href="services.html">Laser Engraving</a></li><li><a href="services.html">Custom Apparel</a></li><li><a href="services.html">Business Branding</a></li><li><a href="services.html">Stickers &amp; Decals</a></li></ul></div>
+      <div><h4>Services</h4><ul><li><a href="services.html">Sublimation</a></li><li hidden data-status="coming-soon"><a href="services.html">Embroidery</a></li><li hidden data-status="coming-soon"><a href="services.html">Laser Engraving</a></li><li><a href="services.html">Custom Apparel</a></li><li><a href="services.html">Business Branding</a></li><li><a href="services.html">Stickers &amp; Decals</a></li></ul></div>
       <div><h4>Get in Touch</h4><ul><li><a class="js-email" href="mailto:info@laccistudio.com">info@laccistudio.com</a></li><li><a href="contact.html">Request a Quote</a></li></ul>
         <div class="foot-social">
         <a href="#" class="js-instagram" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>

@@ -1,7 +1,7 @@
 /* =========================================================================
    Lacci Studio — Shop + Cart engine
    Compact grid + category filters + personalization & design upload (in cart)
-   Reads products & checkout settings from assets/js/shop-config.js
+   Reads products & checkout settings from content/*.json (loaded by boot.js)
    ========================================================================= */
 (function () {
   function run() {
