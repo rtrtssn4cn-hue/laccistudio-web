@@ -15,7 +15,7 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "lacci-orders"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "300514d1-f136-4aa9-97fc-e870984412de"
 migrations_dir = "migrations"
 
 [vars]
