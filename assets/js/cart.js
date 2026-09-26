@@ -132,7 +132,11 @@
     var imgs = (p.images && p.images.length) ? p.images : (p.mockupPhoto ? [p.mockupPhoto] : []);
     var slides = imgs.length
       ? imgs.map(function (src, i) {
-          return '<div class="pslide' + (i === 0 ? " active" : "") + '"><img class="prod-mockphoto" src="' + esc(src) + '" alt="' + esc(p.name) + '" loading="lazy"></div>';
+          // Shop cards use a small JPEG copy of each mockup (assets/img/card/); the full PNG stays for the customizer.
+          // The grid was loading ~15 MB of PNGs. Falls back to the original if no card copy exists.
+          var card = String(src).replace(/^(https?:\/\/[^\/]+)?\/?assets\/img\/mock\/([\w-]+)\.png(\?.*)?$/, "/assets/img/card/$2.jpg");
+          var fb = card !== src ? ' onerror="this.onerror=null;this.src=\'' + esc(src).replace(/'/g, "%27") + '\'"' : "";
+          return '<div class="pslide' + (i === 0 ? " active" : "") + '"><img class="prod-mockphoto" src="' + esc(card) + '"' + fb + ' alt="' + esc(p.name) + '" loading="lazy"></div>';
         })
       : ['<div class="pslide active"><div class="prod-mock">' + mockupSVG(p) + "</div></div>"];
     if (p.video) {
