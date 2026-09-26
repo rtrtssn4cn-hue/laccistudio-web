@@ -6,3 +6,9 @@ node_modules
 .netlify
 wrangler.toml
 Shop refs per file*
+tools
+tools/**
+docs
+docs/**
+.github
+.github/**

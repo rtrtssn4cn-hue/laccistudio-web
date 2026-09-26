@@ -17,6 +17,11 @@ jobs:
         with:
           node-version: 20
 
+      # Snipcart checks prices against this page; rebuild it from products.json so
+      # a price edited in /admin can never disagree with it. Fails the deploy on bad data.
+      - name: Build Snipcart price catalog
+        run: node tools/build-snipcart-catalog.mjs
+
       - name: Publish with Wrangler
         uses: cloudflare/wrangler-action@v3
         with:
