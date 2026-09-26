@@ -9,10 +9,21 @@
   if (!SHOP) return;
   var CO = SHOP.checkout || {};
   var MODE = CO.mode || "inquiry";
+  // Stripe checkout can be tried before it is switched on for everyone: ?checkout=stripe keeps it on
+  // for this browser tab (sessionStorage); ?checkout=default turns the override off.
+  try {
+    var qsMode = new URLSearchParams(location.search).get("checkout");
+    if (qsMode === "stripe") sessionStorage.setItem("lacci_checkout", "stripe");
+    if (qsMode === "default") sessionStorage.removeItem("lacci_checkout");
+    if (sessionStorage.getItem("lacci_checkout") === "stripe") MODE = "stripe";
+  } catch (e) {}
   var SYM = SHOP.currencySymbol || "$";
   var CUR = SHOP.currency || "USD";
   var KEY = "lacci_cart_v2";
   var SNIPCART = (MODE === "snipcart" && CO.snipcartApiKey);
+  var STRIPE = (MODE === "stripe");
+  window.LACCI_CHECKOUT_MODE = MODE;
+  var CUSTOMIZE = SNIPCART || STRIPE; // both use the customizer; they differ only in where "Add to cart" goes
   var UC = CO.uploadcarePublicKey || ""; // Uploadcare public key for customer design uploads
   // Your Uploadcare project delivers from its own CDN domain (not the shared ucarecdn.com).
   // Override any time by adding "uploadcareCdnBase" in content/settings.json.
@@ -266,7 +277,7 @@
     var grid = document.querySelector("#shop-grid");
     if (!grid) return;
     grid.innerHTML = (SHOP.products || []).map(function (p) {
-      var btn = SNIPCART
+      var btn = CUSTOMIZE
         ? '<button class="btn btn-gold js-customize" data-cz="' + esc(p.id) + '">Add to Cart</button>'
         : '<button class="btn btn-gold js-add" data-add="' + esc(p.id) + '">Add to Cart</button>';
       return '<article class="prod-card reveal in" data-category="' + esc(p.category || "") + '" data-subcategory="' + esc(p.subcategory || "") + '" title="' + esc(p.description || "") + '">' +
@@ -277,7 +288,7 @@
         btn + "</div></article>";
     }).join("");
 
-    if (SNIPCART) {
+    if (CUSTOMIZE) {
       grid.querySelectorAll(".js-customize").forEach(function (b) {
         b.addEventListener("click", function () { openCustomize(findProduct(b.getAttribute("data-cz"))); });
       });
@@ -290,7 +301,7 @@
       });
     }
     setupCarousels(grid);
-    if (!SNIPCART) {
+    if (!CUSTOMIZE) {
       grid.querySelectorAll(".prod-card").forEach(function (card) {
         var addBtn = card.querySelector(".js-add"); if (!addBtn) return;
         var pid = addBtn.getAttribute("data-add");
@@ -413,6 +424,26 @@
     b.click();
     setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 900);
   }
+  // Hands a customized line to the Stripe cart (assets/js/checkout.mjs). Options go by choice name;
+  // the server re-prices everything from products.json.
+  function stripeAdd(p, v, garment) {
+    var options = {};
+    groupsOf(p).forEach(function (g) {
+      var tok = v.options[g.label];
+      var c = g.choices.find(function (x) { return snipToken(p, x) === tok; });
+      if (c) options[g.label] = choiceName(c);
+    });
+    var send = function () {
+      window.LacciCheckout.add({
+        productId: p.id, name: p.name, image: p.image, qty: v.qty || 1, options: options,
+        color: (colorsOf(p) && garment && garment.id) || null,
+        personalization: { text: v.personalization, font: v.font, textColor: v.color, textColorCode: v.hex, placement: v.placement, textStyle: v.textStyle, comments: v.comments, proof: v.proof },
+        files: { design: v.design, backDesign: v.design2, preview: v.placementImg }
+      });
+    };
+    if (window.LacciCheckout) send();
+    else document.addEventListener("lacci:checkout-ready", send, { once: true });
+  }
   function unitPrice(p, selected) {
     var total = Number(p.price);
     groupsOf(p).forEach(function (g) {
@@ -424,7 +455,7 @@
     return total;
   }
   function injectCustomizeModal() {
-    if (!SNIPCART || document.querySelector("#cz-modal")) return;
+    if (!CUSTOMIZE || document.querySelector("#cz-modal")) return;
     var wrap = document.createElement("div");
     wrap.innerHTML =
       '<div class="cz-overlay" id="cz-overlay"></div>' +
@@ -997,12 +1028,13 @@
       addBtn.disabled = true; addBtn.textContent = "Saving your placement\u2026";
       capturePreview(function (previewUrl) {
       addBtn.disabled = false; addBtn.textContent = "Add to Cart";
-      snipAdd(p, {
+      var line = {
         personalization: (body.querySelector("#cz-pers") || {}).value || "",
         font: (body.querySelector("#cz-font") || {}).value || "",
         color: (body.querySelector("#cz-color") || {}).value || "",
         options: selectedTokens(),
         design: state.design,
+        design2: state.design2, // back artwork: was uploaded but never sent with the order
         proof: (body.querySelector("#cz-proof") || {}).value || "",
         timeline: (body.querySelector("#cz-timeline") || {}).value || "",
         comments: (body.querySelector("#cz-comments") || {}).value || "",
@@ -1012,7 +1044,8 @@
         textStyle: textStyleText(),
         placementImg: previewUrl,
         qty: qv
-      });
+      };
+      if (STRIPE) stripeAdd(p, line, garment); else snipAdd(p, line);
       closeCustomize();
       });
     });
@@ -1026,12 +1059,14 @@
     if (navUL && !document.querySelector(".cart-btn")) {
       var li = document.createElement("li");
       li.className = "cart-li";
-      if (SNIPCART) li.innerHTML = '<a href="#" class="cart-btn snipcart-checkout" aria-label="Cart">' + cartIcon() + '<span class="cart-count snipcart-items-count">0</span></a>';
+      if (STRIPE) li.innerHTML = '<a href="#" class="cart-btn js-stripe-cart" aria-label="Cart">' + cartIcon() + '<span class="cart-count" style="display:none">0</span></a>';
+      else if (SNIPCART) li.innerHTML = '<a href="#" class="cart-btn snipcart-checkout" aria-label="Cart">' + cartIcon() + '<span class="cart-count snipcart-items-count">0</span></a>';
       else li.innerHTML = '<a href="#" class="cart-btn" aria-label="Cart">' + cartIcon() + '<span class="cart-count">0</span></a>';
       navUL.appendChild(li);
-      if (!SNIPCART) li.querySelector(".cart-btn").addEventListener("click", function (e) { e.preventDefault(); openDrawer(); });
+      if (STRIPE) li.querySelector(".cart-btn").addEventListener("click", function (e) { e.preventDefault(); if (window.LacciCheckout) window.LacciCheckout.open(); });
+      else if (!SNIPCART) li.querySelector(".cart-btn").addEventListener("click", function (e) { e.preventDefault(); openDrawer(); });
     }
-    if (SNIPCART) return;
+    if (SNIPCART || STRIPE) return;
     if (document.querySelector("#cart-drawer")) return;
     var wrap = document.createElement("div");
     wrap.innerHTML =
@@ -1049,11 +1084,12 @@
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="22" height="22">' +
       '<path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/></svg>';
   }
-  function openDrawer() { if (SNIPCART) return; document.querySelector("#cart-drawer").classList.add("open"); document.querySelector("#cart-overlay").classList.add("show"); }
+  function openDrawer() { if (STRIPE) { if (window.LacciCheckout) window.LacciCheckout.open(); return; } if (SNIPCART) return; document.querySelector("#cart-drawer").classList.add("open"); document.querySelector("#cart-overlay").classList.add("show"); }
   function closeDrawer() { document.querySelector("#cart-drawer").classList.remove("open"); document.querySelector("#cart-overlay").classList.remove("show"); }
 
   /* ------------------------------ render ------------------------------ */
   function render() {
+    if (STRIPE) { if (window.LacciCheckout) window.LacciCheckout.refreshBadge(); return; }
     document.querySelectorAll(".cart-count").forEach(function (el) { el.textContent = count(); el.style.display = count() ? "" : "none"; });
     if (SNIPCART) return;
     var box = document.querySelector("#cart-items");
@@ -1291,7 +1327,7 @@
   }
 
   /* ------------------------------- init ------------------------------- */
-  function init() { renderGrid(); renderFilters(); injectChrome(); injectQuickView(); if (SNIPCART) injectCustomizeModal(); render(); if (SNIPCART) initSnipcart(); }
+  function init() { renderGrid(); renderFilters(); injectChrome(); injectQuickView(); if (CUSTOMIZE) injectCustomizeModal(); render(); if (SNIPCART) initSnipcart(); }
   init();
   }
   if (window.LACCI_READY) run();

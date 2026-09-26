@@ -1,8 +1,30 @@
-# Tells Cloudflare this repo is a static website served by the Worker.
-# On every git push, "npx wrangler deploy" uploads these files to the worker
-# that laccistudio.com already points at — so edits publish automatically.
+# Cloudflare Worker "laccistudio": serves the static site and, since the Stripe migration,
+# the /api/ checkout routes in worker/index.js. Files are served before the worker runs, so
+# ordinary page views never use a worker request.
 name = "laccistudio"
+main = "worker/index.js"
 compatibility_date = "2026-07-21"
 
 [assets]
 directory = "./"
+binding = "ASSETS"
+
+# Orders database (Cloudflare D1, free plan). Create it once in the Cloudflare dashboard
+# (Workers & Pages -> D1 -> Create, name "lacci-orders"), paste its id below, then run the
+# migration in migrations/ (see docs/COMMERCE.md).
+[[d1_databases]]
+binding = "DB"
+database_name = "lacci-orders"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+[vars]
+SITE_URL = "https://laccistudio.com"
+ADMIN_GITHUB_REPO = "rtrtssn4cn-hue/laccistudio-web"
+UPLOAD_HOSTS = "51niy1s3e7.ucarecd.net,ucarecdn.com"
+# "texas" = apply the TX 8.25% rate from content/shipping.json; "none" = no tax.
+TAX_MODE = "texas"
+
+# Secrets (set in the Cloudflare dashboard, never in this file):
+#   STRIPE_SECRET_KEY      sk_test_... while testing, sk_live_... after approval
+#   STRIPE_WEBHOOK_SECRET  whsec_... from the Stripe webhook endpoint

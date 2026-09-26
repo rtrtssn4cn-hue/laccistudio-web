@@ -1,5 +1,6 @@
 User-agent: *
 Disallow: /admin/
 Disallow: /snipcart-products.html
+Disallow: /order-confirmed.html
 
 Sitemap: https://laccistudio.com/sitemap.xml

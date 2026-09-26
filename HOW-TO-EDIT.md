@@ -13,12 +13,14 @@ The earlier version of this guide pointed at `site-config.js` and `shop-config.j
 
 Things to know:
 - **Saving publishes immediately.** There is no draft yet.
-- **Option prices (sizes, coaster sets, finishes) can't be edited in the admin yet.** The "from" price on a product with options comes from its options, not the base price. Changing only the base price won't change what customers pay for an option.
-- Leave **Checkout mode** set to `snipcart`. Any other value turns off card checkout.
+- **Option prices** (sizes, coaster sets, finishes) are under each product → Options. A choice has either a full price (e.g. Set of 4 = 24.99) or an extra charge (e.g. Glitter +3). The "from" price shown in the shop is the cheapest visible choice.
+- **Hide without deleting:** product → "Hide this product from the shop"; a choice → "Hidden from customers"; a garment colour → switch "Visible to customers" off.
+- Leave **Checkout mode** set to `snipcart` until the Stripe checkout is approved (see `docs/COMMERCE.md`); then it becomes `stripe`.
+- **Orders** placed through the new Stripe checkout are at **laccistudio.com/admin/orders.html** (log in to /admin first).
 - Product categories are free text: spell them the same way every time, or a second filter button appears.
 
 ## What can't be edited in the admin yet
-Navigation, footer, homepage sections and their order, services, About, FAQ, and hiding/showing products. These are HTML or data edits for now; the plan to make them editable is in `docs/ADMIN_AUDIT.md`.
+Navigation, footer, homepage sections and their order, services, About and FAQ. These are HTML or data edits for now; the plan to make them editable is in `docs/ADMIN_AUDIT.md`.
 
 ## If something goes wrong
 Every change is saved in GitHub history. Any file can be restored to an earlier version; `docs/PROJECT.md` explains how.

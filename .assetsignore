@@ -12,3 +12,8 @@ docs
 docs/**
 .github
 .github/**
+worker
+worker/**
+migrations
+migrations/**
+.dev.vars

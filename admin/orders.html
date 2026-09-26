@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Orders — Lacci Studio</title>
+<link rel="icon" href="/assets/logo/favicon.png" type="image/png">
+<style>
+  :root { --espresso:#2B1D12; --gold:#D4A43A; --ivory:#FBF7F1; --beige:#F5EFE6; --taupe:#A79D8F; --line:#E6DCCD; --ok:#2e6b3f; --warn:#8a5a00; --bad:#9b1c1c; }
+  * { box-sizing:border-box }
+  body { margin:0; font:15px/1.5 -apple-system, "Segoe UI", Montserrat, sans-serif; background:var(--ivory); color:var(--espresso) }
+  header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 1.5rem; background:#fff; border-bottom:1px solid var(--line) }
+  header img { height:34px } header a { color:var(--espresso) }
+  main { max-width:1100px; margin:0 auto; padding:1.5rem }
+  h1 { font:600 1.6rem Georgia, "Cormorant Garamond", serif; margin:0 0 1rem }
+  .tabs { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem }
+  .tabs button { border:1px solid var(--line); background:#fff; padding:.45rem .9rem; border-radius:99px; cursor:pointer; font:inherit }
+  .tabs button.on { background:var(--espresso); color:#fff; border-color:var(--espresso) }
+  .order { background:#fff; border:1px solid var(--line); border-radius:10px; margin-bottom:.8rem }
+  .order > summary { list-style:none; cursor:pointer; padding:.9rem 1.1rem; display:grid; grid-template-columns:110px 1fr 110px 100px; gap:.8rem; align-items:center }
+  .order > summary::-webkit-details-marker { display:none }
+  .badge { display:inline-block; padding:.15rem .6rem; border-radius:99px; font-size:.78rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; background:var(--beige) }
+  .paid { background:#e3f1e6; color:var(--ok) } .fulfilled { background:#e8e8e8; color:#444 } .pending { background:#fff4d6; color:var(--warn) } .expired,.payment_failed { background:#f8e1e1; color:var(--bad) }
+  .test { font-size:.72rem; color:var(--warn); font-weight:600 }
+  .body { padding:0 1.1rem 1.1rem; display:grid; grid-template-columns:1fr 1fr; gap:1.2rem }
+  .line { border-top:1px solid var(--line); padding:.7rem 0 }
+  .line:first-child { border-top:0 }
+  .muted { color:#6d6257; font-size:.88rem }
+  .note { background:#fff4d6; padding:.5rem .7rem; border-radius:6px; font-size:.88rem; margin:.4rem 0 }
+  table { width:100%; border-collapse:collapse } td { padding:.2rem 0 } td:last-child { text-align:right }
+  button.act { background:var(--gold); border:0; padding:.55rem 1rem; border-radius:6px; font:inherit; font-weight:600; cursor:pointer }
+  textarea { width:100%; min-height:60px; font:inherit; border:1px solid var(--line); border-radius:6px; padding:.5rem }
+  .empty, .error { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.5rem; text-align:center }
+  a.file { display:inline-block; margin:.2rem .4rem .2rem 0 }
+  @media (max-width:760px) { .order > summary { grid-template-columns:1fr 1fr } .body { grid-template-columns:1fr } }
+</style>
+</head>
+<body>
+<header>
+  <a href="/admin/"><img src="/assets/logo/lacci-primary.png" alt="Lacci Studio"></a>
+  <nav><a href="/admin/">Site editor</a> · <strong>Orders</strong></nav>
+</header>
+<main>
+  <h1>Orders</h1>
+  <div class="tabs" role="tablist">
+    <button data-s="paid" class="on">To make &amp; ship</button>
+    <button data-s="fulfilled">Fulfilled</button>
+    <button data-s="all">All</button>
+    <button data-s="pending">Unpaid / abandoned</button>
+  </div>
+  <div id="list" aria-live="polite"><div class="empty">Loading orders…</div></div>
+</main>
+<script>
+  // Order data comes from /api/admin/orders; access is checked on the server against GitHub repo write access.
+  // Everything customers typed is inserted as text (never HTML).
+  var el = function (tag, attrs, kids) {
+    var n = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) { if (k === "text") n.textContent = attrs[k]; else if (k === "cls") n.className = attrs[k]; else n.setAttribute(k, attrs[k]); });
+    (kids || []).forEach(function (c) { if (c) n.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+    return n;
+  };
+  var money = function (c) { return c == null ? "—" : "$" + (c / 100).toFixed(2); };
+  var when = function (s) { return s ? new Date(s).toLocaleString() : "—"; };
+  function token() {
+    try { var u = JSON.parse(localStorage.getItem("decap-cms-user") || "null"); return u && u.token; } catch (e) { return null; }
+  }
+  function api(path, opts) {
+    opts = opts || {}; opts.headers = Object.assign({ Authorization: "Bearer " + token() }, opts.headers || {});
+    return fetch(path, opts).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || ("Error " + r.status)); return d; }); });
+  }
+  var status = "paid";
+  function load() {
+    var list = document.querySelector("#list");
+    if (!token()) { list.replaceChildren(el("div", { cls: "error" }, ["Please log in first: open ", el("a", { href: "/admin/", text: "the site editor" }), ", log in with GitHub, then come back to this page."])); return; }
+    list.replaceChildren(el("div", { cls: "empty", text: "Loading orders…" }));
+    api("/api/admin/orders?status=" + status).then(function (d) {
+      if (!d.orders.length) { list.replaceChildren(el("div", { cls: "empty", text: "No orders here yet." })); return; }
+      list.replaceChildren.apply(list, d.orders.map(render));
+    }).catch(function (e) { list.replaceChildren(el("div", { cls: "error", text: e.message })); });
+  }
+  function render(o) {
+    var addr = o.shippingAddress && o.shippingAddress.address;
+    var sum = el("summary", {}, [
+      el("strong", { text: o.orderNumber }),
+      el("span", {}, [o.customerName || "(awaiting payment)", el("br"), el("span", { cls: "muted", text: when(o.createdAt) })]),
+      el("span", { cls: "badge " + o.status, text: o.status.replace("_", " ") }),
+      el("span", {}, [el("strong", { text: money(o.total != null ? o.total : o.subtotal) }), o.livemode ? null : el("div", { cls: "test", text: "TEST" })])
+    ]);
+    var lines = el("div", {}, (o.lines || []).map(function (l) {
+      var files = Object.keys(l.files || {}).map(function (k) {
+        var label = { design: "Front / main artwork", backDesign: "Back artwork", preview: "Placement preview" }[k] || k;
+        return el("a", { cls: "file", href: l.files[k], target: "_blank", rel: "noopener noreferrer", text: "⬇ " + label });
+      });
+      var p = l.personalization || {};
+      return el("div", { cls: "line" }, [
+        el("strong", { text: l.name + " × " + l.qty }), " ", el("span", { cls: "muted", text: money(l.unitCents) + " each" }),
+        el("div", { cls: "muted", text: (l.options || []).map(function (x) { return x.label + ": " + x.value; }).join(" · ") }),
+        p.text ? el("div", {}, ["Text: ", el("strong", { text: p.text })]) : null,
+        (p.font || p.textColor || p.textColorCode) ? el("div", { cls: "muted", text: ["Font: " + (p.font || "—"), "Text colour: " + (p.textColorCode || p.textColor || "—")].join(" · ") }) : null,
+        p.placement ? el("div", { cls: "muted", text: "Placement: " + p.placement }) : null,
+        p.textStyle ? el("div", { cls: "muted", text: "Text styling: " + p.textStyle }) : null,
+        p.proof ? el("div", { cls: "muted", text: "Proof: " + p.proof }) : null,
+        p.comments ? el("div", {}, ["Notes: ", el("em", { text: p.comments })]) : null,
+        files.length ? el("div", {}, files) : null
+      ]);
+    }));
+    var ship = el("div", {}, [
+      el("h3", { text: "Ship to" }),
+      addr ? el("div", {}, [o.shippingAddress.name || o.customerName || "", el("br"), addr.line1 || "", addr.line2 ? el("br") : null, addr.line2 || "", el("br"), (addr.city || "") + ", " + (addr.state || "") + " " + (addr.postal_code || ""), el("br"), addr.country || ""]) : el("div", { cls: "muted", text: "No address yet" }),
+      el("div", { cls: "muted", text: (o.customerEmail || "") + (o.phone ? " · " + o.phone : "") }),
+      o.shippingAddress && o.shippingAddress.method ? el("div", {}, ["Method: ", el("strong", { text: o.shippingAddress.method })]) : null,
+      o.packing ? el("div", { cls: "muted", text: o.packing.suggestedBox ? "Suggested box: " + o.packing.suggestedBox + " (" + o.packing.coasters + " coasters)" : (o.packing.note || "") }) : null,
+      el("table", {}, [
+        el("tr", {}, [el("td", { text: "Subtotal" }), el("td", { text: money(o.subtotal) })]),
+        o.discount ? el("tr", {}, [el("td", { text: "Discount" }), el("td", { text: "−" + money(o.discount) })]) : null,
+        el("tr", {}, [el("td", { text: "Shipping" }), el("td", { text: money(o.shipping) })]),
+        el("tr", {}, [el("td", { text: "Tax" }), el("td", { text: money(o.tax) })]),
+        el("tr", {}, [el("td", {}, [el("strong", { text: "Total" })]), el("td", {}, [el("strong", { text: money(o.total) })])])
+      ]),
+      el("div", { cls: "muted", text: "Paid: " + when(o.paidAt) + (o.fulfilledAt ? " · Fulfilled: " + when(o.fulfilledAt) : "") })
+    ]);
+    var notes = el("textarea", { "aria-label": "Private notes for " + o.orderNumber }); notes.value = o.notes || "";
+    var actions = el("div", {}, [
+      o.notes && /CHECK|OUTSIDE AREA/.test(o.notes) ? el("div", { cls: "note", text: o.notes }) : null,
+      el("label", { cls: "muted", text: "Private notes" }), notes,
+      el("div", { style: "margin-top:.5rem;display:flex;gap:.5rem;flex-wrap:wrap" }, [
+        o.status === "paid" ? btn("Mark fulfilled", function () { return { status: "fulfilled", notes: notes.value }; }) : null,
+        o.status === "fulfilled" ? btn("Move back to 'to make'", function () { return { status: "paid", notes: notes.value }; }) : null,
+        btn("Save notes", function () { return { notes: notes.value }; })
+      ])
+    ]);
+    function btn(label, body) {
+      var b = el("button", { cls: "act", type: "button", text: label });
+      b.onclick = function () { b.disabled = true; api("/api/admin/orders/" + o.orderNumber, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body()) }).then(load).catch(function (e) { alert(e.message); b.disabled = false; }); };
+      return b;
+    }
+    return el("details", { cls: "order" }, [sum, el("div", { cls: "body" }, [el("div", {}, [el("h3", { text: "Items" }), lines]), el("div", {}, [ship, actions])])]);
+  }
+  document.querySelectorAll(".tabs button").forEach(function (b) {
+    b.onclick = function () { document.querySelectorAll(".tabs button").forEach(function (x) { x.classList.remove("on"); }); b.classList.add("on"); status = b.getAttribute("data-s"); load(); };
+  });
+  load();
+</script>
+</body>
+</html>

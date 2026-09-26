@@ -99,6 +99,15 @@ The website also shows 22 more products and 18 hidden ones. Whether those can be
 | 2026-09-26 | Recommended: identical prices on Etsy and website; no permanent "sale" pricing; revisit a direct-site perk when the website sells over ~$1k/month | Recommendation |
 | – | Internal costs (blanks, ink, paper, packaging, labor, reprints) | **Not yet provided.** All price recommendations are provisional. |
 
+## Commerce (read docs/COMMERCE.md)
+
+The store is moving from Snipcart to **Stripe Checkout + a Cloudflare Worker** (branch `stripe-checkout`), so there's no monthly fee: only Stripe's per-sale fee.
+- Prices, options and visibility come only from `content/products.json` via `assets/js/pricing.mjs`, used by the shop, the cart **and** the server. The server never trusts a browser price.
+- Orders are stored in Cloudflare D1 and managed at `/admin/orders.html`. Stripe webhooks are signature-checked and idempotent.
+- Shipping methods and bands, the TX 8.25% tax rate, packaging rules and real shipping history: `content/shipping.json`.
+- **The future visual admin is built on this system, not Snipcart.** It edits `products.json` / `colors.json` / `shipping.json`, and shows orders from the D1 order API.
+- Snipcart stays live until the owner approves the tested Stripe replacement. Its next billing date is 2026-10-18.
+
 ## Checkout status (2026-09-26)
 
 - Snipcart runs in **Test mode** (the key in `settings.json` is a test key), on live as well.

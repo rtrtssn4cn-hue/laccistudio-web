@@ -168,7 +168,7 @@ collections:
           - { name: "tiktok", label: "TikTok (blank to hide)", widget: "string", required: false, hint: "Handle or full link \u2014 e.g. @laccistudio" }
           - { name: "pinterest", label: "Pinterest (blank to hide)", widget: "string", required: false, hint: "Username or full link" }
           - { name: "youtube", label: "YouTube (blank to hide)", widget: "string", required: false, hint: "Handle or full link \u2014 e.g. @laccistudio" }
-          - { name: "checkoutMode", label: "Checkout mode", widget: "select", options: ["inquiry", "paypal", "snipcart"], default: "inquiry", hint: "'inquiry' emails you the order. 'paypal' or 'snipcart' take card payments (fill the key below)." }
+          - { name: "checkoutMode", label: "Checkout mode (advanced)", widget: "select", options: ["snipcart", "stripe", "inquiry", "paypal"], default: "snipcart", hint: "snipcart = current cart. stripe = new Stripe checkout (only after it is set up and approved, see docs/COMMERCE.md). Changing this switches the checkout for every customer." }
           - { name: "orderEmail", label: "Where orders are emailed", widget: "string" }
           - { name: "paypalClientId", label: "PayPal Client ID (for paypal mode)", widget: "string", required: false }
           - { name: "snipcartApiKey", label: "Snipcart public key (for snipcart mode)", widget: "string", required: false }

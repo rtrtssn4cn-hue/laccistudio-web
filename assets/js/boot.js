@@ -91,6 +91,8 @@
     var h = res[2] || {};
     var g = res[3] || {};
     var colorLib = (res[4] && res[4].garmentColors) || [];
+    // Unfiltered data for the Stripe cart, which prices lines with assets/js/pricing.mjs (same code as the server).
+    window.LACCI_RAW = { products: p.products || [], colors: colorLib };
 
     // ---- Contact / site settings (used by main.js) ----
     window.LACCI_CONFIG = {

@@ -1,0 +1,54 @@
+{
+  "note": "Shipping methods and weight bands copied exactly from the owner's Snipcart configuration (2026-09-26). Order weight = product 'weight' (grams, content/products.json) x quantity, the same rule Snipcart used. Those weights are unverified and do not grow with coaster set size; replace them with real packed weights when measured.",
+  "allowedCountries": ["US"],
+  "methods": [
+    {
+      "id": "usps-ground",
+      "name": "USPS Ground Advantage (7–10 business days)",
+      "maxDays": 10,
+      "bands": [
+        { "maxGrams": 454, "amount": 8.95 },
+        { "maxGrams": 1361, "amount": 11.95 },
+        { "maxGrams": 2268, "amount": 14.95 },
+        { "maxGrams": 4536, "amount": 19.95 },
+        { "maxGrams": null, "amount": 44.95 }
+      ]
+    },
+    {
+      "id": "usps-priority",
+      "name": "USPS Priority Mail (5–7 business days)",
+      "maxDays": 7,
+      "bands": [
+        { "maxGrams": 454, "amount": 12.95 },
+        { "maxGrams": 1361, "amount": 15.95 },
+        { "maxGrams": 2268, "amount": 19.95 },
+        { "maxGrams": 4536, "amount": 25.95 },
+        { "maxGrams": null, "amount": 54.95 }
+      ]
+    },
+    {
+      "id": "local-delivery",
+      "name": "Local delivery — Houston area ZIP codes only (free)",
+      "maxDays": 5,
+      "postalCodePattern": "^77([0-4][0-9]{2}|5(0[0-9]|1[0-8]|2[0-3]|3[0-9]|4[0-9]|7[0-9]|8[0-9]|9[0-9]))",
+      "bands": [{ "maxGrams": null, "amount": 0 }]
+    }
+  ],
+  "tax": {
+    "note": "Copied from Snipcart: 'TX SALES TAX' 8.25% for US-TX addresses, charged on items after discounts (not on shipping).",
+    "rates": [{ "id": "tx-sales-tax", "displayName": "TX sales tax", "percentage": 8.25, "country": "US", "state": "TX" }]
+  },
+  "packaging": {
+    "coasters": [
+      { "minCoasters": 1, "maxCoasters": 3, "box": "6 x 6 x 2 in" },
+      { "minCoasters": 4, "maxCoasters": 4, "box": "9 x 6 x 2 in" },
+      { "minCoasters": 5, "maxCoasters": 8, "box": "9 x 6 x 4 in" }
+    ]
+  },
+  "packedWeights": {
+    "note": "Not yet measured. Do not estimate."
+  },
+  "history": [
+    { "items": "8 ceramic coasters", "box": "6 x 6 x 6 in", "carrier": "USPS, Etsy-generated label", "cost": 10.69 }
+  ]
+}

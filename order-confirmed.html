@@ -3,16 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gallery — Lacci Studio</title>
-<meta name="description" content="Coasters, tumblers, apparel and stickers made by Lacci Studio.">
-<link rel="canonical" href="https://laccistudio.com/gallery">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Lacci Studio">
-<meta property="og:title" content="Gallery — Lacci Studio">
-<meta property="og:description" content="Coasters, tumblers, apparel and stickers made by Lacci Studio.">
-<meta property="og:url" content="https://laccistudio.com/gallery">
-<meta property="og:image" content="https://laccistudio.com/assets/logo/lacci-primary.png">
-<meta name="twitter:card" content="summary_large_image">
+<title>Order confirmed — Lacci Studio</title>
+<meta name="robots" content="noindex">
 <link rel="icon" href="assets/logo/favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +22,7 @@
       <li><a href="index.html">Home</a></li>
       <li><a href="shop.html">Shop</a></li>
       <li><a href="services.html">Services</a></li>
-      <li><a href="gallery.html" class="active">Gallery</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="contact.html">Contact</a></li>
       <li><a href="shop.html" class="btn btn-gold">Shop Gifts</a></li>
@@ -38,32 +30,18 @@
   </div>
 </header>
 
-<section class="page-hero">
+<section class="page-hero page-hero-slim">
   <div class="wrap">
-    <p class="crumb"><a href="index.html">Home</a> &nbsp;/&nbsp; Gallery</p>
-    <h1>Our Work</h1>
-    <p class="lead" data-c="galleryIntro">A look at what we make.</p>
+    <h1 id="oc-title">Thank you!</h1>
+    <p class="lead" id="oc-lead">Checking your payment…</p>
   </div>
 </section>
-
 <section>
-  <div class="wrap">
-    <div id="gallery-filters" class="shop-filters"><!-- category filters render here --></div>
-    <div id="gallery-grid" class="gal-grid">
-      <noscript><p style="text-align:center;color:var(--mocha)">Please enable JavaScript to view the gallery, or <a href="contact.html">contact us</a>.</p></noscript>
+  <div class="wrap" style="max-width:640px">
+    <div class="form-card" id="oc-card" aria-live="polite">
+      <p id="oc-status">One moment while we confirm your order with our payment provider.</p>
     </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="cta-band">
-  <div class="wrap" style="max-width:720px">
-    <h2>Want something like this?</h2>
-    <p class="lead">Send us your idea, photo, or logo and we'll create a custom piece just for you.</p>
-    <div class="btn-row center" style="justify-content:center">
-      <a href="contact.html" class="btn btn-gold">Start a Custom Order</a>
-      <a href="shop.html" class="btn btn-ghost-gold">Shop Designs</a>
-    </div>
+    <p style="text-align:center;margin-top:1.5rem"><a href="shop.html" class="btn btn-outline">Back to the shop</a></p>
   </div>
 </section>
 
@@ -90,9 +68,41 @@
 </footer>
 
 <script src="assets/js/boot.js"></script>
-<script src="assets/js/cart.js?v=12"></script>
-<script type="module" src="assets/js/checkout.mjs"></script>
 <script src="assets/js/main.js"></script>
-<script src="assets/js/promo-banner.js"></script>
+
+<script type="module">
+  // Shows the order once the server has confirmed payment with Stripe. Nothing here marks an order paid.
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const money = (c) => (c == null ? "—" : "$" + (c / 100).toFixed(2));
+  const id = new URLSearchParams(location.search).get("session_id");
+  const card = document.querySelector("#oc-card"), lead = document.querySelector("#oc-lead"), title = document.querySelector("#oc-title");
+  async function check(tries) {
+    if (!id) { lead.textContent = "We couldn't find an order reference."; card.innerHTML = "<p>If you completed a payment, your receipt email has your order details. Questions? Email <a href='mailto:info@laccistudio.com'>info@laccistudio.com</a>.</p>"; return; }
+    const res = await fetch("/api/order-status?session_id=" + encodeURIComponent(id)).catch(() => null);
+    const d = res && res.ok ? await res.json() : null;
+    if (!d) { lead.textContent = "We couldn't look up your order."; card.innerHTML = "<p>If you completed a payment, your receipt email has your order details. Questions? Email <a href='mailto:info@laccistudio.com'>info@laccistudio.com</a>.</p>"; return; }
+    if (d.status === "paid" || d.status === "fulfilled") {
+      try { localStorage.removeItem("lacci_stripe_cart_v1"); } catch (e) {}
+      title.textContent = "Thank you — your order is in!";
+      lead.textContent = "Order " + d.orderNumber + (d.email ? " · a receipt is on its way to " + d.email : "");
+      card.innerHTML = "<table style='width:100%;border-collapse:collapse'>" +
+        d.items.map((i) => "<tr><td style='padding:.4rem 0'><strong>" + esc(i.name) + "</strong> × " + i.qty + "<br><small>" + esc(i.options) + "</small></td><td style='text-align:right'>" + money(i.line) + "</td></tr>").join("") +
+        "<tr><td style='padding-top:.8rem'>Subtotal</td><td style='text-align:right;padding-top:.8rem'>" + money(d.subtotal) + "</td></tr>" +
+        (d.discount ? "<tr><td>Discount</td><td style='text-align:right'>−" + money(d.discount) + "</td></tr>" : "") +
+        "<tr><td>Shipping</td><td style='text-align:right'>" + money(d.shipping) + "</td></tr>" +
+        "<tr><td>Tax</td><td style='text-align:right'>" + money(d.tax) + "</td></tr>" +
+        "<tr><td><strong>Total</strong></td><td style='text-align:right'><strong>" + money(d.total) + "</strong></td></tr></table>" +
+        "<p style='margin-top:1rem'>If you asked for a proof, we'll email it before we print. Questions? <a href='mailto:info@laccistudio.com'>info@laccistudio.com</a></p>";
+      return;
+    }
+    if (d.status === "pending" && tries < 10) { setTimeout(() => check(tries + 1), 2000); return; }
+    title.textContent = d.status === "pending" ? "Almost there" : "Payment not completed";
+    lead.textContent = d.status === "pending" ? "Your payment is still being confirmed." : "Your order wasn't charged.";
+    card.innerHTML = d.status === "pending"
+      ? "<p>This can take a minute. We'll email your receipt as soon as it clears. Order reference: " + esc(d.orderNumber) + "</p>"
+      : "<p>Your cart is still saved. <a href='shop.html'>Return to the shop</a> to try again.</p>";
+  }
+  check(0);
+</script>
 </body>
 </html>
