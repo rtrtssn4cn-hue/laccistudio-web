@@ -149,7 +149,7 @@ Every photo currently in the Gallery is one of these. The owner will choose repl
    - Drive the page in a browser, including the customizer and add-to-cart.
 4. Inventory controls (links, buttons, inputs) before and after, and explain every difference.
 5. Count before and after (bytes, broken images, controls). No single-run timing claims.
-6. No tool or vendor names, provenance statements or machine paths in files or commits. **Don't create tool-specific files (no CLAUDE.md or similar)**; this document is the entry point. Keep third-party licence notices. Never strip content-provenance metadata (C2PA) from images: 9 images in `assets/img` carry it. Ask the owner first.
+6. No tool or vendor names, provenance statements or machine paths in files or commits. **Don't add tool-specific instruction files to the repo**; this document is the entry point. Keep third-party licence notices. Never strip content-provenance metadata (C2PA) from images: 9 images in `assets/img` carry it. Ask the owner first.
 7. Never commit customer data. Order details stay in Snipcart and Etsy.
 
 ## Outstanding tasks
@@ -169,4 +169,5 @@ See `AUDIT-2026-09.md` §8 (decisions), §9 (bugs), §10 (next steps), §15 (inf
 | 2026-09-26 | Editor script pinned to decap-cms 3.16.3 with an integrity hash |
 | 2026-09-26 | Visual editor approved in principle (ADMIN_AUDIT §4). Starts on its own branch **after** the stabilization branch is published and verified |
 | 2026-09-26 | Garment colours: global library + per-product visible flags; White only visible. Option choices can be hidden the same way |
-| 2026-09-26 | No CLAUDE.md or other tool-named files in the repository (owner preference) |
+| 2026-09-26 | No tool-named files in the repository (owner preference) |
+| 2026-09-26 | Whether Snipcart stays is undecided. The visual editor must not depend on Snipcart; it edits provider-neutral content only |

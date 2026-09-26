@@ -181,3 +181,13 @@ Found and fixed during that test: summary lines using `{{#if}}` aren't supported
 Still to verify once Snipcart's account works: that Snipcart's server rejects an order carrying a hidden, non-priced value such as a colour. Price-bearing options are covered, because a hidden choice is missing from the catalog.
 
 **Requirement for the rebuild:** the visual editor writes these same fields, previews through the same `boot.js` filtering, and keeps "hide" separate from "delete". The same pattern should later cover sizes, quantities, personalization options, seasonal designs and collections.
+
+## 8. Checkout-provider independence (owner instruction, 2026-09-26)
+
+Whether Snipcart stays isn't decided (it's in test mode, and its API currently returns HTTP 402). So the visual editor is **not** to be built around Snipcart:
+- The editor reads and writes only provider-neutral content: `content/products.json` (prices, options, visibility), `content/colors.json` and the page/section files. No Snipcart fields, IDs or concepts in the editor UI or data model.
+- Everything Snipcart-specific stays behind two seams that a different checkout (Shopify Buy Button, Stripe Checkout / Payment Links, Square, etc.) would replace:
+  1. `tools/build-snipcart-catalog.mjs`: turns products.json into Snipcart's validation page.
+  2. The Snipcart section of `assets/js/cart.js`: `snipAdd()`, `customFieldDefs()`/`snipToken()` formatting, `initSnipcart()`, and the cart-restore check.
+- Price rules (full price vs extra charge per choice), visibility and validation belong to the content model, not the provider. Any future provider adapter must reproduce them.
+- The dashboard's "Orders" link points to whichever provider is chosen.
