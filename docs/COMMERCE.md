@@ -154,6 +154,51 @@ Then `node tools/worker-local.mjs` (it refuses to start with a live key). Planne
 | Snipcart dashboard: domain laccistudio.com, shipping methods, TX tax, discounts, email templates | Snipcart account (cancel after export) |
 | Stripe → Snipcart connection on …VQlh | Stripe → Settings → connected platforms (disconnect only after cancellation, owner approval) |
 
+## 9b. Open decisions: tax and payment methods (owner to decide; nothing deployed)
+
+Sources and details: `research/texas-tax-stripe-fees-2026-09.md`. This is a summary of published rules, not tax or legal advice.
+
+### How Snipcart taxes today
+- One custom rule: "TX SALES TAX", US–TX, 8.25%. No other state.
+- SNIP-1001 shows it charged on the item subtotal after the 55% discount ($67.47 × 8.25% = $5.57).
+- That order had $0 shipping, so **whether Snipcart also taxed shipping can't be determined** from the settings viewed or the one order.
+
+### What the Texas rules say (Comptroller sources)
+| Situation | Rule found |
+|---|---|
+| Texas customer, shipped | Local tax is sourced to the seller's place of business (Pub. 94-105; Rule 3.334). Houston studio: 6.25% state + 1% City of Houston + 1% METRO = **8.25%**, already the 2% local maximum. Confirm the exact studio address in the Comptroller's rate locator (one Houston row in the table shows 7.25%). |
+| Texas customer, local delivery | No separate rule; same sourcing. |
+| Texas customer, pickup (if offered later) | Order taken in person: taxed at the seller's location. |
+| Website orders specifically | **Unsettled:** a Comptroller amendment moving many online orders to delivery-address sourcing was permanently blocked by a Texas court (date, appeal and currently applicable text not confirmed). With Houston at the maximum rate, either reading gives ≤ 8.25%. |
+| Shipping / delivery charges | **Taxable** when the item is taxable, even if stated separately (Rule 3.303; Pub. 94-171). |
+| Personalized printed goods | Taxable at the full price including the customizing work (Rule 3.300); no exemption found. |
+| Permit | A Texas seller of taxable items needs a sales tax permit (Rule 3.286). Filing monthly, quarterly, or yearly if under $1,000/year with approval. Whether a zero return is needed each period: to confirm. |
+| Customers outside Texas | Economic-nexus thresholds are $100,000+ (some also 200 transactions) in every state that has one. **At Lacci's volume the business appears to be below all of them**, so no other state's tax should be collected unless that changes. In about 26 jurisdictions, Etsy sales count toward the seller's own threshold. |
+
+### Implementation options
+| | 1. Stripe Tax, Texas registration only | 2. Texas-only rate without Stripe Tax | 3. Embedded checkout with address callback |
+|---|---|---|---|
+| How | Turn on Stripe Tax, set the head office, add only a Texas registration; `TAX_MODE=stripe_tax` (already built). Shipping taxed with tax code `txcd_92010001` on the shipping rate | Ask the ship-to state on our site before checkout. If Texas, attach a fixed 8.25% rate to every line and charge shipping as a taxed line; otherwise no tax. Verify the state on the paid order | Replace hosted Checkout with the embedded form; on address change the server updates line items and taxes |
+| Cost | **0.5% per taxed transaction, no monthly fee, no minimum** (about $0.15 on a $30 order; $0 in months without sales). No fee for orders outside Texas ("not collecting") | $0 | $0 |
+| Accuracy | Stripe maintains rates and rules; handles the Texas origin rule; records per order for filing | Correct only while the 8.25% rate and the rules stay as coded; the customer's state entry can be wrong (flag and correct by hand) | Same as 2, but using the address the customer actually entered; wallets (Apple Pay, Google Pay) skip the callback |
+| Maintenance | Low | Owner must watch rate and rule changes; shipping must be handled as a line item | Highest: more code, and this use is not shown in Stripe's guide |
+| Customer experience | Unchanged | One extra question before checkout | Checkout embedded on our site |
+
+**Recommendation for your review:** option 1 (Stripe Tax registered only in Texas, shipping taxable). It's the only option that stays correct without hand maintenance, costs nothing when there are no sales, and never collects for other states unless you add a registration. Before switching on, confirm with the Comptroller rate locator and your tax adviser: the studio's exact rate, the website-sourcing question, and your permit and filing status.
+
+### Payment methods (US standard Stripe pricing)
+| Method | Fee | Status on the branch |
+|---|---|---|
+| Cards | 2.9% + 30¢ (+1.5% international cards, +1% currency conversion) | **On** |
+| Apple Pay / Google Pay | 2.9% + 30¢ (card wallets) | On with cards (hosted Checkout handles setup) |
+| Link (card) | 2.9% + 30¢ | **Off** (`payment_method_types: ["card"]`) until approved |
+| Cash App Pay | 2.9% + 30¢ | Off until approved |
+| Affirm | 6% + 30¢ | **Off** (buy now, pay later) |
+| Klarna | 5.99% + 30¢ | **Off** (buy now, pay later) |
+| ACH / bank ("$5 back" offer) | ACH 0.8% capped at $5; the Link bank rate isn't on the pricing page | Off |
+
+Other fees: disputes $15 (+$15 counter fee, refunded if won). Refunds cost nothing extra, but the original fee isn't returned. No extra fee for Checkout itself.
+
 ## 10. Test results (2026-09-26)
 
 ### Automated suite, simulated Stripe (`node tools/test-commerce.mjs`): 27 passed, 0 failed
