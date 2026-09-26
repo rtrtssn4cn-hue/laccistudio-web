@@ -49,7 +49,7 @@ Nothing is deleted to take it off sale. Three switches, all editable in /admin:
 
 | Level | Field | Meaning |
 |---|---|---|
-| Product | `"hidden": true` on the product | Not shown in the shop; all data kept |
+| Product | `"status"` on the product: `active` (default), `hidden`, `draft` or `seasonal`. Only `active` is shown and sold; rule in `productStatus()` in `assets/js/pricing.mjs`. An unknown word, or the older `"hidden": true`, counts as hidden | Not shown anywhere in the shop, not on the Snipcart price page, refused by Stripe checkout; all data kept. Set back to `active` to return it |
 | Option choice (size, quantity, finish…) | `"hidden": true` on the choice (`"visible": false` also accepted) | Not offered; its name, price and image are kept |
 | Garment colour | product `colors: [{ "id": "white", "visible": true }, …]` referring to `content/colors.json` | Per product, in display order. Only `visible: true` colours are offered |
 
@@ -135,13 +135,13 @@ Every photo currently in the Gallery is one of these. The owner will choose repl
 - Feel: premium, minimal, editorial, handmade, giftable. Not a print-on-demand template, and not quote-first.
 - Name story: **Lacci = La (Lana) + cci (Chibby).** Don't invent who Lana and Chibby are.
 - **Never invent reviews.** Show only real reviews, verbatim, with source, date and first name as the source shows it.
-- Don't advertise products or services that aren't available. Hide them (`hidden` attribute / `"hidden": true`); don't delete them.
+- Don't advertise products or services that aren't available. Hide them (products: `"status": "hidden"`; choices: `"hidden": true`); don't delete them.
 - Standard products are bought directly. Quotes are only for bulk, business, unusual or one-off work.
 
 ## How to hide / reactivate things
 
 - Embroidery / Laser Engraving: search the HTML for `data-status="coming-soon"`. Delete the `hidden` attribute to show them again (home cards, services cards, footer links on 6 pages). Re-add the two `<option>`s to the Contact form select.
-- A product: /admin → Shop → product → "Hide this product from the shop" (`"hidden": true`).
+- A product: /admin → Shop → product → **Visibility** → Hidden (`"status": "hidden"`). The product list shows each product's visibility after its price. A filter (All / Active / Hidden / Draft / Seasonal) and one-click toggles are planned for the visual admin rebuild.
 - An option choice: /admin → product → Options → choice → "Hidden from customers".
 - A garment colour: /admin → product → Garment colours → "Visible to customers" on/off. New colours go in /admin → Garment Colours.
 - Two hidden products point at images that don't exist (`assets/img/gal-gifts.jpg`, `assets/img/product-gifts.jpg`). Fix or remove those references before un-hiding them.

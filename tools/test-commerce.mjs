@@ -191,7 +191,7 @@ await test("15. Tampering without a price hint still charges the real price", as
   eq(Number(stripeState.created.at(-1).params["line_items[0][price_data][unit_amount]"]), 2799, "Stripe gets 2799");
 });
 await test("16. Other invalid carts: hidden product, unknown product, bad quantities, nothing to print", async () => {
-  const hidden = products.find((p) => p.hidden);
+  const hidden = products.find((p) => p.status === "hidden");
   eq((await checkout([line(hidden.id, {})])).status, 400, "hidden product");
   eq((await checkout([line("does-not-exist", {})])).status, 400, "unknown product");
   eq((await checkout([line("sublimation-mug", { Size: "11 oz", Style: "Standard White" }, { qty: 0 })])).status, 400, "qty 0");
@@ -343,6 +343,26 @@ await test("29. Upgrade: existing sandbox LS- order is relabelled and kept; live
   const go = (e) => worker.fetch(new Request("http://localhost:8787/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: one }), e).then((r) => r.json());
   eq((await go(liveEnv)).orderNumber, "LS-1001", "first live order after upgrade");
   eq((await go(upEnv)).orderNumber, "TEST-LS-1002", "next sandbox order after upgrade");
+});
+
+await test("30. Hidden products: every one is refused by checkout; draft/seasonal/unknown also off sale; Snipcart page lists active only", async () => {
+  const off = products.filter((p) => p.status !== "active");
+  ok(off.length >= 12, "hidden products present in the data (kept, not deleted)");
+  for (const p of off) {
+    const g = (p.optionGroups || [])[0], c = g && (g.choices || []).find((x) => !x.hidden);
+    const r = await checkout([line(p.id, g && c ? { [g.label]: typeof c === "string" ? c : c.name } : {})]);
+    eq(r.status, 400, "checkout refuses " + p.id);
+  }
+  const base = products.find((p) => p.status === "active");
+  const st = (extra) => pricing.productStatus({ ...base, ...extra });
+  eq(st({}), "active", "active stays on sale"); eq(st({ status: undefined }), "active", "no status = active");
+  for (const s of ["hidden", "draft", "seasonal", "retired", ""]) ok(!pricing.isProductOnSale({ ...base, status: s || " " }), `status "${s}" is off sale`);
+  ok(!pricing.isProductOnSale({ ...base, status: "active", hidden: true }), "old hidden flag still hides");
+  ok(!pricing.priceLine({ ...base, status: "draft" }, { options: {} }, colors).ok, "priceLine refuses a draft product");
+  const page = readFileSync(new URL("../snipcart-products.html", import.meta.url), "utf8");
+  const listed = [...page.matchAll(/data-item-id="([^"]+)"/g)].map((m) => m[1]);
+  eq(listed.length, products.filter((p) => p.status === "active").length, "Snipcart page lists active products only");
+  ok(off.every((p) => !listed.includes(p.id)), "no hidden product on the Snipcart page");
 });
 
 for (const [r, n] of results) console.log(`${r}  ${n}`);

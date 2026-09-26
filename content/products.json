@@ -53,6 +53,7 @@
       "video": "",
       "id": "sublimation-tumbler",
       "description": "Keep drinks ice-cold for hours in a double-wall insulated stainless tumbler, custom-printed with your name, photo, or design. Lid & straw included — the perfect personalized gift for birthdays, bridesmaids, teachers & travel.",
+      "status": "active",
       "category": "Drinkware"
     },
     {
@@ -109,6 +110,7 @@
       "video": "",
       "id": "sublimation-mug",
       "description": "Start every morning with a one-of-a-kind ceramic mug featuring your photo, pet portrait, or custom text. Dishwasher & microwave safe — a heartfelt gift for coffee lovers, holidays, Mother's & Father's Day.",
+      "status": "active",
       "category": "Drinkware"
     },
     {
@@ -172,6 +174,7 @@
       "video": "",
       "id": "apparel-t-shirt",
       "description": "Custom t-shirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "active",
       "category": "Apparel",
       "colors": [
         {
@@ -305,6 +308,7 @@
       "video": "",
       "id": "apparel-v-neck-tee",
       "description": "Custom v-neck tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "hidden",
       "category": "Apparel",
       "colors": [
         {
@@ -438,6 +442,7 @@
       "video": "",
       "id": "apparel-ladies-fitted-tee",
       "description": "Custom ladies' fitted tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "hidden",
       "category": "Apparel",
       "colors": [
         {
@@ -571,6 +576,7 @@
       "video": "",
       "id": "apparel-tank-top",
       "description": "Custom tank top printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "active",
       "category": "Apparel",
       "colors": [
         {
@@ -704,6 +710,7 @@
       "video": "",
       "id": "apparel-long-sleeve-tee",
       "description": "Custom long-sleeve tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "active",
       "category": "Apparel",
       "colors": [
         {
@@ -829,6 +836,7 @@
       "video": "",
       "id": "apparel-youth-tee",
       "description": "Custom youth tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "hidden",
       "category": "Apparel",
       "colors": [
         {
@@ -958,6 +966,7 @@
       "video": "",
       "id": "apparel-baby-onesie",
       "description": "Custom baby onesie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "active",
       "category": "Apparel",
       "colors": [
         {
@@ -1091,6 +1100,7 @@
       "video": "",
       "id": "apparel-crewneck-sweatshirt",
       "description": "Custom crewneck sweatshirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "active",
       "category": "Apparel",
       "colors": [
         {
@@ -1224,6 +1234,7 @@
       "video": "",
       "id": "apparel-hoodie",
       "description": "Custom hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "active",
       "category": "Apparel",
       "colors": [
         {
@@ -1357,6 +1368,7 @@
       "video": "",
       "id": "apparel-zip-up-hoodie",
       "description": "Custom zip-up hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "hidden",
       "category": "Apparel",
       "colors": [
         {
@@ -1441,6 +1453,7 @@
       "video": "",
       "id": "apparel-dad-cap",
       "description": "Custom dad cap printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "hidden",
       "category": "Apparel"
     },
     {
@@ -1455,6 +1468,7 @@
       "video": "",
       "id": "apparel-trucker-hat",
       "description": "Custom trucker hat printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "hidden",
       "category": "Apparel"
     },
     {
@@ -1469,6 +1483,7 @@
       "video": "",
       "id": "apparel-beanie",
       "description": "Custom beanie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "hidden",
       "category": "Apparel"
     },
     {
@@ -1483,6 +1498,7 @@
       "video": "",
       "id": "apparel-tote-bag",
       "description": "Custom tote bag printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "active",
       "category": "Apparel"
     },
     {
@@ -1497,6 +1513,7 @@
       "video": "",
       "id": "apparel-apron",
       "description": "Custom apron printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "status": "active",
       "category": "Apparel"
     },
     {
@@ -1555,6 +1572,7 @@
       "video": "",
       "id": "personalized-ornament",
       "description": "Capture the memory with a custom keepsake ornament featuring names, dates, or a favorite photo. Ceramic, in multiple shapes and sizes — a cherished holiday gift and yearly tradition.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
@@ -1569,6 +1587,7 @@
       "video": "",
       "id": "gift-bookmark",
       "description": "Personalized bookmark made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
@@ -1583,6 +1602,7 @@
       "video": "",
       "id": "gift-fridge-magnet",
       "description": "Personalized fridge magnet made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "active",
       "category": "Gifts"
     },
     {
@@ -1597,12 +1617,12 @@
       "video": "",
       "id": "gift-can-cooler-koozie",
       "description": "Personalized can cooler made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 8.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Shot Glass",
       "mockupPhoto": "assets/img/mock/mock-gift-shot-glass.png?v=12",
       "images": [
@@ -1612,12 +1632,12 @@
       "video": "",
       "id": "gift-shot-glass",
       "description": "Personalized shot glass made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 9.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Keychain",
       "mockupPhoto": "assets/img/mock/mock-gift-keychain.png?v=12",
       "images": [
@@ -1627,12 +1647,12 @@
       "video": "",
       "id": "gift-keychain",
       "description": "Personalized keychain made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 9.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Photo Print",
       "images": [
         "assets/img/product-gifts.jpg",
@@ -1642,12 +1662,12 @@
       "video": "",
       "id": "gift-photo-print",
       "description": "Personalized photo print made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 9.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Pet ID Tag",
       "images": [
         "assets/img/product-gifts.jpg",
@@ -1657,12 +1677,12 @@
       "video": "",
       "id": "gift-pet-id-tag",
       "description": "Personalized pet id tag made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 10.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Bag Charm",
       "mockupPhoto": "assets/img/mock/mock-gift-bag-charm.png?v=12",
       "images": [
@@ -1672,12 +1692,12 @@
       "video": "",
       "id": "gift-bag-charm",
       "description": "Personalized bag charm made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 10.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Luggage Tag",
       "mockupPhoto": "assets/img/mock/mock-gift-luggage-tag.png?v=12",
       "images": [
@@ -1687,12 +1707,12 @@
       "video": "",
       "id": "gift-luggage-tag",
       "description": "Personalized luggage tag made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 10.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Lanyard",
       "images": [
         "assets/img/product-gifts.jpg",
@@ -1702,12 +1722,12 @@
       "video": "",
       "id": "gift-lanyard",
       "description": "Personalized lanyard made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 11.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Compact Mirror",
       "images": [
         "assets/img/product-gifts.jpg",
@@ -1717,12 +1737,12 @@
       "video": "",
       "id": "gift-compact-mirror",
       "description": "Personalized compact mirror made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 12.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Bottle Opener",
       "images": [
         "assets/img/product-gifts.jpg",
@@ -1732,12 +1752,12 @@
       "video": "",
       "id": "gift-bottle-opener",
       "description": "Personalized bottle opener made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 12.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Pot Holder",
       "images": [
         "assets/img/product-gifts.jpg",
@@ -1747,12 +1767,12 @@
       "video": "",
       "id": "gift-pot-holder",
       "description": "Personalized pot holder made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 13.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Tea Towel",
       "images": [
         "assets/img/product-gifts.jpg",
@@ -1762,6 +1782,7 @@
       "video": "",
       "id": "gift-tea-towel",
       "description": "Personalized tea towel made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
@@ -1776,6 +1797,7 @@
       "video": "",
       "id": "gift-socks",
       "description": "Personalized socks made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "active",
       "category": "Gifts"
     },
     {
@@ -1790,12 +1812,12 @@
       "video": "",
       "id": "gift-mouse-pad",
       "description": "Personalized mouse pad made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "active",
       "category": "Gifts"
     },
     {
       "price": 16.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Notebook",
       "mockupPhoto": "assets/img/mock/mock-gift-notebook-journal.png?v=12",
       "images": [
@@ -1805,6 +1827,7 @@
       "video": "",
       "id": "gift-notebook-journal",
       "description": "Personalized notebook made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
@@ -1819,12 +1842,12 @@
       "video": "",
       "id": "gift-zip-pouch",
       "description": "Personalized zip pouch made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 16.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Makeup Bag",
       "images": [
         "assets/img/product-gifts.jpg",
@@ -1834,6 +1857,7 @@
       "video": "",
       "id": "gift-makeup-bag",
       "description": "Personalized makeup bag made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
@@ -1848,12 +1872,12 @@
       "video": "",
       "id": "gift-license-plate",
       "description": "Personalized license plate made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 21.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Jigsaw Puzzle",
       "images": [
         "assets/img/product-gifts.jpg",
@@ -1863,12 +1887,12 @@
       "video": "",
       "id": "gift-jigsaw-puzzle",
       "description": "Personalized jigsaw puzzle made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 21.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Garden Flag",
       "images": [
         "assets/img/product-gifts.jpg",
@@ -1878,12 +1902,12 @@
       "video": "",
       "id": "gift-garden-flag",
       "description": "Personalized garden flag made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 22.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Water Bottle",
       "images": [
         "assets/img/product-gifts.jpg",
@@ -1893,12 +1917,12 @@
       "video": "",
       "id": "gift-water-bottle",
       "description": "Personalized water bottle made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 24.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Pillow Cover",
       "mockupPhoto": "assets/img/mock/mock-gift-pillow-cover.png?v=12",
       "images": [
@@ -1908,12 +1932,12 @@
       "video": "",
       "id": "gift-pillow-cover",
       "description": "Personalized pillow cover made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
       "price": 26.99,
       "optionGroups": [],
-      "hidden": true,
       "name": "Personalized Wine Tumbler",
       "images": [
         "assets/img/product-gifts.jpg",
@@ -1923,6 +1947,7 @@
       "video": "",
       "id": "gift-wine-tumbler",
       "description": "Personalized wine tumbler made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
+      "status": "hidden",
       "category": "Gifts"
     },
     {
@@ -2005,6 +2030,7 @@
       "video": "",
       "id": "ceramic-coasters",
       "description": "Protect your table in style with personalized coasters made from your design or photo. Singles or gift sets in ceramic, sandstone, cork, neoprene, acrylic or slate — a thoughtful housewarming & wedding gift.",
+      "status": "active",
       "category": "Home"
     },
     {
@@ -2114,6 +2140,7 @@
       "video": "",
       "id": "custom-stickers",
       "description": "Bring your artwork to life with durable die-cut vinyl stickers & decals — waterproof options and finishes like holographic & glitter. Sizes 2\"–6\", singles or packs — perfect for tumblers, laptops, cars, water bottles & small-business branding.",
+      "status": "active",
       "category": "Stickers"
     }
   ]

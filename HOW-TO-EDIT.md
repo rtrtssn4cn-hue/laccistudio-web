@@ -14,7 +14,7 @@ The earlier version of this guide pointed at `site-config.js` and `shop-config.j
 Things to know:
 - **Saving publishes immediately.** There is no draft yet.
 - **Option prices** (sizes, coaster sets, finishes) are under each product → Options. A choice has either a full price (e.g. Set of 4 = 24.99) or an extra charge (e.g. Glitter +3). The "from" price shown in the shop is the cheapest visible choice.
-- **Hide without deleting:** product → "Hide this product from the shop"; a choice → "Hidden from customers"; a garment colour → switch "Visible to customers" off.
+- **Hide without deleting:** product → **Visibility** → Hidden (set it back to Active to return it); a choice → "Hidden from customers"; a garment colour → switch "Visible to customers" off.
 - Leave **Checkout mode** set to `snipcart` until the Stripe checkout is approved (see `docs/COMMERCE.md`); then it becomes `stripe`.
 - **Orders** placed through the new Stripe checkout are at **laccistudio.com/admin/orders.html** (log in to /admin first).
 - Product categories are free text: spell them the same way every time, or a second filter button appears.

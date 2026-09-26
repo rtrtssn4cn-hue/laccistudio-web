@@ -4,7 +4,7 @@ Generated 2026-09-26 from `content/products.json` (work branch). **Nothing has b
 
 Every product is personalized the same way: typed text and/or an uploaded photo or design, with font, text colour and proof options. "Customization type" below lists the product-specific options.
 
-How to act on it: tell us which products you can make and ship today. Everything else is set to hidden (switch in /admin → product → "Hide this product from the shop"). It keeps all its data and comes back with one switch.
+How to act on it: tell us which products you can make and ship today. Everything else is set to hidden (/admin → product → **Visibility** → Hidden). It keeps all its data and comes back with one switch.
 
 | Product | Currently visible? | Price (all visible options) | Customization type | Category | Recommendation | Information needed from you |
 |---|---|---|---|---|---|---|
@@ -55,3 +55,5 @@ How to act on it: tell us which products you can make and ship today. Everything
 | Personalized Wine Tumbler | No (hidden) | $26.99 | none | Gifts | Keep hidden | Only if you want to launch it |
 
 Totals: 45 products — 27 visible (4 of them sold on Etsy), 18 hidden.
+
+**Update 2026-09-26 (owner request):** 12 more hidden, not deleted: License Plate, Can Cooler, Zip Pouch, Ornament, Bookmark, Dad Cap, Trucker Hat, Beanie, Zip-Up Hoodie, Youth Tee, V-Neck Tee, Ladies' Fitted Tee. Now 15 active, 30 hidden. Visibility is the product `status` field.
