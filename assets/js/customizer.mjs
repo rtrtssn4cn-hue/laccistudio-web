@@ -496,6 +496,13 @@ function fitLayer(l, how, scale = 1) {
   l.x = 0.5; l.y = 0.5; l.rotation = 0;
 }
 
+// Escape closes a Crop or Touch up box without saving.
+function escToClose(ov) {
+  const onKey = (e) => { if (e.key === "Escape") { e.stopPropagation(); ov.remove(); } };
+  document.addEventListener("keydown", onKey, true);
+  new MutationObserver((_, obs) => { if (!ov.isConnected) { document.removeEventListener("keydown", onKey, true); obs.disconnect(); } }).observe(ov.parentNode, { childList: true });
+}
+
 // ---------------------------------------------------------------- touch up
 // Brush over the picture to bring back parts the background removal took away (Restore) or to
 // remove leftovers by hand (Erase). Removed areas show faintly so it is clear what can be restored.
@@ -511,13 +518,14 @@ function openTouchUp(l) {
   orig.getContext("2d").drawImage(info.img, 0, 0, Wk, Hk);
   const ov = document.createElement("div");
   ov.className = "lz-crop lz-touch";
-  ov.innerHTML = `<div class="lz-crop-box"><h3>Touch up</h3>
+  ov.innerHTML = `<div class="lz-crop-box"><div class="lz-crop-head"><h3>Touch up</h3><button type="button" class="lz-crop-x" data-c="cancel" aria-label="Close without saving">&times;</button></div>
     <div class="lz-seg" data-bind="brush"><button type="button" data-v="restore" aria-pressed="true">Restore</button><button type="button" data-v="erase" aria-pressed="false">Erase</button></div>
     <p class="lz-note" id="lz-touch-tip">Brush over parts that should be kept. Faded areas are removed.</p>
     <div class="lz-crop-stage lz-touch-stage"><canvas></canvas><span class="lz-brush" hidden></span></div>
     <label class="lz-field lz-touch-size"><span>Brush size</span><input type="range" min="8" max="90" value="28"></label>
     <div class="lz-row"><button type="button" class="btn btn-ghost-gold" data-c="undo" disabled>Undo</button><button type="button" class="btn btn-ghost-gold" data-c="reset">Reset</button><button type="button" class="btn btn-ghost-gold" data-c="cancel">Cancel</button><button type="button" class="btn btn-gold" data-c="apply">Done</button></div></div>`;
   root.querySelector(".lz").appendChild(ov);
+  escToClose(ov);
   const stage = ov.querySelector(".lz-touch-stage"), cv = ov.querySelector("canvas"), dot = ov.querySelector(".lz-brush");
   const size = ov.querySelector("input[type=range]"), undoBtn = ov.querySelector('[data-c="undo"]');
   const maxW = Math.min(520, window.innerWidth - 64), maxH = Math.min(420, window.innerHeight * 0.5); // 64 = frame and box padding
@@ -589,9 +597,10 @@ function openCrop(l) {
   const src = info.display || info.img;
   const ov = document.createElement("div");
   ov.className = "lz-crop";
-  ov.innerHTML = `<div class="lz-crop-box"><h3>Crop</h3><div class="lz-crop-stage"><canvas></canvas><div class="lz-crop-rect"><span data-h="nw"></span><span data-h="ne"></span><span data-h="sw"></span><span data-h="se"></span></div></div>
+  ov.innerHTML = `<div class="lz-crop-box"><div class="lz-crop-head"><h3>Crop</h3><button type="button" class="lz-crop-x" data-c="cancel" aria-label="Close without saving">&times;</button></div><div class="lz-crop-stage"><canvas></canvas><div class="lz-crop-rect"><span data-h="nw"></span><span data-h="ne"></span><span data-h="sw"></span><span data-h="se"></span></div></div>
     <div class="lz-row"><button type="button" class="btn btn-ghost-gold" data-c="reset">Reset crop</button><button type="button" class="btn btn-ghost-gold" data-c="cancel">Cancel</button><button type="button" class="btn btn-gold" data-c="apply">Apply</button></div></div>`;
   root.querySelector(".lz").appendChild(ov);
+  escToClose(ov);
   const stage = ov.querySelector(".lz-crop-stage"), cv = ov.querySelector("canvas"), rect = ov.querySelector(".lz-crop-rect");
   const sw = src.naturalWidth || src.width, sh = src.naturalHeight || src.height;
   const maxW = Math.min(520, window.innerWidth - 64), maxH = Math.min(420, window.innerHeight * 0.55);
