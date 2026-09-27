@@ -1243,7 +1243,8 @@ async function addToCart() {
   const firstPreview = each ? Object.values((rec.items[0] || {}).previews || {})[0] : rec.previews[ar[0].id];
   const allLayers = (each ? rec.items.flatMap((it) => Object.values(it.areas)) : Object.values(rec.areas)).flatMap((d) => d.layers);
   const texts = allLayers.filter((l) => l.type === "text");
-  const firstImg = (id) => { const d = each ? (rec.items[0] || {}).areas || {} : rec.areas; const x = d[id]; return x ? ((x.layers.find((l) => l.type === "image") || {}).src || ((x.attachments || [])[0] || {}).src || "") : ""; };
+  // First customer upload on a side (a Lacci design picture is not a customer file)
+  const firstImg = (id) => { const d = each ? (rec.items[0] || {}).areas || {} : rec.areas; const x = d[id]; return x ? ((x.layers.find((l) => l.type === "image" && !l.design) || {}).src || ((x.attachments || [])[0] || {}).src || "") : ""; };
   const line = {
     productId: S.pid, name: product().name, image: firstPreview || product().image, qty: S.qty, options: { ...S.options }, color: S.color,
     customizationId: S.customizationId, customization: rec,

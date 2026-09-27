@@ -471,6 +471,18 @@ await test("35. Lacci designs: site design pictures and photo spots are kept; ot
   eq(stripeState.created.length, before, "no Stripe session for refused designs");
 });
 
+await test("36. A cart line whose design uses a Lacci design picture is accepted (files and design record)", async () => {
+  const D = "/assets/img/designs/christmas-tree-gifts.png";
+  const cz = { schema: 1, customizationId: "c_design000002", productId: "ceramic-coasters", layout: "same", proof: true, comments: "",
+    areas: { main: { layers: [{ type: "image", src: D, name: "Christmas tree", naturalW: 1600, naturalH: 1600, x: 0.5, y: 0.5, w: 1, rotation: 0, removeWhite: true, design: { id: "christmas-tree-gifts" } },
+      { type: "text", text: "The Smiths", font: "Monogram", color: "#2E1E19", size: 0.06, x: 0.7, y: 0.33, rotation: 0 }] } }, previews: { main: UC } };
+  const base = { ...line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" }), personalization: { text: "The Smiths" }, files: { design: D, preview: UC } };
+  const r = await checkout([{ ...base, customization: cz, expectedUnitCents: pricing.priceLine(P("ceramic-coasters"), { options: base.options }, colors).unitCents }]);
+  eq(r.status, 200, "accepted " + JSON.stringify(r.body));
+  eq(JSON.parse((await order(stripeState.created.at(-1).id)).lines_json)[0].files.design, D, "design picture kept on the order");
+  eq((await checkout([{ ...base, files: { design: "/assets/img/other.png" } }])).status, 400, "other site paths still refused");
+});
+
 for (const [r, n] of results) console.log(`${r}  ${n}`);
 console.log(`\n${pass} passed, ${fail} failed; simulated Stripe calls: ${stripeState.calls.length}`);
 process.exit(fail ? 1 : 0);

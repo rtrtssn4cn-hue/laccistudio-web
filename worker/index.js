@@ -15,7 +15,7 @@
 // shop uses. A price sent by the browser is never charged; it is only compared, and a mismatch
 // returns the correct prices instead of creating a payment.
 
-import { cleanCustomization } from "./customization.js";
+import { cleanCustomization, DESIGN_SRC } from "./customization.js";
 import { priceLine, coasterCount, money } from "../assets/js/pricing.mjs";
 import { stripe, isTestKey, verifyStripeSignature } from "./stripe.js";
 import { handleAdminContent } from "./admin-content.js";
@@ -108,7 +108,8 @@ async function validateCart(env, body) {
     for (const k of PERSONALIZATION_KEYS) { const v = clip(raw.personalization && raw.personalization[k]); if (v) personalization[k] = v; }
     const files = {};
     for (const k of FILE_KEYS) {
-      const v = cleanFileUrl(env, raw.files && raw.files[k]);
+      const f = raw.files && raw.files[k];
+      const v = typeof f === "string" && DESIGN_SRC.test(f) ? f : cleanFileUrl(env, f); // a Lacci design picture from the site is allowed too
       if (v === null) return { error: "One of the uploaded files could not be verified. Please upload it again.", status: 400 };
       if (v) files[k] = v;
     }
