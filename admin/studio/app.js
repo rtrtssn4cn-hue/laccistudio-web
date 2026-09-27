@@ -240,7 +240,7 @@ function loginView() {
     h("h1", { text: "Lacci Studio Admin" }),
     h("p", { class: "muted", text: "Log in with GitHub on the editor page, then come back here." }),
     h("div", { class: "row-end", style: "justify-content:center" },
-      h("a", { class: "btn primary", href: "/admin/" }, "Log in"),
+      h("a", { class: "btn primary", href: "/admin/?next=studio" }, "Log in"),
       h("button", { class: "btn", type: "button", text: "I've logged in", onclick: () => { state.token = token(); load(); } })));
 }
 
@@ -624,6 +624,8 @@ function seoTab(p) {
 function moreView() {
   return h("div", {},
     h("h1", { text: "More" }),
+    h("div", { class: "card" }, h("b", { text: "Signed in" }), h("p", { class: "muted", text: "Log out on a shared phone or computer. You'll need to log in with GitHub again next time." }),
+      h("button", { class: "btn", onclick: () => { if (!confirm("Log out of Lacci Admin on this device?")) return; try { localStorage.removeItem("decap-cms-user"); } catch {} location.reload(); } }, "Log out")),
     h("div", { class: "card" }, h("b", { text: "Classic editor" }), h("p", { class: "muted", text: "The previous editor stays available while the new admin grows. Changes made there go live immediately." }), h("a", { class: "btn", href: "/admin/" }, "Open classic editor")),
     h("div", { class: "card" }, h("b", { text: "Help" }),
       h("ul", { class: "list-plain" },
