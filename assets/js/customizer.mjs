@@ -89,6 +89,8 @@ function snapshot() { return JSON.stringify(snapKeys.map((k) => S[k])); }
 function resetHistory() { hist = [snapshot()]; histAt = 0; }
 // Record the current state as one undo step (after a gesture, a tool, or a pause in typing).
 function commit() {
+  clearTimeout(typingTimer); typingTimer = 0;
+  if (S && root) followDesigns(); // a design's wording is saved where it will be drawn
   const s = snapshot();
   if (hist[histAt] === s) return;
   hist = hist.slice(0, histAt + 1); hist.push(s); if (hist.length > 80) hist.shift(); histAt = hist.length - 1;
@@ -99,7 +101,8 @@ function restore(i) {
   snapKeys.forEach((k, j) => (S[k] = v[j]));
   S.sel = -1; render();
 }
-const undo = () => { if (histAt > 0) restore(histAt - 1); };
+// Each action is one step. Typing that hasn't been saved as a step yet is saved first, so undo takes it back.
+const undo = () => { if (typingTimer) commit(); if (histAt > 0) restore(histAt - 1); };
 const redo = () => { if (histAt < hist.length - 1) restore(histAt + 1); };
 function updateUndo() {
   if (!root) return;
@@ -959,7 +962,7 @@ function bindPanel(box) {
   };
   box.oninput = (e) => {
     const t = e.target, l = selected();
-    if (t.id === "lz-text" && l) { l.text = t.value.slice(0, 200); if (l.fromDesign) fitText(l); draw(); commitSoon(); }
+    if (t.id === "lz-text" && l) { l.text = t.value.slice(0, 200); if (l.fromDesign) fitText(l); draw(); if (/\s$/.test(t.value)) commit(); else commitSoon(); } // one step per word
     else if (t.id === "lz-comments") { S.comments = t.value; saveWip(); }
     else if (t.id === "lz-proof") { S.proof = t.checked; saveWip(); }
   };
@@ -1209,7 +1212,7 @@ function onKey(e) {
     };
     if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); return tool("delete"); }
     if (e.key === "Escape") { S.sel = -1; render(); return; }
-    if (acts[e.key]) { acts[e.key](); e.preventDefault(); e.stopPropagation(); draw(); commitSoon(); }
+    if (acts[e.key]) { acts[e.key](); e.preventDefault(); e.stopPropagation(); draw(); commit(); } // one step per key press
 }
 // Remove everything on this side (Clear all, or select all + Delete). Undo brings it back.
 function clearSide() {
