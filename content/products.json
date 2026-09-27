@@ -576,7 +576,7 @@
       "video": "",
       "id": "apparel-tank-top",
       "description": "Custom tank top printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "status": "active",
+      "status": "hidden",
       "category": "Apparel",
       "colors": [
         {
@@ -710,7 +710,7 @@
       "video": "",
       "id": "apparel-long-sleeve-tee",
       "description": "Custom long-sleeve tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "status": "active",
+      "status": "hidden",
       "category": "Apparel",
       "colors": [
         {
@@ -966,7 +966,7 @@
       "video": "",
       "id": "apparel-baby-onesie",
       "description": "Custom baby onesie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "status": "active",
+      "status": "hidden",
       "category": "Apparel",
       "colors": [
         {
@@ -1100,7 +1100,7 @@
       "video": "",
       "id": "apparel-crewneck-sweatshirt",
       "description": "Custom crewneck sweatshirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "status": "active",
+      "status": "hidden",
       "category": "Apparel",
       "colors": [
         {
