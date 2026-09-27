@@ -539,7 +539,7 @@ function openDesigns() {
   ov.className = "lz-crop lz-designs";
   ov.innerHTML = `<div class="lz-crop-box"><div class="lz-crop-head"><h3>Lacci designs</h3><button type="button" class="lz-crop-x" data-c="cancel" aria-label="Close">&times;</button></div>
     ${cols.length > 1 ? `<div class="lz-chips">${["All", ...cols].map((c, i) => `<button type="button" data-col="${esc(c)}" aria-pressed="${i === 0}">${esc(c)}</button>`).join("")}</div>` : ""}
-    <div class="lz-dgrid">${list.map((d) => `<button type="button" data-design="${esc(d.id)}" data-colof="${esc(d.collection || "Designs")}"><img src="${esc(d.image)}" alt="" loading="lazy"><span>${esc(d.name || "")}</span>${d.type === "photo" ? `<small>Add your photo</small>` : ""}</button>`).join("")}</div></div>`;
+    <div class="lz-dgrid">${list.map((d) => `<button type="button" data-design="${esc(d.id)}" data-colof="${esc(d.collection || "Designs")}"><img src="${esc(d.thumb || d.image)}" alt="" loading="lazy"><span>${esc(d.name || "")}</span>${d.type === "photo" ? `<small>Add your photo</small>` : ""}</button>`).join("")}</div></div>`;
   root.querySelector(".lz").appendChild(ov);
   escToClose(ov);
   ov.onclick = (e) => {
@@ -573,9 +573,18 @@ function useDesign(d) {
       }
       ls.splice(0, ls.length, l); S.sel = -1;
     } else {
-      fitLayer(l, "fit", 0.85);
-      if (ls.length >= MAX_LAYERS) return error(`Up to ${MAX_LAYERS} items per side.`);
-      ls.push(l); S.sel = ls.length - 1;
+      fitLayer(l, "fit"); // Lacci designs already carry their own margin, so they fill the print area
+      const texts = Array.isArray(d.texts) ? d.texts : [];
+      if (ls.length + 1 + texts.length > MAX_LAYERS) return error(`Up to ${MAX_LAYERS} items per side. Remove something first.`);
+      ls.push(l);
+      // The design's wording, placed where it sits in the design (positions are shares of the design picture)
+      const a = area(), aspect = a.rect.w / a.rect.h, hFrac = l.w * aspect / (info.w / info.h), left = l.x - l.w / 2, top = l.y - hFrac / 2;
+      for (const t of texts) {
+        ls.push({ type: "text", text: t.text, font: t.font || "Serif / Classic", color: t.color || "#231F20", size: round(t.size * hFrac), x: round(left + t.x * l.w), y: round(top + t.y * hFrac),
+          rotation: 0, spacing: 0, curve: 0, bold: !!t.bold, vertical: false, align: "center", placeholder: t.text });
+      }
+      S.sel = texts.length ? ls.length - texts.length : ls.length - 1;
+      if (texts.length) S.tab = "text";
     }
     commit(); render();
   }).catch(() => error("That design couldn't be loaded. Please try again."));
@@ -1210,6 +1219,8 @@ async function addToCart() {
     const missing = ar.find((a) => !(S.shared[a.id] || []).some(filled));
     if (missing) { S.area = missing.id; render(); return error(`Add your design for the ${missing.label.toLowerCase()} too, or choose a different print location.`); }
   }
+  const leftover = [...new Set(designs.flatMap((d) => Object.values(d || {}).flat()).filter((l) => l && l.type === "text" && l.placeholder && l.text.trim() === l.placeholder).map((l) => l.text.trim()))];
+  if (leftover.length && !confirm(`Your design still shows the sample wording “${leftover.join("”, “")}”. Add to cart anyway? Tap Cancel to change the text.`)) { S.tab = "text"; render(); return; }
   add.disabled = true; add.textContent = "Saving your design…";
   const rec = { schema: 1, customizationId: S.customizationId, productId: S.pid, layout: each ? "each" : "same", proof: S.proof, comments: S.comments.trim().slice(0, 1000), createdAt: new Date().toISOString() };
   if (each) rec.items = designs.map((d, i) => ({ index: i, areas: recordAreas(d, ar) }));
