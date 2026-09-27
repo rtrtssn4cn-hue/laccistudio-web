@@ -125,13 +125,13 @@ await test("4. Artwork link from an unknown host is refused", async () => {
   const r = await checkout([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" }, { files: { design: "https://evil.example/x.png" } })]);
   eq(r.status, 400, "status");
 });
-await test("5. Mug 15 oz Color-Changing x3", async () => { await chain([line("sublimation-mug", { Size: "15 oz", Style: "Color-Changing Magic" }, { qty: 3 })], [2499]); });
-await test("6. Tumbler 30 oz Glitter", async () => { await chain([line("sublimation-tumbler", { Size: "30 oz", Finish: "Glitter" })], [3599]); });
+await test("5. Mug 15 oz Color-Changing x3", async () => { await chain([line("sublimation-mug", { Size: "15 oz", Style: "Color-Changing Magic" }, { qty: 3 })], [2399]); });
+await test("6. Tumbler 30 oz Glitter", async () => { await chain([line("sublimation-tumbler", { Size: "30 oz", Finish: "Glitter" })], [3399]); });
 await test("7. White T-shirt, size L, front and back", async () => {
-  await chain([line("apparel-t-shirt", { "Print location": "Front and back", Size: "L" }, { color: "white", files: { design: UC, backDesign: UC } })], [3798]);
+  await chain([line("apparel-t-shirt", { "Print location": "Front and back", Size: "L" }, { color: "white", files: { design: UC, backDesign: UC } })], [3099]);
 });
 await test("8. Size selection: every T-shirt size prices as shown", async () => {
-  const sizes = { XS: 2698, S: 2798, M: 2998, L: 3198, XL: 3398, "2XL": 3598, "3XL": 3798 };
+  const sizes = { XS: 2499, S: 2499, M: 2499, L: 2499, XL: 2499, "2XL": 2699, "3XL": 2899 };
   for (const [size, cents] of Object.entries(sizes)) await chain([line("apparel-t-shirt", { "Print location": "Front only", Size: size }, { color: "white" })], [cents]);
 });
 await test("9. Hidden colour (Black) cannot be ordered", async () => {
@@ -149,7 +149,7 @@ await test("11. Cart with multiple different products", async () => {
     line("sublimation-mug", { Size: "11 oz", Style: "Standard White" }, { qty: 2 }),
     line("sublimation-tumbler", { Size: "20 oz", Finish: "Glossy" }),
     line("apparel-t-shirt", { "Print location": "Front only", Size: "M" }, { color: "white" }),
-  ], [1999, 1899, 2799, 2998]);
+  ], [1999, 1699, 2599, 2499]);
 });
 await test("12. Shipping: owner's Snipcart bands chosen by weight", async () => {
   await checkout([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })]); // 260 g
@@ -184,11 +184,11 @@ await test("14. Price tampering: browser says $1.00 for the tumbler", async () =
   const before = stripeState.created.length;
   const r = await checkout([{ ...line("sublimation-tumbler", { Size: "20 oz", Finish: "Glossy" }), expectedUnitCents: 100, price: 1, unit_amount: 100 }]);
   eq(r.status, 409, "refused with fresh prices"); eq(stripeState.created.length, before, "no Stripe session created");
-  eq(r.body.fresh[0].unitCents, 2799, "server returns the real price");
+  eq(r.body.fresh[0].unitCents, 2599, "server returns the real price");
 });
 await test("15. Tampering without a price hint still charges the real price", async () => {
   await checkout([{ ...line("sublimation-tumbler", { Size: "20 oz", Finish: "Glossy" }), price: 1, unit_amount: 100, unitCents: 100 }]);
-  eq(Number(stripeState.created.at(-1).params["line_items[0][price_data][unit_amount]"]), 2799, "Stripe gets 2799");
+  eq(Number(stripeState.created.at(-1).params["line_items[0][price_data][unit_amount]"]), 2599, "Stripe gets 2599");
 });
 await test("16. Other invalid carts: hidden product, unknown product, bad quantities, nothing to print", async () => {
   const hidden = products.find((p) => p.status === "hidden");
@@ -201,7 +201,7 @@ await test("16. Other invalid carts: hidden product, unknown product, bad quanti
   eq((await checkout([])).status, 400, "empty cart");
 });
 await test("17. Webhook with a bad signature is rejected and changes nothing", async () => {
-  const { s } = await chain([line("sublimation-mug", { Size: "11 oz", Style: "Standard White" })], [1899]);
+  const { s } = await chain([line("sublimation-mug", { Size: "11 oz", Style: "Standard White" })], [1699]);
   pay(s.id);
   const r = await webhook({ id: "evt_bad", type: "checkout.session.completed", data: { object: s } }, "whsec_wrong");
   eq(r.status, 400, "status"); eq((await order(s.id)).status, "pending", "still pending");
@@ -219,7 +219,7 @@ await test("18. Successful payment: webhook marks the order paid with everything
   ok(!o.notes, "no warnings");
 });
 await test("19. Same webhook delivered twice, and a second event for the same session: one paid order", async () => {
-  const { s } = await chain([line("sublimation-tumbler", { Size: "20 oz", Finish: "Glossy" })], [2799]);
+  const { s } = await chain([line("sublimation-tumbler", { Size: "20 oz", Finish: "Glossy" })], [2599]);
   pay(s.id);
   const ev = { id: "evt_dup_1", type: "checkout.session.completed", data: { object: s } };
   await webhook(ev);
@@ -233,13 +233,13 @@ await test("19. Same webhook delivered twice, and a second event for the same se
   eq(count.n, 1, "one order row");
 });
 await test("20. Declined card: order stays unpaid; failed async payment and expiry recorded", async () => {
-  const { s } = await chain([line("sublimation-mug", { Size: "11 oz", Style: "Standard White" })], [1899]);
+  const { s } = await chain([line("sublimation-mug", { Size: "11 oz", Style: "Standard White" })], [1699]);
   // A declined card never completes the session: Stripe sends no completed event.
   const status = await call("/api/order-status?session_id=" + s.id);
   eq(status.body.status, "pending", "status page shows not paid"); eq((await order(s.id)).status, "pending", "not paid");
   await webhook({ id: "evt_exp", type: "checkout.session.expired", data: { object: s } });
   eq((await order(s.id)).status, "expired", "expired");
-  const { s: s2 } = await chain([line("sublimation-mug", { Size: "11 oz", Style: "Standard White" })], [1899]);
+  const { s: s2 } = await chain([line("sublimation-mug", { Size: "11 oz", Style: "Standard White" })], [1699]);
   await webhook({ id: "evt_fail", type: "checkout.session.async_payment_failed", data: { object: s2 } });
   eq((await order(s2.id)).status, "payment_failed", "payment_failed");
 });
@@ -287,16 +287,16 @@ await test("26. Cart captured from the real browser flow: customizer -> cart -> 
   // prices (nobody is charged a price they didn't see); re-sent with those prices it goes through.
   const body = JSON.parse(readFileSync(new URL("./fixtures/cart-from-browser.json", import.meta.url)));
   const stale = await checkout(body.lines);
-  eq(stale.status, 409, "old-price cart refused"); eq(stale.body.fresh.map((f) => f.unitCents).join(","), "799,1999,3198", "fresh prices returned");
+  eq(stale.status, 409, "old-price cart refused"); eq(stale.body.fresh.map((f) => f.unitCents).join(","), "799,1999,2499", "fresh prices returned");
   const r = await checkout(body.lines.map((l, i) => ({ ...l, expectedUnitCents: stale.body.fresh[i].unitCents })));
   eq(r.status, 200, "checkout " + JSON.stringify(r.body));
   const s = stripeState.created.at(-1);
-  eq(s.amount_subtotal, 7995, "Stripe subtotal = cart subtotal $79.95");
-  [799, 1999, 3198].forEach((c, i) => eq(Number(s.params[`line_items[${i}][price_data][unit_amount]`]), c, "Stripe unit line " + i));
+  eq(s.amount_subtotal, 7296, "Stripe subtotal = cart subtotal $72.96");
+  [799, 1999, 2499].forEach((c, i) => eq(Number(s.params[`line_items[${i}][price_data][unit_amount]`]), c, "Stripe unit line " + i));
   pay(s.id, { tax: 0, shipping: 1195 });
   await webhook({ id: "evt_browser_cart", type: "checkout.session.completed", data: { object: s } });
   const o = await order(s.id);
-  eq(o.subtotal_cents, 7995, "order subtotal"); eq(o.total_cents, 7995 + 1195, "order total"); eq(o.total_cents, s.amount_total, "order total = Stripe total");
+  eq(o.subtotal_cents, 7296, "order subtotal"); eq(o.total_cents, 7296 + 1195, "order total"); eq(o.total_cents, s.amount_total, "order total = Stripe total");
   const lines = JSON.parse(o.lines_json);
   eq(lines[2].options.find((x) => x.label === "Garment colour").value, "White", "garment colour on the order");
   eq(lines[0].personalization.text, "Smith", "personalization on the order");
@@ -402,6 +402,25 @@ await test("32. Coaster Growth ladder: 1 $7.99 · 2 $13.99 · 4 $19.99 · 6 $29.
     eq((await checkout([line("ceramic-coasters", { Quantity: n, Material: "Ceramic", Shape: "Round" })])).status, 400, "checkout refuses " + n);
   }
   eq(pricing.fromPriceCents(P("ceramic-coasters")), 799, "shop card shows from $7.99");
+});
+
+await test("33. Growth prices for every product on sale reach Stripe exactly; no size makes a tee or hoodie jump", async () => {
+  const cases = [
+    ["sublimation-tumbler", { Size: "20 oz", Finish: "Glossy" }, null, 2599], ["sublimation-tumbler", { Size: "40 oz", Finish: "Matte" }, null, 3499],
+    ["sublimation-mug", { Size: "11 oz", Style: "Standard White" }, null, 1699], ["sublimation-mug", { Size: "15 oz", Style: "Standard White" }, null, 1999],
+    ["apparel-t-shirt", { "Print location": "Front only", Size: "XL" }, "white", 2499], ["apparel-t-shirt", { "Print location": "Front only", Size: "3XL" }, "white", 2899],
+    ["apparel-hoodie", { "Print location": "Front only", Size: "M" }, "white", 3999], ["apparel-hoodie", { "Print location": "Front only", Size: "3XL" }, "white", 4399],
+    ["apparel-tote-bag", {}, null, 1899], ["gift-fridge-magnet", {}, null, 799], ["gift-socks", {}, null, 1499], ["gift-mouse-pad", {}, null, 1499],
+    ["custom-stickers", { Size: "3 inch", Type: "Die-Cut", Pack: "Pack of 10" }, null, 2499], ["custom-stickers", { Size: "3 inch", Type: "Die-Cut", Pack: "Pack of 25" }, null, 4499],
+  ];
+  await chain(cases.map(([id, o, color]) => line(id, o, { color })), cases.map((c) => c[3]));
+  for (const id of ["apparel-t-shirt", "apparel-hoodie"]) {
+    const size = P(id).optionGroups.find((g) => g.label === "Size").choices;
+    eq(new Set(size.filter((c) => ["XS", "S", "M", "L", "XL"].includes(c.name)).map((c) => c.price)).size, 1, id + ": one price for XS to XL");
+  }
+  const onSale = products.filter((p) => pricing.isProductOnSale(p));
+  eq(onSale.length, 10, "ten products on sale");
+  for (const p of onSale) ok(pricing.fromPriceCents(p) > 0, p.id + " has a positive from-price");
 });
 
 for (const [r, n] of results) console.log(`${r}  ${n}`);
