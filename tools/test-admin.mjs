@@ -57,7 +57,8 @@ await test("5. Archiving keeps the product and all its data", async () => {
   const data = r.body.data; const before = JSON.stringify(data.products[0]); data.products[0].status = "archived";
   eq((await save(data, r.body.sha)).status, 200, "archive saved");
   const saved = JSON.parse(gh.files.draft["content/products.json"].text).products[0];
-  eq(saved.status, "archived", "archived"); eq(JSON.stringify({ ...saved, status: JSON.parse(before).status }), JSON.stringify(JSON.parse(before)), "every other field kept");
+  eq(saved.status, "archived", "archived"); const { updatedAt, ...rest } = saved; ok(updatedAt, "save time stamped");
+  eq(JSON.stringify({ ...rest, status: JSON.parse(before).status }), JSON.stringify(JSON.parse(before)), "every other field kept");
 });
 await test("6. A stale edit (someone else saved first) is refused, not overwritten", async () => {
   const r = await call("/api/admin/content/products");
@@ -81,6 +82,48 @@ await test("7. Publish merges the draft into live; Discard resets the draft", as
 await test("8. Saving with no real change creates no commit", async () => {
   const r = await call("/api/admin/content/products");
   const s = await save(r.body.data, r.body.sha); eq(s.body.unchanged, true, "unchanged"); eq(gh.commits.length, 0, "no commit");
+});
+
+await test("9. Colours and sizes switch on/off without losing anything; only edited products get a new date", async () => {
+  const r = await call("/api/admin/content/products");
+  const data = r.body.data; const tee = data.products.find((p) => p.id === "apparel-t-shirt");
+  tee.colors.find((c) => c.id === "black").visible = true;
+  const size = tee.optionGroups.find((g) => g.label === "Size"); size.choices.find((c) => c.name === "XS").hidden = true;
+  size.choices.find((c) => c.name === "3XL").price = 38.5;
+  const s = await save(data, r.body.sha); eq(s.status, 200, "saved " + JSON.stringify(s.body));
+  const out = JSON.parse(gh.files.draft["content/products.json"].text).products;
+  const t2 = out.find((p) => p.id === "apparel-t-shirt");
+  eq(t2.colors.length, tee.colors.length, "every colour kept"); eq(t2.colors.find((c) => c.id === "black").visible, true, "black on");
+  eq(t2.optionGroups[1].choices.length, size.choices.length, "every size kept"); eq(t2.optionGroups[1].choices.find((c) => c.name === "XS").hidden, true, "XS off");
+  ok(/colours on: black/.test(gh.commits[0].message) && /XS off/.test(gh.commits[0].message) && /3XL \$37\.98 → \$38\.5/.test(gh.commits[0].message), "plain message: " + gh.commits[0].message.split("\n")[0]);
+  ok(t2.updatedAt, "edited product dated"); ok(!out.find((p) => p.id === "sublimation-mug").updatedAt, "untouched product not dated");
+});
+await test("10. Removing a size/colour, unknown colours, and a for-sale product with every choice off are refused", async () => {
+  const r = await call("/api/admin/content/products");
+  const a = structuredClone(r.body.data); a.products.find((p) => p.id === "apparel-t-shirt").optionGroups[1].choices.pop();
+  const ra = await save(a, r.body.sha); eq(ra.status, 400, "choice removal refused"); ok(/Turn choices off/.test(ra.body.error), "explains turn off");
+  const b = structuredClone(r.body.data); b.products.find((p) => p.id === "apparel-hoodie").colors.pop();
+  eq((await save(b, r.body.sha)).status, 400, "colour removal refused");
+  const c = structuredClone(r.body.data); c.products.find((p) => p.id === "apparel-hoodie").colors.push({ id: "made-up", visible: true });
+  eq((await save(c, r.body.sha)).status, 400, "unknown colour refused");
+  const d = structuredClone(r.body.data); d.products.find((p) => p.id === "sublimation-mug").optionGroups[0].choices.forEach((x) => (x.hidden = true));
+  const rd = await save(d, r.body.sha); eq(rd.status, 400, "all sizes off refused while for sale"); ok(/Turn at least one on/.test(rd.body.error), "explains");
+  const f = structuredClone(r.body.data); f.products[0].optionGroups[0].choices[0].price = "abc";
+  eq((await save(f, r.body.sha)).status, 400, "bad option price refused");
+  const g = structuredClone(r.body.data); g.products[0].images = ["javascript:alert(1)"];
+  eq((await save(g, r.body.sha)).status, 400, "script picture refused");
+  const e = structuredClone(r.body.data); const mug = e.products.find((p) => p.id === "sublimation-mug"); mug.optionGroups[0].choices.forEach((x) => (x.hidden = true)); mug.status = "hidden";
+  eq((await save(e, r.body.sha)).status, 200, "allowed once the product is off");
+});
+await test("11. Pictures upload into the draft only; wrong types and oversize files are refused", async () => {
+  const png = Buffer.from("89504e470d0a1a0a", "hex").toString("base64");
+  const up = await call("/api/admin/content/media", { method: "POST", body: JSON.stringify({ name: "My Photo.PNG", type: "image/png", data: png }) });
+  eq(up.status, 200, "upload " + JSON.stringify(up.body)); ok(/^\/assets\/img\/uploads\/my-photo-[0-9a-f]{8}\.png$/.test(up.body.path), "safe name: " + up.body.path);
+  ok(gh.files.draft[up.body.path.slice(1)], "file on draft"); ok(!gh.files.main[up.body.path.slice(1)], "not live");
+  const back = await call("/api/admin/content/file?path=" + up.body.path.slice(1)); eq(back.body.data, png, "readable before publish");
+  eq((await call("/api/admin/content/media", { method: "POST", body: JSON.stringify({ name: "x.svg", type: "image/svg+xml", data: png }) })).status, 400, "svg refused");
+  eq((await call("/api/admin/content/file?path=content/products.json")).status, 404, "only uploads readable");
+  eq((await call("/api/admin/content/media", { method: "POST", body: JSON.stringify({ name: "x.png", type: "image/png", data: png }) }, "readonly")).status, 401, "read-only user refused");
 });
 
 for (const [r, name] of results) console.log(`${r}  ${name}`);

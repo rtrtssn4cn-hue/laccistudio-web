@@ -37,11 +37,11 @@ globalThis.fetch = async (input, init = {}) => {
   if ((m = p.match(/^\/git\/ref\/heads\/(\w+)$/))) return gh.branches[m[1]] ? reply({ object: { sha: gh.branches[m[1]] } }) : reply({ message: "Not Found" }, 404);
   if (p === "/git/refs" && method === "POST") { const name = body.ref.replace("refs/heads/", ""); gh.branches[name] = body.sha; gh.files[name] = structuredClone(gh.files.main); return reply({ ref: body.ref }, 201); }
   if ((m = p.match(/^\/git\/refs\/heads\/(\w+)$/)) && method === "PATCH") { gh.branches[m[1]] = body.sha; gh.files[m[1]] = structuredClone(gh.files.main); return reply({}); }
-  if ((m = p.match(/^\/contents\/(.+)\?ref=(\w+)$/)) && method === "GET") { const f = (gh.files[m[2]] || {})[m[1]]; return f ? reply({ sha: f.sha, content: b64(f.text) }) : reply({ message: "Not Found" }, 404); }
+  if ((m = p.match(/^\/contents\/(.+)\?ref=(\w+)$/)) && method === "GET") { const f = (gh.files[m[2]] || {})[m[1]]; return f ? reply({ sha: f.sha, content: f.raw || b64(f.text) }) : reply({ message: "Not Found" }, 404); }
   if ((m = p.match(/^\/contents\/(.+)$/)) && method === "PUT") {
     const f = gh.files[body.branch][m[1]];
-    if (f.sha !== body.sha) return reply({ message: "sha mismatch" }, 409);
-    const next = { sha: sha(), text: Buffer.from(body.content, "base64").toString("utf8") };
+    if (f ? f.sha !== body.sha : body.sha) return reply({ message: "sha mismatch" }, 409);
+    const next = { sha: sha(), text: Buffer.from(body.content, "base64").toString("utf8"), raw: body.content };
     gh.files[body.branch][m[1]] = next; gh.branches[body.branch] = sha();
     gh.commits.push({ branch: body.branch, message: body.message });
     return reply({ content: { sha: next.sha } }, 200);

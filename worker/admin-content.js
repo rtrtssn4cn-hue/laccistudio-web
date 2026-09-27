@@ -10,6 +10,8 @@
 //   PUT  /api/admin/content/products                save products to the draft branch
 //   POST /api/admin/content/publish                 merge draft into main
 //   POST /api/admin/content/discard                 reset draft to main
+//   POST /api/admin/content/media                   save a picture or video into the draft (assets/img/uploads/)
+//   GET  /api/admin/content/file?path=…             read an uploaded file back from the draft (before it is live)
 //
 // Access is checked by the caller (handleAdmin → adminUser: GitHub push access) on every request.
 // The server validates everything it writes; the admin screens are never trusted on their own.
@@ -21,6 +23,8 @@ const MAIN = "main";
 const PRODUCTS_PATH = "content/products.json";
 const COLORS_PATH = "content/colors.json";
 const MAX_BODY = 2 * 1024 * 1024;
+const MAX_MEDIA = 28 * 1024 * 1024;
+const MEDIA_TYPES = { "image/jpeg": { ext: "jpg" }, "image/png": { ext: "png" }, "image/webp": { ext: "webp" }, "video/mp4": { ext: "mp4" } };
 
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
@@ -63,10 +67,70 @@ async function readFile(api, path, ref) {
   return { sha: r.data.sha, text: fromB64(r.data.content) };
 }
 
-// Server-side checks on a products list before it is written. Existing products can't disappear
-// (they are archived instead); unknown fields are kept as they are.
-export function validateProducts(next, current) {
+// Server-side checks on a products list before it is written. Existing products, option choices
+// and colours can't disappear (they are hidden or archived instead); unknown fields are kept.
+const PERSONALIZATION_FLAGS = ["upload", "text", "designs", "blank", "preview", "proof", "notes"];
+const unsafeUrl = (v) => typeof v !== "string" || v.length > 1000 || /^\s*(javascript|data|vbscript):/i.test(v);
+const num = (v, lo, hi) => { const n = Number(v); return Number.isFinite(n) && n >= lo && n <= hi; };
+const choiceName = (c) => (c && typeof c === "object" ? c.name : c);
+const choiceOn = (c) => !(c && typeof c === "object" && (c.hidden === true || c.visible === false));
+
+function checkProduct(p, colorIds) {
+  const who = `"${p.name}"`;
+  if (p.optionGroups !== undefined) {
+    if (!Array.isArray(p.optionGroups) || p.optionGroups.length > 20) return `${who}: the options list is invalid.`;
+    const labels = new Set();
+    for (const g of p.optionGroups) {
+      if (!g || typeof g.label !== "string" || !g.label.trim() || g.label.length > 60) return `${who}: every option needs a name.`;
+      if (labels.has(g.label)) return `${who}: two options are both called "${g.label}".`;
+      labels.add(g.label);
+      if (!Array.isArray(g.choices) || !g.choices.length || g.choices.length > 60) return `${who}: "${g.label}" needs at least one choice.`;
+      const names = new Set();
+      for (const c of g.choices) {
+        const n = choiceName(c);
+        if (typeof n !== "string" || !n.trim() || n.length > 80) return `${who}: a "${g.label}" choice has no name.`;
+        if (names.has(n)) return `${who}: "${g.label}" lists "${n}" twice.`;
+        names.add(n);
+        if (c && typeof c === "object") {
+          if (c.price !== undefined && c.price !== null && c.price !== "" && !num(c.price, 0.5, 10000)) return `${who}: "${n}" has an invalid price.`;
+          if (c.add !== undefined && c.add !== null && c.add !== "" && !num(c.add, -1000, 1000)) return `${who}: "${n}" has an invalid extra charge.`;
+          if (c.hidden !== undefined && typeof c.hidden !== "boolean") return `${who}: "${n}" availability must be on or off.`;
+          if (c.img !== undefined && unsafeUrl(c.img)) return `${who}: "${n}" has an invalid picture.`;
+        }
+      }
+      if ((p.status || "active") === "active" && !g.choices.some(choiceOn)) return `${who} is available for sale but every "${g.label}" choice is off. Turn at least one on, or turn the product off.`;
+    }
+  }
+  if (p.colors !== undefined && p.colors !== null) {
+    if (!Array.isArray(p.colors) || p.colors.length > 80) return `${who}: the colour list is invalid.`;
+    const seen = new Set();
+    for (const c of p.colors) {
+      if (!c || typeof c.id !== "string" || !colorIds.has(c.id)) return `${who}: unknown colour "${c && c.id}".`;
+      if (seen.has(c.id)) return `${who}: colour "${c.id}" is listed twice.`;
+      seen.add(c.id);
+      if (typeof c.visible !== "boolean") return `${who}: colour "${c.id}" availability must be on or off.`;
+    }
+    if ((p.status || "active") === "active" && p.colors.length && !p.colors.some((c) => c.visible)) return `${who} is available for sale but every colour is off. Turn at least one on, or turn the product off.`;
+  }
+  for (const k of ["mockupPhoto", "video"]) if (p[k] !== undefined && p[k] !== "" && unsafeUrl(p[k])) return `${who}: ${k} is invalid.`;
+  if (p.weight !== undefined && !num(p.weight, 0, 50000)) return `${who}: weight must be between 0 and 50,000 grams.`;
+  if (p.seo !== undefined) {
+    if (!p.seo || typeof p.seo !== "object") return `${who}: SEO settings are invalid.`;
+    if (p.seo.title !== undefined && (typeof p.seo.title !== "string" || p.seo.title.length > 120)) return `${who}: SEO title is too long (120 max).`;
+    if (p.seo.description !== undefined && (typeof p.seo.description !== "string" || p.seo.description.length > 320)) return `${who}: SEO description is too long (320 max).`;
+  }
+  if (p.personalization !== undefined) {
+    const z = p.personalization;
+    if (!z || typeof z !== "object") return `${who}: personalization settings are invalid.`;
+    for (const f of PERSONALIZATION_FLAGS) if (z[f] !== undefined && typeof z[f] !== "boolean") return `${who}: personalization "${f}" must be on or off.`;
+    for (const f of ["fonts", "textColors"]) if (z[f] !== undefined && (!Array.isArray(z[f]) || z[f].length > 40 || z[f].some((x) => typeof x !== "string" || x.length > 60))) return `${who}: personalization ${f} list is invalid.`;
+  }
+  return null;
+}
+
+export function validateProducts(next, current, colorLib) {
   if (!next || !Array.isArray(next.products)) return "The product list is missing.";
+  const colorIds = new Set(((colorLib && colorLib.garmentColors) || []).map((c) => c.id));
   const ids = new Set();
   for (const p of next.products) {
     if (!p || typeof p !== "object") return "A product entry is invalid.";
@@ -77,13 +141,50 @@ export function validateProducts(next, current) {
     const price = Number(p.price);
     if (!Number.isFinite(price) || price < 0 || price > 10000) return `"${p.name}" has an invalid price.`;
     if (p.status !== undefined && !PRODUCT_STATUSES.includes(p.status)) return `"${p.name}" has an unknown status.`;
-    if (p.images !== undefined && (!Array.isArray(p.images) || p.images.some((i) => typeof i !== "string" || /^\s*javascript:/i.test(i)))) return `"${p.name}" has an invalid picture list.`;
+    if (p.images !== undefined && (!Array.isArray(p.images) || p.images.some(unsafeUrl))) return `"${p.name}" has an invalid picture list.`;
     for (const k of ["description", "category", "subcategory"]) if (p[k] !== undefined && (typeof p[k] !== "string" || p[k].length > 5000)) return `"${p.name}": ${k} is invalid.`;
     if (p.featured !== undefined && typeof p.featured !== "boolean") return `"${p.name}": featured must be on or off.`;
+    const problem = checkProduct(p, colorIds);
+    if (problem) return problem;
   }
-  const missing = (current.products || []).filter((p) => !ids.has(p.id)).map((p) => p.name || p.id);
+  const byId = new Map(next.products.map((p) => [p.id, p]));
+  const missing = (current.products || []).filter((p) => !byId.has(p.id)).map((p) => p.name || p.id);
   if (missing.length) return `These products would be removed: ${missing.slice(0, 5).join(", ")}. Archive them instead.`;
+  // Nothing inside a product is dropped either: choices and colours are turned off, not deleted.
+  for (const old of current.products || []) {
+    const p = byId.get(old.id);
+    for (const g of old.optionGroups || []) {
+      const ng = (p.optionGroups || []).find((x) => x.label === g.label);
+      if (!ng) return `"${p.name}": the option "${g.label}" would be removed. Turn its choices off instead.`;
+      const names = new Set(ng.choices.map(choiceName));
+      const gone = g.choices.map(choiceName).filter((n) => !names.has(n));
+      if (gone.length) return `"${p.name}": "${g.label}" would lose ${gone.slice(0, 3).join(", ")}. Turn choices off instead of removing them.`;
+    }
+    const nc = new Set((p.colors || []).map((c) => c.id));
+    const goneC = (old.colors || []).map((c) => c.id).filter((id) => !nc.has(id));
+    if (goneC.length) return `"${p.name}": colours ${goneC.slice(0, 3).join(", ")} would be removed. Turn them off instead.`;
+  }
   return null;
+}
+
+function colourChange(a = [], b = []) {
+  const was = new Map(a.map((c) => [c.id, c.visible]));
+  const on = b.filter((c) => c.visible && was.get(c.id) === false).map((c) => c.id), off = b.filter((c) => !c.visible && was.get(c.id) === true).map((c) => c.id);
+  return [on.length ? `colours on: ${on.join(", ")}` : "", off.length ? `colours off: ${off.join(", ")}` : ""].filter(Boolean).join("; ") || "colours";
+}
+function optionChange(a = [], b = []) {
+  const out = [];
+  for (const g of b) {
+    const og = a.find((x) => x.label === g.label); if (!og) continue;
+    for (const c of g.choices) {
+      const n = choiceName(c), oc = og.choices.find((x) => choiceName(x) === n); if (oc === undefined) continue;
+      const o = typeof oc === "object" ? oc : {}, v = typeof c === "object" ? c : {};
+      if (choiceOn(oc) !== choiceOn(c)) out.push(`${n} ${choiceOn(c) ? "on" : "off"}`);
+      if (String(o.price ?? "") !== String(v.price ?? "")) out.push(`${n} $${o.price ?? "—"} → $${v.price ?? "—"}`);
+      if (String(o.add ?? "") !== String(v.add ?? "")) out.push(`${n} +$${o.add ?? 0} → +$${v.add ?? 0}`);
+    }
+  }
+  return out.length ? out.join(", ") : "options";
 }
 
 function summarize(prev, next) {
@@ -94,7 +195,8 @@ function summarize(prev, next) {
     if (!o) { lines.push(`Added ${p.name}`); continue; }
     const changed = Object.keys({ ...o, ...p }).filter((k) => JSON.stringify(o[k]) !== JSON.stringify(p[k]));
     if (!changed.length) continue;
-    const bits = changed.map((k) => (k === "price" ? `price $${o.price} → $${p.price}` : k === "status" ? `${o.status || "active"} → ${p.status || "active"}` : k));
+    const bits = changed.filter((k) => k !== "updatedAt").map((k) => (k === "price" ? `price $${o.price} → $${p.price}` : k === "status" ? `${o.status || "active"} → ${p.status || "active"}` : k === "colors" ? colourChange(o.colors, p.colors) : k === "optionGroups" ? optionChange(o.optionGroups, p.optionGroups) : k));
+    if (!bits.length) continue;
     lines.push(`${p.name}: ${bits.join(", ")}`);
   }
   return lines;
@@ -134,9 +236,12 @@ export async function handleAdminContent(request, env, url, token, user) {
     if (!current) return json({ error: "Could not read the draft." }, 502);
     if (body.sha && body.sha !== current.sha) return json({ error: "Someone else changed the products since you opened them. Reload and try again.", conflict: true }, 409);
     const prev = JSON.parse(current.text);
-    const problem = validateProducts(body.data, prev);
+    const lib = await readFile(api, COLORS_PATH, DRAFT);
+    const problem = validateProducts(body.data, prev, lib ? JSON.parse(lib.text) : { garmentColors: [] });
     if (problem) return json({ error: problem }, 400);
     const next = { ...prev, ...body.data };
+    const stamp = new Date().toISOString(), before = new Map((prev.products || []).map((p) => [p.id, JSON.stringify({ ...p, updatedAt: 0 })]));
+    next.products = next.products.map((p) => (before.get(p.id) === JSON.stringify({ ...p, updatedAt: 0 }) ? p : { ...p, updatedAt: stamp }));
     const lines = summarize(prev, next);
     if (!lines.length) return json({ ok: true, sha: current.sha, unchanged: true });
     const title = lines.length === 1 ? lines[0] : `${lines.length} product changes`;
@@ -144,6 +249,31 @@ export async function handleAdminContent(request, env, url, token, user) {
     const put = await api("PUT", `/contents/${PRODUCTS_PATH}`, { message, content: toB64(JSON.stringify(next, null, 2) + "\n"), sha: current.sha, branch: DRAFT });
     if (!put.ok) return json({ error: "Saving failed. Please try again." }, 502);
     return json({ ok: true, sha: put.data.content.sha, changes: lines });
+  }
+
+  if (route === "/media" && request.method === "POST") {
+    if (Number(request.headers.get("content-length") || 0) > MAX_MEDIA) return json({ error: "That file is too large (20 MB max)." }, 413);
+    let body; try { body = await request.json(); } catch { return json({ error: "Invalid request." }, 400); }
+    const kind = MEDIA_TYPES[String(body.type || "").toLowerCase()];
+    if (!kind) return json({ error: "Use a JPG, PNG, WebP picture or an MP4 video." }, 400);
+    if (typeof body.data !== "string" || !/^[A-Za-z0-9+/=]+$/.test(body.data)) return json({ error: "The file could not be read." }, 400);
+    const bytes = Math.floor(body.data.length * 3 / 4);
+    if (bytes > (kind.ext === "mp4" ? 20 : 8) * 1024 * 1024) return json({ error: kind.ext === "mp4" ? "Videos can be up to 20 MB." : "Pictures can be up to 8 MB." }, 413);
+    const base = String(body.name || "upload").toLowerCase().replace(/\.[a-z0-9]+$/, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "upload";
+    const rand = Array.from(crypto.getRandomValues(new Uint8Array(4)), (b) => b.toString(16).padStart(2, "0")).join("");
+    const path = `assets/img/uploads/${base}-${rand}.${kind.ext}`;
+    await ensureDraft(api);
+    const put = await api("PUT", `/contents/${path}`, { message: `Add ${kind.ext === "mp4" ? "video" : "picture"} ${base}.${kind.ext}\n\nUploaded in the Lacci Studio Admin by ${user.login}.`, content: body.data, branch: DRAFT });
+    if (!put.ok) return json({ error: "Upload failed. Please try again." }, 502);
+    return json({ ok: true, path: "/" + path });
+  }
+
+  if (route === "/file" && request.method === "GET") {
+    const path = url.searchParams.get("path") || "";
+    if (!/^assets\/img\/uploads\/[a-z0-9-]+\.(jpg|png|webp|mp4)$/.test(path)) return json({ error: "Not found." }, 404);
+    const r = await api("GET", `/contents/${path}?ref=${DRAFT}`);
+    if (!r.ok || !r.data.content) return json({ error: "Not found." }, 404);
+    return json({ data: r.data.content.replace(/\n/g, "") });
   }
 
   if (route === "/publish" && request.method === "POST") {
