@@ -7,6 +7,7 @@ const MAX_BYTES = 24 * 1024;
 const AREA_IDS = new Set(["main", "front", "back"]);
 const LIMITS = { layers: 10, items: 12, attachments: 5, text: 200, comments: 1000, name: 120 };
 
+const DESIGN_SRC = /^\/assets\/img\/designs\/[a-z0-9-]{1,80}\.(png|jpg|webp)$/;
 const num = (v, lo, hi) => (typeof v === "number" && Number.isFinite(v) && v >= lo && v <= hi ? Math.round(v * 10000) / 10000 : null);
 const str = (v, n) => (typeof v === "string" ? v.slice(0, n) : "");
 const hex = (v) => (typeof v === "string" && /^#[0-9a-fA-F]{6}$/.test(v) ? v.toUpperCase() : null);
@@ -17,7 +18,7 @@ function cleanLayer(l, cleanUrl) {
   const x = num(l.x, -1, 2), y = num(l.y, -1, 2), rotation = num(l.rotation ?? 0, -360, 360);
   if (x === null || y === null || rotation === null) return { error: "A design layer has an invalid position." };
   if (l.type === "image") {
-    const src = cleanUrl(l.src);
+    const src = DESIGN_SRC.test(l.src || "") ? l.src : cleanUrl(l.src); // a Lacci design from the site, or the customer's upload
     if (!src) return { error: "One of the uploaded files could not be verified. Please upload it again." };
     const w = num(l.w, 0.01, 5), nw = num(l.naturalW ?? 0, 0, 30000), nh = num(l.naturalH ?? 0, 0, 30000);
     if (w === null || nw === null || nh === null) return { error: "A picture in the design has an invalid size." };
@@ -28,6 +29,14 @@ function cleanLayer(l, cleanUrl) {
       out.crop = c;
     }
     if (l.flipX === true) out.flipX = true;
+    if (l.design && typeof l.design.id === "string" && /^[a-z0-9-]{1,80}$/.test(l.design.id)) out.design = { id: l.design.id };
+    if (l.locked === true) out.locked = true;
+    for (const k of ["clip", "spot"]) { // photo spot of a Lacci photo design, and the customer photo kept inside it
+      if (!l[k]) continue;
+      const c = { x: num(l[k].x, -1, 2), y: num(l[k].y, -1, 2), w: num(l[k].w, 0.01, 3), h: num(l[k].h, 0.01, 3) };
+      if (Object.values(c).some((v) => v === null)) return { error: "A photo position is invalid." };
+      out[k] = { ...c, round: l[k].round === true };
+    }
     if (l.cutout) { const cut = cleanUrl(l.cutout); if (!cut) return { error: "One of the uploaded files could not be verified. Please upload it again." }; out.cutout = cut; }
     return { layer: out };
   }

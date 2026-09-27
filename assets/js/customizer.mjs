@@ -54,6 +54,17 @@ const filled = (l) => l.type === "image" || (l.type === "text" && l.text.trim())
 function hasContent(d) { return Object.values(d || {}).some((ls) => (ls || []).some(filled)); }
 function withPlaceholder(l) { return l.type === "text" && !l.text.trim() ? { ...l, text: "Your text", color: "#9A9A9A" } : l; }
 function clone(d) { return JSON.parse(JSON.stringify(d || {})); }
+// Lacci designs published for this product (content/designs.json, managed from the Design Library).
+let designList = null;
+function loadDesigns() {
+  if (designList) return Promise.resolve(designList);
+  return fetch("/content/designs.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : { designs: [] })).catch(() => ({ designs: [] }))
+    .then((d) => (designList = Array.isArray(d.designs) ? d.designs : []));
+}
+function designsForProduct() {
+  return (designList || []).filter((d) => d.active !== false && d.image && (!Array.isArray(d.products) || !d.products.length || d.products.includes(S.pid)));
+}
+const canPickDesigns = () => personalization().designs && designsForProduct().length > 0;
 function personalization() { return Object.assign({ upload: true, text: true, designs: true, blank: true, preview: true, proof: true, notes: true }, (rawProduct() || {}).personalization || {}); }
 
 function defaults(p) {
@@ -119,7 +130,7 @@ function restoreImages(d) {
     if (l.type !== "image" || imgs[l.src]) continue;
     if (seen[l.src] && seen[l.src].img) { imgs[l.src] = seen[l.src]; continue; }
     const info = imgs[l.src] = { url: l.src, w: l.naturalW, h: l.naturalH, name: l.name || "Your upload" };
-    R.loadImage(ucDisplay(l.src)).then((img) => {
+    R.loadImage(l.src.startsWith("/assets/") ? l.src : ucDisplay(l.src)).then((img) => {
       info.img = img; info.display = R.removeWhite(img); draw();
       if (l.cutout && info.display.bgKind !== "transparent") R.loadImage(ucDisplay(l.cutout)).then((cut) => {
         const c = document.createElement("canvas"); c.width = info.display.width; c.height = info.display.height;
@@ -140,6 +151,7 @@ function ensureCss() {
 export function open(pid) {
   const p = shop().products.find((x) => x.id === pid);
   if (!p) return;
+  loadDesigns().then(() => { if (root && S && S.pid === pid) render(); });
   imgs = {};
   S = defaults(p);
   zoom = 1;
@@ -415,15 +427,16 @@ function renderCtx() {
   const box = root.querySelector("#lz-ctx"), l = selected(), pop = root.querySelector("#lz-pop");
   if (!l) {
     box.innerHTML = personalization().upload || personalization().text
-      ? (personalization().upload ? btn("upload", "Upload", "⬆") : "") + (personalization().text ? btn("addtext", "Add text", "T") : "") + (layers().some(filled) ? btn("selectlast", "Edit design", "✎") : "")
+      ? (canPickDesigns() ? btn("designs", "Lacci designs", "✦") : "") + (personalization().upload ? btn("upload", photoSpotOpen() ? "Add your photo" : "Upload", "⬆") : "") + (personalization().text ? btn("addtext", "Add text", "T") : "") + (layers().some((x) => filled(x) && !x.locked) ? btn("selectlast", "Edit design", "✎") : "")
       : "";
     box.classList.toggle("idle", true);
     pop.hidden = true; S.tool = "";
     return;
   }
   box.classList.toggle("idle", false);
+  if (l.locked) { box.innerHTML = btn("upload", photoSpotOpen() ? "Add your photo" : "Change photo", "⬆") + btn("delete", "Remove design", "🗑", 'class="lz-danger"'); pop.hidden = true; return; }
   const ls = layers(), i = S.sel;
-  const order = (ls.length > 1 ? btn("forward", "Forward", "⬆", i === ls.length - 1 ? "disabled" : "") + btn("backward", "Back", "⬇", i === 0 ? "disabled" : "") : "");
+  const order = (ls.length > 1 && !l.clip ? btn("forward", "Forward", "⬆", i === ls.length - 1 ? "disabled" : "") + btn("backward", "Back", "⬇", i === 0 ? "disabled" : "") : "");
   box.innerHTML = l.type === "image"
     ? btn("replace", "Replace", "⇄") + (bgKind(l) === "plain" ? btn("bg", "Remove bg", "◩", l.removeWhite !== false ? 'aria-pressed="true"' : "") : "") + ((imgs[l.src] || {}).img ? btn("touchup", "Touch up", "🖌") : "") + btn("crop", "Crop", "⌗") + btn("flip", "Flip", "⇋") + btn("fit", "Fit", "⤢") + btn("fill", "Fill", "⛶") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("reset", "Reset", "↺") + btn("delete", "Delete", "🗑", 'class="lz-danger"')
     : btn("edittext", "Edit", "✎") + btn("t-font", "Font", "Aa", S.tool === "t-font" ? 'aria-pressed="true"' : "") + btn("t-size", "Size", "↕", S.tool === "t-size" ? 'aria-pressed="true"' : "") + btn("t-color", "Color", "●", (S.tool === "t-color" ? 'aria-pressed="true" ' : "") + `style="--dot:${esc(l.color)}"`) +
@@ -460,9 +473,11 @@ function renderPop() {
 
 function tool(act, el) {
   if (act === "upload") return pickFile();
+  if (act === "designs") return openDesigns();
   if (act === "addtext") return addText();
   if (act === "selectlast") { S.sel = layers().length - 1; render(); canvas.focus({ preventScroll: true }); return; }
   const l = selected(); if (!l) return;
+  if (l.locked && act !== "delete") return;
   const ls = layers(), i = S.sel, k = l.type === "text" ? "size" : "w";
   if (act.startsWith("t-")) { S.tool = S.tool === act ? "" : act; renderCtx(); return; }
   if (act === "edittext") { S.tab = "text"; if (isMobile()) S.sheet = true; render(); const ta = root.querySelector("#lz-text"); if (ta) { ta.focus(); ta.select(); } return; }
@@ -501,6 +516,69 @@ function escToClose(ov) {
   const onKey = (e) => { if (e.key === "Escape") { e.stopPropagation(); ov.remove(); } };
   document.addEventListener("keydown", onKey, true);
   new MutationObserver((_, obs) => { if (!ov.isConnected) { document.removeEventListener("keydown", onKey, true); obs.disconnect(); } }).observe(ov.parentNode, { childList: true });
+}
+
+// ---------------------------------------------------------------- Lacci designs
+// The photo design on this side, if any, with its photo spot in print-area fractions.
+function photoFrame() {
+  const f = layers().find((x) => x.locked && x.design && x.spot);
+  return f ? { layer: f, spot: f.spot } : null;
+}
+const photoSpotOpen = () => { const f = photoFrame(); return !!f && !layers().some((x) => x.clip); };
+// Customer photo sized to cover the spot, centred in it; they can still move and zoom it.
+function placeInSpot(l, sp) {
+  const a = area(), aspect = a.rect.w / a.rect.h, r = (l.naturalW || 1) / (l.naturalH || 1);
+  l.clip = { x: round(sp.x), y: round(sp.y), w: round(sp.w), h: round(sp.h), round: !!sp.round };
+  l.w = round(Math.max(sp.w, sp.h * r / aspect) * 1.02);
+  l.x = round(sp.x + sp.w / 2); l.y = round(sp.y + sp.h / 2); l.rotation = 0; l.removeWhite = false;
+}
+function openDesigns() {
+  const list = designsForProduct(); if (!list.length) return;
+  const cols = [...new Set(list.map((d) => d.collection || "Designs"))];
+  const ov = document.createElement("div");
+  ov.className = "lz-crop lz-designs";
+  ov.innerHTML = `<div class="lz-crop-box"><div class="lz-crop-head"><h3>Lacci designs</h3><button type="button" class="lz-crop-x" data-c="cancel" aria-label="Close">&times;</button></div>
+    ${cols.length > 1 ? `<div class="lz-chips">${["All", ...cols].map((c, i) => `<button type="button" data-col="${esc(c)}" aria-pressed="${i === 0}">${esc(c)}</button>`).join("")}</div>` : ""}
+    <div class="lz-dgrid">${list.map((d) => `<button type="button" data-design="${esc(d.id)}" data-colof="${esc(d.collection || "Designs")}"><img src="${esc(d.image)}" alt="" loading="lazy"><span>${esc(d.name || "")}</span>${d.type === "photo" ? `<small>Add your photo</small>` : ""}</button>`).join("")}</div></div>`;
+  root.querySelector(".lz").appendChild(ov);
+  escToClose(ov);
+  ov.onclick = (e) => {
+    const col = e.target.closest("[data-col]");
+    if (col) {
+      ov.querySelectorAll("[data-col]").forEach((b) => b.setAttribute("aria-pressed", String(b === col)));
+      ov.querySelectorAll("[data-design]").forEach((b) => { b.hidden = col.dataset.col !== "All" && b.dataset.colof !== col.dataset.col; });
+      return;
+    }
+    const pick = e.target.closest("[data-design]");
+    if (pick) { const d = list.find((x) => x.id === pick.dataset.design); ov.remove(); if (d) useDesign(d); return; }
+    if (e.target.closest('[data-c="cancel"]')) ov.remove();
+  };
+}
+function useDesign(d) {
+  const ls = layers();
+  if (d.type === "photo" && ls.some(filled) && !confirm("Use this design? It replaces what's on this side now.")) return;
+  S.started = true;
+  const key = d.image;
+  const info = imgs[key] || (imgs[key] = { url: d.image, name: d.name || "Lacci design" });
+  R.loadImage(d.image).then((img) => {
+    info.img = img; info.w = img.naturalWidth; info.h = img.naturalHeight; info.display = R.removeWhite(img);
+    const l = { type: "image", src: key, name: d.name || "Lacci design", naturalW: info.w, naturalH: info.h, x: 0.5, y: 0.5, w: 0.8, rotation: 0, removeWhite: true, design: { id: d.id } };
+    if (d.type === "photo") {
+      const spotImg = d.spot || R.findPhotoSpot(img);
+      fitLayer(l, "fit");
+      l.locked = true;
+      if (spotImg) { // spot in design fractions → print-area fractions, using where the design sits
+        const a = area(), aspect = a.rect.w / a.rect.h, hFrac = l.w * aspect / (info.w / info.h), left = l.x - l.w / 2, top = l.y - hFrac / 2;
+        l.spot = { x: round(left + spotImg.x * l.w), y: round(top + spotImg.y * hFrac), w: round(spotImg.w * l.w), h: round(spotImg.h * hFrac), round: !!spotImg.round };
+      }
+      ls.splice(0, ls.length, l); S.sel = -1;
+    } else {
+      fitLayer(l, "fit", 0.85);
+      if (ls.length >= MAX_LAYERS) return error(`Up to ${MAX_LAYERS} items per side.`);
+      ls.push(l); S.sel = ls.length - 1;
+    }
+    commit(); render();
+  }).catch(() => error("That design couldn't be loaded. Please try again."));
 }
 
 // ---------------------------------------------------------------- touch up
@@ -659,13 +737,14 @@ function layerLabel(l) { return l.type === "image" ? "🖼 " + esc((imgs[l.src] 
 function designPanel() {
   const ls = layers(), n = setSize(S.options), z = personalization();
   const list = ls.map((l, i) => ({ l, i })).reverse().map(({ l, i }) => `<li class="${i === S.sel ? "on" : ""}"><button type="button" data-select="${i}">${layerLabel(l)}</button>
-    <span class="lz-lacts"><button type="button" class="lz-mini" data-up="${i}" aria-label="Bring forward" ${i === ls.length - 1 ? "disabled" : ""}>▲</button><button type="button" class="lz-mini" data-down="${i}" aria-label="Send backward" ${i === 0 ? "disabled" : ""}>▼</button><button type="button" class="lz-mini" data-del="${i}" aria-label="Delete">×</button></span></li>`).join("");
+    <span class="lz-lacts"><button type="button" class="lz-mini" data-up="${i}" aria-label="Bring forward" ${i === ls.length - 1 || l.clip || l.locked ? "disabled" : ""}>▲</button><button type="button" class="lz-mini" data-down="${i}" aria-label="Send backward" ${i === 0 || l.clip || l.locked ? "disabled" : ""}>▼</button><button type="button" class="lz-mini" data-del="${i}" aria-label="Delete">×</button></span></li>`).join("");
   const att = (S.attachments || []).filter((a) => a.area === area().id);
   return `
     ${n > 1 ? `<div class="lz-field"><span>Your set of ${n}</span><div class="lz-seg" data-bind="layout">
       <button type="button" data-v="same" aria-pressed="${S.layout === "same"}">Same design on all</button>
       <button type="button" data-v="each" aria-pressed="${S.layout === "each"}">Customize individually</button></div></div>` : ""}
-    <div class="lz-row">${z.upload ? `<button type="button" class="btn btn-gold" data-do="upload">＋ Upload</button>` : ""}${z.text ? `<button type="button" class="btn btn-ghost-gold" data-do="addtext">＋ Text</button>` : ""}</div>
+    ${canPickDesigns() ? `<button type="button" class="btn btn-ghost-gold lz-wide" data-do="designs">✦ Choose a Lacci design</button>` : ""}
+    <div class="lz-row">${z.upload ? `<button type="button" class="btn btn-gold" data-do="upload">＋ ${photoSpotOpen() ? "Add your photo" : "Upload"}</button>` : ""}${z.text ? `<button type="button" class="btn btn-ghost-gold" data-do="addtext">＋ Text</button>` : ""}</div>
     ${ls.length ? `<div class="lz-field"><span>Layers (top first)</span><ul class="lz-layers">${list}</ul></div>` : `<p class="lz-note">Nothing on ${esc(area().label.toLowerCase())} yet.</p>`}
     ${qualityNotes(ls, area())}
     ${att.length ? `<p class="lz-note">Attached for us to place: ${att.map((a) => esc(a.name)).join(", ")}</p>` : ""}
@@ -674,7 +753,7 @@ function designPanel() {
 }
 const bgKind = (l) => ((imgs[l.src] || {}).display || {}).bgKind || "";
 function bgNote(ls) {
-  const im = ls.filter((l) => l.type === "image"), kinds = im.map((l) => [l, bgKind(l)]);
+  const im = ls.filter((l) => l.type === "image" && !l.clip && !l.design), kinds = im.map((l) => [l, bgKind(l)]);
   if (kinds.some(([l, k]) => k === "plain" && l.removeWhite !== false)) return `<p class="lz-note">The plain background around your picture is removed, so only your design is printed. Tap <b>Remove bg</b> to keep it.</p>`;
   if (kinds.some(([, k]) => k === "plain")) return `<p class="lz-note">The background around your picture is kept and will be printed. Tap <b>Remove bg</b> to remove it.</p>`;
   if (kinds.some(([, k]) => k === "busy")) return `<p class="lz-note">This photo has a detailed background, so it's printed as it is.</p>`;
@@ -785,7 +864,8 @@ function drawFinals() {
 function bindPanel(box) {
   box.onclick = (e) => {
     const t = e.target.closest("button"); if (!t) return;
-    if (t.dataset.do === "upload") pickFile();
+    if (t.dataset.do === "designs") openDesigns();
+    else if (t.dataset.do === "upload") pickFile();
     else if (t.dataset.do === "addtext") addText();
     else if (t.dataset.do === "done") { S.sel = -1; S.sheet = false; render(); }
     else if (t.dataset.select != null) { S.sel = +t.dataset.select; if (isMobile()) S.sheet = false; render(); canvas.focus({ preventScroll: true }); }
@@ -864,8 +944,15 @@ function addUpload(file, replaceLayer) {
     info.img = img; info.w = img.naturalWidth; info.h = img.naturalHeight; info.display = R.removeWhite(img);
     if (replaceLayer) { layer.src = key; layer.name = info.name; layer.naturalW = info.w; layer.naturalH = info.h; delete layer.crop; }
     else {
-      layer.naturalW = info.w; layer.naturalH = info.h; fitLayer(layer, "fit", 0.85);
-      if (!layers().includes(layer)) { layers().push(layer); S.sel = layers().length - 1; }
+      layer.naturalW = info.w; layer.naturalH = info.h;
+      const frame = !replaceLayer && photoFrame();
+      if (frame) {
+        layers().filter((x) => x.clip).forEach((x) => layers().splice(layers().indexOf(x), 1)); // one photo per spot: a new one replaces it
+        placeInSpot(layer, frame.spot); layers().unshift(layer); S.sel = 0;
+      } else {
+        fitLayer(layer, "fit", 0.85);
+        if (!layers().includes(layer)) { layers().push(layer); S.sel = layers().length - 1; }
+      }
     }
     commit(); render();
   };
@@ -922,6 +1009,7 @@ function bindGestures() {
       if (Math.hypot(p.x - h.resize[0], p.y - h.resize[1]) < pad) return (g = { kind: "resize", c, d0: Math.hypot(p.x - c.cx, p.y - c.cy), s: snap(selected()) });
     }
     for (let i = ls.length - 1; i >= 0; i--) {
+      if (ls[i].locked) continue; // a photo design's artwork stays put; taps reach the photo under it
       if (R.hitLayer(ls[i], a, W, W, imgs, p.x, p.y, pointerType === "touch" ? 8 : 2)) {
         if (S.sel !== i) { S.sel = i; S.tool = ""; render(); }
         return (g = { kind: "move", p0: p, s: snap(selected()) });
@@ -1038,6 +1126,7 @@ function recordLayer(l) {
   if (l.type === "image") {
     const o = { type: "image", src: imgs[l.src].url, name: l.name || "", naturalW: l.naturalW || 0, naturalH: l.naturalH || 0, x: l.x, y: l.y, w: l.w, rotation: l.rotation, removeWhite: l.removeWhite !== false };
     if (l.crop) o.crop = l.crop; if (l.flipX) o.flipX = true;
+    if (l.design) o.design = l.design; if (l.locked) o.locked = true; if (l.clip) o.clip = l.clip; if (l.spot) o.spot = l.spot;
     return o;
   }
   return { type: "text", text: l.text.trim(), font: l.font, color: l.color, size: l.size, x: l.x, y: l.y, rotation: l.rotation, spacing: l.spacing || 0, curve: l.curve || 0, bold: !!l.bold, vertical: !!l.vertical, align: l.align || "center" };
