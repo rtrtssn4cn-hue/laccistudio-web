@@ -330,6 +330,7 @@ export function drawComposite(ctx, area, layers, W, H, imgs, opts = {}) {
   layers.forEach((l) => drawLayer(ctx, l, area, W, H, imgs));
   ctx.restore();
   if (opts.editing) { // no print-area outline: parts outside it show faded, and the window warns about them
+    if (opts.selectedAll) layers.forEach((l) => drawSelection(ctx, l, area, W, H, imgs, false));
     const sel = layers[opts.selected];
     if (sel) drawSelection(ctx, sel, area, W, H, imgs, opts.handles !== false);
   }

@@ -362,7 +362,7 @@ function draw() {
     raf = 0;
     if (!ctx || !W || !S) return;
     const a = area();
-    R.drawComposite(ctx, a, layers().map(withPlaceholder), W, W, imgs, { mockup: mockupImage(a), editing: true, selected: S.sel });
+    R.drawComposite(ctx, a, layers().map(withPlaceholder), W, W, imgs, { mockup: mockupImage(a), editing: true, selected: S.sel, selectedAll: !!S.all });
     const out = layers().some((l) => filled(l) && R.isOutside(l, a, W, W, imgs));
     root.querySelector("#lz-warn").hidden = !out;
   });
@@ -472,6 +472,7 @@ function renderPop() {
 }
 
 function tool(act, el) {
+  S.all = false;
   if (act === "upload") return pickFile();
   if (act === "designs") return openDesigns();
   if (act === "addtext") return addText();
@@ -500,7 +501,11 @@ function tool(act, el) {
   if (act === "duplicate") { if (ls.length >= MAX_LAYERS) return error(`Up to ${MAX_LAYERS} items per side.`); const c = clone(l); c.x = round(clamp(c.x + 0.05, 0, 1)); c.y = round(clamp(c.y + 0.05, 0, 1)); ls.splice(i + 1, 0, c); S.sel = i + 1; }
   if (act === "forward" && i < ls.length - 1) { [ls[i], ls[i + 1]] = [ls[i + 1], ls[i]]; S.sel = i + 1; }
   if (act === "backward" && i > 0) { [ls[i], ls[i - 1]] = [ls[i - 1], ls[i]]; S.sel = i - 1; }
-  if (act === "delete") { ls.splice(i, 1); S.sel = -1; }
+  if (act === "delete") {
+    ls.splice(i, 1); S.sel = -1;
+    if (l.design && !ls.some((x) => x.design && x.design.id === l.design.id)) // the design's own wording goes with it
+      for (let j = ls.length - 1; j >= 0; j--) if (ls[j].fromDesign === l.design.id) ls.splice(j, 1);
+  }
   commit(); render();
 }
 function snapRot(d) { let r = ((Math.round(d) % 360) + 540) % 360 - 180; for (const s of [-180, -90, 0, 90, 180]) if (Math.abs(r - s) < 4) r = s; return r; }
@@ -582,7 +587,7 @@ function useDesign(d) {
       const a = area(), aspect = a.rect.w / a.rect.h, hFrac = l.w * aspect / (info.w / info.h), left = l.x - l.w / 2, top = l.y - hFrac / 2;
       for (const t of texts) {
         ls.push({ type: "text", text: t.text, font: t.font || "Serif / Classic", color: t.color || "#231F20", size: round(t.size * hFrac), x: round(left + t.x * l.w), y: round(top + t.y * hFrac),
-          rotation: 0, spacing: 0, curve: 0, bold: !!t.bold, vertical: false, align: "center", placeholder: t.text });
+          rotation: 0, spacing: 0, curve: 0, bold: !!t.bold, vertical: false, align: "center", placeholder: t.text, fromDesign: d.id });
       }
       S.sel = texts.length ? ls.length - texts.length : ls.length - 1;
       if (texts.length) S.tab = "text";
@@ -755,7 +760,7 @@ function designPanel() {
       <button type="button" data-v="each" aria-pressed="${S.layout === "each"}">Customize individually</button></div></div>` : ""}
     ${canPickDesigns() ? `<button type="button" class="btn btn-ghost-gold lz-wide" data-do="designs">✦ Choose a Lacci design</button>` : ""}
     <div class="lz-row">${z.upload ? `<button type="button" class="btn btn-gold" data-do="upload">＋ ${photoSpotOpen() ? "Add your photo" : "Upload"}</button>` : ""}${z.text ? `<button type="button" class="btn btn-ghost-gold" data-do="addtext">＋ Text</button>` : ""}</div>
-    ${ls.length ? `<div class="lz-field"><span>Layers (top first)</span><ul class="lz-layers">${list}</ul></div>` : `<p class="lz-note">Nothing on ${esc(area().label.toLowerCase())} yet.</p>`}
+    ${ls.length ? `<div class="lz-field"><span class="lz-lhead">Layers (top first)<button type="button" class="lz-clear" data-do="clearall">Clear all</button></span><ul class="lz-layers">${list}</ul></div>` : `<p class="lz-note">Nothing on ${esc(area().label.toLowerCase())} yet.</p>`}
     ${qualityNotes(ls, area())}
     ${att.length ? `<p class="lz-note">Attached for us to place: ${att.map((a) => esc(a.name)).join(", ")}</p>` : ""}
     ${bgNote(ls)}
@@ -874,7 +879,8 @@ function drawFinals() {
 function bindPanel(box) {
   box.onclick = (e) => {
     const t = e.target.closest("button"); if (!t) return;
-    if (t.dataset.do === "designs") openDesigns();
+    if (t.dataset.do === "clearall") clearSide();
+    else if (t.dataset.do === "designs") openDesigns();
     else if (t.dataset.do === "upload") pickFile();
     else if (t.dataset.do === "addtext") addText();
     else if (t.dataset.do === "done") { S.sel = -1; S.sheet = false; render(); }
@@ -1039,6 +1045,7 @@ function bindGestures() {
   }
 
   canvas.addEventListener("pointerdown", (e) => {
+    if (S.all) { S.all = false; draw(); }
     if (!layers().length && zoom === 1 && e.pointerType !== "touch") return;
     canvas.setPointerCapture(e.pointerId);
     pts.set(e.pointerId, pos(e));
@@ -1109,7 +1116,25 @@ function bindGestures() {
     else l[k] = round(clamp(l[k] * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.002)), 0.03, 3));
     draw(); commitSoon();
   }, { passive: false });
-  canvas.addEventListener("keydown", (e) => {
+  if (!keysBound) { keysBound = true; document.addEventListener("keydown", onKey); }
+}
+let keysBound = false;
+// Keyboard shortcuts while the window is open. Ignored while typing in a field or when a
+// Crop / Touch up / Lacci designs box is open, so Backspace in the text box only edits text.
+function onKey(e) {
+    if (!root || !root.isConnected || !S) return;
+    const t = e.target;
+    if (t && (t.closest && t.closest("input, textarea, select, [contenteditable]"))) return;
+    if (root.querySelector(".lz-crop")) return;
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "a") {
+      if (!layers().length) return;
+      e.preventDefault(); S.all = true; S.sel = -1; render(); return;
+    }
+    if (S.all) {
+      if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); clearSide(); return; }
+      if (e.key === "Escape") { S.all = false; render(); return; }
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") { e.preventDefault(); return e.shiftKey ? redo() : undo(); }
     const l = selected();
     if (!l) { if (/^Arrow/.test(e.key) && layers().length) { S.sel = layers().length - 1; render(); e.preventDefault(); } return; }
     const step = e.shiftKey ? 0.05 : 0.01, k = l.type === "text" ? "size" : "w";
@@ -1122,7 +1147,12 @@ function bindGestures() {
     if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); return tool("delete"); }
     if (e.key === "Escape") { S.sel = -1; render(); return; }
     if (acts[e.key]) { acts[e.key](); e.preventDefault(); e.stopPropagation(); draw(); commitSoon(); }
-  });
+}
+// Remove everything on this side (Clear all, or select all + Delete). Undo brings it back.
+function clearSide() {
+  const ls = layers(); if (!ls.length) return;
+  if (!confirm("Remove everything on this side? You can undo this.")) return;
+  ls.splice(0, ls.length); S.sel = -1; S.all = false; commit(); render();
 }
 
 // ---------------------------------------------------------------- saving to the cart

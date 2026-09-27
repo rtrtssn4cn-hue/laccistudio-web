@@ -211,3 +211,6 @@ html.lz-lock, html.lz-lock body { overflow: hidden; }
 .lz-dgrid button[hidden] { display: none; }
 .lz-dgrid img { width: 100%; aspect-ratio: 1; object-fit: contain; background: repeating-conic-gradient(#f1ece6 0 25%, #fff 0 50%) 0 0 / 12px 12px; border-radius: 8px; }
 .lz-dgrid small { color: var(--lz-gold-deep); font-weight: 600; }
+
+.lz-lhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.lz-clear { border: 0; background: none; padding: 0; color: var(--lz-gold-deep); font: 600 .72rem 'Montserrat', sans-serif; text-decoration: underline; text-transform: none; letter-spacing: 0; cursor: pointer; }
