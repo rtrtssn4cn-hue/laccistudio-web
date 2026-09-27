@@ -37,6 +37,12 @@
   textarea { width:100%; min-height:60px; font:inherit; border:1px solid var(--line); border-radius:6px; padding:.5rem }
   .empty, .error { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.5rem; text-align:center }
   a.file { display:inline-block; margin:.2rem .4rem .2rem 0 }
+  .design { margin:.5rem 0; padding:.6rem .7rem; background:var(--beige); border-radius:8px }
+  .design h4 { margin:0 0 .4rem; font-size:.85rem; text-transform:uppercase; letter-spacing:.05em }
+  .previews { display:flex; flex-wrap:wrap; gap:.5rem; margin:.3rem 0 }
+  .previews a { display:block; text-align:center; font-size:.75rem; color:var(--espresso); text-decoration:none }
+  .previews img { width:96px; height:96px; object-fit:contain; background:#fff; border:1px solid var(--line); border-radius:6px; display:block }
+  .design ul { margin:.2rem 0; padding-left:1.1rem; font-size:.88rem }
   @media (max-width:760px) { .order > summary { grid-template-columns:1fr 1fr } .body { grid-template-columns:1fr } }
 </style>
 </head>
@@ -86,6 +92,35 @@
       list.replaceChildren.apply(list, d.orders.map(render));
     }).catch(function (e) { list.replaceChildren(el("div", { cls: "error", text: e.message })); });
   }
+  // Design made in the visual customizer: previews per print area (and per coaster), the original
+  // uploads to print from, and every text item with its font and colour.
+  function designView(c) {
+    var areaName = { main: "Design", front: "Front", back: "Back" };
+    var sets = c.layout === "each" ? (c.items || []).map(function (it, i) { return { title: "Coaster " + (i + 1), areas: it.areas || {}, previews: it.previews || {} }; })
+      : [{ title: "", areas: c.areas || {}, previews: c.previews || {} }];
+    var thumbs = [], uploads = [], texts = [];
+    sets.forEach(function (s) {
+      Object.keys(s.previews).forEach(function (id) {
+        thumbs.push(el("a", { href: s.previews[id], target: "_blank", rel: "noopener noreferrer" }, [el("img", { src: s.previews[id], alt: "", loading: "lazy" }), [s.title, sets.length === 1 || Object.keys(s.previews).length > 1 ? areaName[id] || id : ""].filter(Boolean).join(" · ")]));
+      });
+      Object.keys(s.areas).forEach(function (id) {
+        var a = s.areas[id] || {}, where = [s.title, areaName[id] || id].filter(Boolean).join(" · ");
+        (a.layers || []).forEach(function (l) {
+          if (l.type === "image") uploads.push(el("li", {}, [el("a", { href: l.src, target: "_blank", rel: "noopener noreferrer", text: "⬇ " + (l.name || "Uploaded picture") }), el("span", { cls: "muted", text: " — " + where + (l.naturalW ? " · " + l.naturalW + "×" + l.naturalH + " px" : "") + (l.crop ? " · cropped" : "") + (l.flipX ? " · flipped" : "") + (l.rotation ? " · rotated " + Math.round(l.rotation) + "°" : "") })]));
+          if (l.type === "text") texts.push(el("li", {}, [el("strong", { text: "“" + l.text + "”" }), el("span", { cls: "muted", text: " — " + where + " · " + (l.font || "—") + " · " + l.color + (l.curve ? " · curved" : "") + (l.bold ? " · bold" : "") })]));
+        });
+        (a.attachments || []).forEach(function (f) { uploads.push(el("li", {}, [el("a", { href: f.src, target: "_blank", rel: "noopener noreferrer", text: "⬇ " + (f.name || "Attached file") }), el("span", { cls: "muted", text: " — " + where + " · attached for us to place" })])); });
+      });
+    });
+    return el("div", { cls: "design" }, [
+      el("h4", { text: "Customer design" + (c.layout === "each" ? " · each coaster different" : "") }),
+      thumbs.length ? el("div", { cls: "previews" }, thumbs) : el("div", { cls: "muted", text: "No preview image was saved." }),
+      uploads.length ? el("div", {}, [el("div", { cls: "muted", text: "Original files to print from:" }), el("ul", {}, uploads)]) : null,
+      texts.length ? el("div", {}, [el("div", { cls: "muted", text: "Text:" }), el("ul", {}, texts)]) : null,
+      el("div", { cls: "muted", text: "Proof: " + (c.proof ? "customer wants a digital proof before production" : "no proof — produce as submitted") }),
+      c.comments ? el("div", {}, ["Notes: ", el("em", { text: c.comments })]) : null
+    ]);
+  }
   function render(o) {
     var addr = o.shippingAddress && o.shippingAddress.address;
     var sum = el("summary", {}, [
@@ -109,7 +144,8 @@
         p.textStyle ? el("div", { cls: "muted", text: "Text styling: " + p.textStyle }) : null,
         p.proof ? el("div", { cls: "muted", text: "Proof: " + p.proof }) : null,
         p.comments ? el("div", {}, ["Notes: ", el("em", { text: p.comments })]) : null,
-        files.length ? el("div", {}, files) : null
+        files.length ? el("div", {}, files) : null,
+        l.customization ? designView(l.customization) : null
       ]);
     }));
     var ship = el("div", {}, [

@@ -15,7 +15,17 @@ let cart = load();
 const raw = () => window.LACCI_RAW || { products: [], colors: [] };
 const productOf = (id) => raw().products.find((p) => p.id === id);
 function price(line) { return priceLine(productOf(line.productId), { options: line.options, color: line.color }, raw().colors); }
-const sameLine = (a, b) => JSON.stringify([a.productId, a.options, a.color, a.personalization, a.files]) === JSON.stringify([b.productId, b.options, b.color, b.personalization, b.files]);
+// Lines from the visual customizer carry their own design id, so two different designs of the same
+// product never merge; re-adding the very same design only raises the quantity.
+const sameLine = (a, b) => JSON.stringify([a.productId, a.options, a.color, a.personalization, a.files, a.customizationId || null]) === JSON.stringify([b.productId, b.options, b.color, b.personalization, b.files, b.customizationId || null]);
+// Rendered previews saved with a customized line: one per coaster for sets designed individually.
+function previewsOf(l) {
+  const c = l.customization;
+  if (!c) return l.files && l.files.preview ? [l.files.preview] : [];
+  if (c.items) return c.items.map((it) => Object.values(it.previews || {})[0]).filter(Boolean);
+  return Object.values(c.previews || {});
+}
+const customizer = () => import("./customizer.mjs?v=1");
 
 function ensureDrawer() {
   if (document.querySelector("#sc-drawer")) return;
@@ -55,9 +65,12 @@ function render(message) {
     const opts = p.ok ? p.summary.map((o) => `${esc(o.label)}: ${esc(o.value)}`).join("<br>") : "";
     const pers = l.personalization && l.personalization.text ? `<span class="ci-opt">“${esc(l.personalization.text)}”</span>` : "";
     const files = l.files && (l.files.design || l.files.backDesign) ? '<span class="ci-design ok">✓ Artwork attached</span>' : "";
+    const pv = previewsOf(l);
+    const thumbs = pv.length > 1 ? `<span class="ci-thumbs">${pv.map((u, k) => `<img src="${esc(u)}" alt="Design ${k + 1}" loading="lazy">`).join("")}</span>` : "";
+    const actions = l.customization ? `<span class="ci-acts"><button type="button" data-edit="${i}">Edit design</button><button type="button" data-dup="${i}">Duplicate</button></span>` : "";
     return `<div class="cart-item">` +
-      `<img src="${esc(l.image || "")}" alt="">` +
-      `<div class="ci-info"><strong>${esc(l.name)}</strong><span class="ci-opt">${opts}</span>${pers}${files}` +
+      `<img src="${esc(pv[0] || l.image || "")}" alt="${l.customization ? "Your design" : ""}">` +
+      `<div class="ci-info"><strong>${esc(l.name)}</strong><span class="ci-opt">${opts}</span>${pers}${files}${thumbs}${actions}` +
       (p.ok ? `<span class="ci-price">${money(p.unitCents)}</span>` : `<span class="ci-price" style="color:#b3261e">${esc(p.error)} Please remove it.</span>`) + `</div>` +
       `<div class="ci-qty"><button data-dec="${i}" aria-label="Decrease quantity">&minus;</button><span>${l.qty}</span><button data-inc="${i}" aria-label="Increase quantity">+</button></div>` +
       `<button class="ci-remove" data-rem="${i}" aria-label="Remove ${esc(l.name)}">&times;</button></div>`;
@@ -72,8 +85,37 @@ function render(message) {
   box.querySelectorAll("[data-inc]").forEach((b) => (b.onclick = () => setQty(+b.dataset.inc, cart[+b.dataset.inc].qty + 1)));
   box.querySelectorAll("[data-dec]").forEach((b) => (b.onclick = () => setQty(+b.dataset.dec, cart[+b.dataset.dec].qty - 1)));
   box.querySelectorAll("[data-rem]").forEach((b) => (b.onclick = () => setQty(+b.dataset.rem, 0)));
+  box.querySelectorAll("[data-edit]").forEach((b) => (b.onclick = () => customizer().then((m) => m.edit(+b.dataset.edit))));
+  box.querySelectorAll("[data-dup]").forEach((b) => (b.onclick = () => customizer().then((m) => m.edit(+b.dataset.dup, true))));
   document.querySelector("#sc-continue").onclick = close;
-  document.querySelector("#sc-checkout").onclick = checkout;
+  document.querySelector("#sc-checkout").onclick = cart.some((l) => l.customization) ? review : checkout;
+}
+
+// Last look before paying: every customized design large, with its options and text.
+function review() {
+  const box = document.querySelector("#sc-items"), foot = document.querySelector("#sc-foot");
+  let subtotal = 0;
+  box.innerHTML = `<h4 class="rv-title">Review your order</h4>` + cart.map((l, i) => {
+    const p = price(l); if (p.ok) subtotal += p.unitCents * l.qty;
+    const pv = previewsOf(l), c = l.customization;
+    const texts = [];
+    if (c) for (const a of (c.items ? c.items.flatMap((it) => Object.values(it.areas)) : Object.values(c.areas || {}))) for (const x of a.layers || []) if (x.type === "text") texts.push(x.text);
+    return `<div class="rv-item"><div class="rv-imgs">${(pv.length ? pv : [l.image]).map((u, k) => `<img src="${esc(u || "")}" alt="${pv.length > 1 ? "Coaster " + (k + 1) : "Your design"}">`).join("")}</div>` +
+      `<div class="rv-info"><strong>${esc(l.name)} × ${l.qty}</strong>` +
+      (p.ok ? p.summary.map((o) => `<span>${esc(o.label)}: ${esc(o.value)}</span>`).join("") : "") +
+      (texts.length ? `<span>Text: “${texts.map(esc).join("”, “")}”</span>` : "") +
+      (c ? `<span>${c.proof ? "Digital proof before we make it" : "No proof — made as shown"}</span>` : "") +
+      (c && c.comments ? `<span>Notes: ${esc(c.comments)}</span>` : "") +
+      `<span class="ci-price">${p.ok ? money(p.unitCents * l.qty) : esc(p.error)}</span>` +
+      (c ? `<button type="button" class="rv-edit" data-edit="${i}">Edit design</button>` : "") + `</div></div>`;
+  }).join("");
+  foot.innerHTML = `<div class="cart-subtotal"><span>Subtotal</span><strong>${money(subtotal)}</strong></div>` +
+    `<p class="cart-note">Shipping and any sales tax are added on the next page.</p>` +
+    `<button class="btn btn-gold" id="sc-pay" style="width:100%;justify-content:center">Continue to secure checkout</button>` +
+    `<button class="cart-continue" id="sc-back">Back to cart</button>`;
+  box.querySelectorAll("[data-edit]").forEach((b) => (b.onclick = () => customizer().then((m) => m.edit(+b.dataset.edit))));
+  document.querySelector("#sc-pay").onclick = checkout;
+  document.querySelector("#sc-back").onclick = () => render();
 }
 
 function setQty(i, q) {
@@ -88,6 +130,7 @@ function add(line) {
     options: line.options || {}, color: line.color || null,
     personalization: Object.fromEntries(Object.entries(line.personalization || {}).filter(([, v]) => v)),
     files: Object.fromEntries(Object.entries(line.files || {}).filter(([, v]) => v)),
+    ...(line.customization ? { customizationId: line.customizationId, customization: line.customization } : {}),
   };
   const p = price(clean);
   if (!p.ok) { alert(p.error); return; }
@@ -97,7 +140,7 @@ function add(line) {
 }
 
 async function checkout() {
-  const btn = document.querySelector("#sc-checkout");
+  const btn = document.querySelector("#sc-pay") || document.querySelector("#sc-checkout");
   btn.disabled = true; btn.textContent = "Opening secure checkout…";
   const lines = cart.map((l) => ({ ...l, expectedUnitCents: price(l).unitCents }));
   try {
@@ -128,6 +171,16 @@ async function reloadCatalog() {
 }
 
 function clear() { cart = []; save(cart); refreshBadge(); }
+// Swap a line for its edited version (Edit design), keeping its place in the cart.
+function replace(i, line) {
+  if (!cart[i]) return add(line);
+  const before = cart.slice();
+  cart.splice(i, 1);
+  const n = cart.length;
+  add(line);
+  if (cart.length > n) { const [l] = cart.splice(cart.length - 1, 1); cart.splice(i, 0, l); save(cart); render(); }
+  else if (!cart.length) cart = before;
+}
 
 const active = () => window.LACCI_CHECKOUT_MODE === "stripe";
 function start() {
@@ -138,6 +191,6 @@ function start() {
   if (new URLSearchParams(location.search).get("checkout") === "cancelled") { ensureDrawer(); open(); }
 }
 
-window.LacciCheckout = { add, open, close, refreshBadge, clear, lines: () => cart.slice() };
+window.LacciCheckout = { add, replace, open, close, refreshBadge, clear, lines: () => cart.slice() };
 document.dispatchEvent(new Event("lacci:checkout-ready"));
 if (window.LACCI_READY) start(); else document.addEventListener("lacci:ready", start, { once: true });
