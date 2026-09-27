@@ -564,6 +564,7 @@
           ]
         }
       ],
+      "hidden": true,
       "name": "Custom Tank Top",
       "mockupPhoto": "assets/img/mock/mock-apparel-tank-top.png?v=12",
       "colors": [
@@ -697,6 +698,7 @@
           ]
         }
       ],
+      "hidden": true,
       "name": "Custom Long-Sleeve Tee",
       "mockupPhoto": "assets/img/mock/mock-apparel-long-sleeve-tee.png?v=12",
       "colors": [
@@ -822,6 +824,7 @@
           ]
         }
       ],
+      "hidden": true,
       "name": "Custom Youth Tee",
       "mockupPhoto": "assets/img/mock/mock-apparel-youth-tee.png?v=12",
       "colors": [
@@ -951,6 +954,7 @@
           ]
         }
       ],
+      "hidden": false,
       "name": "Custom Baby Onesie",
       "mockupPhoto": "assets/img/mock/mock-apparel-baby-onesie.png?v=12",
       "colors": [
@@ -1350,6 +1354,7 @@
           ]
         }
       ],
+      "hidden": true,
       "name": "Custom Zip-Up Hoodie",
       "mockupPhoto": "assets/img/mock/mock-apparel-zip-up-hoodie.png?v=12",
       "colors": [
@@ -1434,6 +1439,7 @@
     {
       "price": 22.99,
       "optionGroups": [],
+      "hidden": true,
       "name": "Custom Dad Cap",
       "mockupPhoto": "assets/img/mock/mock-apparel-dad-cap.png?v=12",
       "images": [
@@ -1448,6 +1454,7 @@
     {
       "price": 22.99,
       "optionGroups": [],
+      "hidden": true,
       "name": "Custom Trucker Hat",
       "mockupPhoto": "assets/img/mock/mock-apparel-trucker-hat.png?v=12",
       "images": [
@@ -1462,6 +1469,7 @@
     {
       "price": 21.99,
       "optionGroups": [],
+      "hidden": true,
       "name": "Custom Beanie",
       "mockupPhoto": "assets/img/mock/mock-apparel-beanie.png?v=12",
       "images": [
@@ -1490,6 +1498,7 @@
     {
       "price": 26.99,
       "optionGroups": [],
+      "hidden": true,
       "name": "Custom Apron",
       "mockupPhoto": "assets/img/mock/mock-apparel-apron.png?v=12",
       "images": [
@@ -1562,6 +1571,7 @@
     {
       "price": 6.99,
       "optionGroups": [],
+      "hidden": true,
       "name": "Personalized Bookmark",
       "mockupPhoto": "assets/img/mock/mock-gift-bookmark.png?v=12",
       "images": [
@@ -1590,6 +1600,7 @@
     {
       "price": 8.99,
       "optionGroups": [],
+      "hidden": true,
       "name": "Personalized Can Cooler",
       "mockupPhoto": "assets/img/mock/mock-gift-can-cooler-koozie.png?v=12",
       "images": [
@@ -1812,6 +1823,7 @@
     {
       "price": 16.99,
       "optionGroups": [],
+      "hidden": true,
       "name": "Personalized Zip Pouch",
       "mockupPhoto": "assets/img/mock/mock-gift-zip-pouch.png?v=12",
       "images": [
@@ -1841,6 +1853,7 @@
     {
       "price": 16.99,
       "optionGroups": [],
+      "hidden": true,
       "name": "Personalized License Plate",
       "mockupPhoto": "assets/img/mock/mock-gift-license-plate.png?v=12",
       "images": [
