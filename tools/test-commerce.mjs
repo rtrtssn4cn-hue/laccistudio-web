@@ -453,6 +453,24 @@ await test("34. Customizer design record: kept on the order, checked, and never 
   eq(stripeState.created.length, before, "no Stripe session for refused designs");
 });
 
+await test("35. Lacci designs: site design pictures and photo spots are kept; other paths refused", async () => {
+  const D = "/assets/img/designs/sample-photo-frame.png";
+  const rec = (layers) => ({ schema: 1, customizationId: "c_design000001", productId: "sublimation-tumbler", layout: "same", proof: true, comments: "", areas: { main: { layers } } });
+  const frame = { type: "image", src: D, name: "Photo frame", naturalW: 1200, naturalH: 1200, x: 0.5, y: 0.5, w: 1, rotation: 0, removeWhite: true, design: { id: "sample-photo-frame" }, locked: true, spot: { x: 0.2, y: 0.1, w: 0.6, h: 0.6, round: true } };
+  const photo = { type: "image", src: UC, name: "photo.jpg", naturalW: 1600, naturalH: 1200, x: 0.5, y: 0.4, w: 0.8, rotation: 0, removeWhite: false, clip: { x: 0.2, y: 0.1, w: 0.6, h: 0.6, round: true } };
+  const base = { ...line("sublimation-tumbler", { Size: "20 oz", Finish: "Glossy" }), personalization: {}, files: {} };
+  const r = await checkout([{ ...base, customization: rec([photo, frame]), expectedUnitCents: 1899 }]);
+  eq(r.status, 200, "accepted " + JSON.stringify(r.body));
+  const c = JSON.parse((await order(stripeState.created.at(-1).id)).lines_json)[0].customization.areas.main.layers;
+  eq(c[1].src, D, "design picture kept"); eq(c[1].design.id, "sample-photo-frame", "design id kept"); eq(c[1].locked, true, "locked kept");
+  eq(c[1].spot.round, true, "photo spot kept"); eq(c[0].clip.w, 0.6, "customer photo kept inside the spot");
+  const before = stripeState.created.length;
+  for (const [src, what] of [["/assets/img/other/x.png", "other site folder"], ["/assets/img/designs/../x.png", "path trick"], ["http://laccistudio.com/assets/img/designs/a.png", "full address"]])
+    eq((await checkout([{ ...base, customization: rec([{ ...frame, src }]) }])).status, 400, what + " refused");
+  eq((await checkout([{ ...base, customization: rec([{ ...photo, clip: { x: "a", y: 0, w: 1, h: 1 } }]) }])).status, 400, "bad photo position refused");
+  eq(stripeState.created.length, before, "no Stripe session for refused designs");
+});
+
 for (const [r, n] of results) console.log(`${r}  ${n}`);
 console.log(`\n${pass} passed, ${fail} failed; simulated Stripe calls: ${stripeState.calls.length}`);
 process.exit(fail ? 1 : 0);

@@ -38,8 +38,9 @@ const DEFAULT_AREAS = {
   "gift-fridge-magnet": [A("main", "Magnet", { x: 0.12, y: 0.1, w: 0.76, h: 0.76 }, { widthIn: 3, heightIn: 3 })],
   "gift-socks": [A("main", "Socks", { x: 0.25, y: 0.08, w: 0.5, h: 0.42 }, { widthIn: 7, heightIn: 5.9 })],
   "gift-mouse-pad": [A("main", "Mouse pad", { x: 0.08, y: 0.15, w: 0.84, h: 0.7 }, { widthIn: 9.25, heightIn: 7.7 })],
-  "ceramic-coasters": [A("main", "Coaster", { x: 0.1, y: 0.08, w: 0.8, h: 0.8 }, { widthIn: 4, heightIn: 4 },
-    { shape: "ellipse", shapeBy: { Shape: { Square: { shape: "rect", rect: { x: 0.09, y: 0.09, w: 0.78, h: 0.78 } } } } })],
+  // Centred on the coaster face in the photos (centre 46.5% across, 47.3% down; the shadow sits to the right)
+  "ceramic-coasters": [A("main", "Coaster", { x: 0.085, y: 0.093, w: 0.76, h: 0.76 }, { widthIn: 4, heightIn: 4 },
+    { shape: "ellipse", shapeBy: { Shape: { Square: { shape: "rect", rect: { x: 0.084, y: 0.093, w: 0.76, h: 0.76 } } } } })],
   "custom-stickers": [A("main", "Sticker", { x: 0.15, y: 0.15, w: 0.7, h: 0.7 }, { widthIn: 3, heightIn: 3 },
     { base: "sticker", printFromOption: "Size" })],
 };
@@ -280,6 +281,12 @@ function clipArea(ctx, area, b) {
 function drawLayer(ctx, layer, area, W, H, imgs) {
   const box = layerBox(layer, area, W, H, imgs);
   ctx.save();
+  if (layer.clip) { // a customer photo inside a Lacci photo design: kept within the design's photo spot
+    const ab = areaBox(area, W, H), c = layer.clip, x = ab.x + c.x * ab.w, y = ab.y + c.y * ab.h, w = c.w * ab.w, h = c.h * ab.h;
+    ctx.beginPath();
+    if (c.round) ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2); else ctx.rect(x, y, w, h);
+    ctx.clip();
+  }
   ctx.translate(box.cx, box.cy); ctx.rotate(box.rot);
   if (layer.flipX) ctx.scale(-1, 1);
   if (layer.flipY) ctx.scale(1, -1);
@@ -322,11 +329,7 @@ export function drawComposite(ctx, area, layers, W, H, imgs, opts = {}) {
   ctx.save(); clipArea(ctx, area, b);
   layers.forEach((l) => drawLayer(ctx, l, area, W, H, imgs));
   ctx.restore();
-  if (opts.editing) {
-    ctx.save(); ctx.setLineDash([W * 0.012, W * 0.01]); ctx.lineWidth = Math.max(1, W / 400); ctx.strokeStyle = "rgba(120,100,70,.55)";
-    ctx.beginPath();
-    if (area.shape === "ellipse") ctx.ellipse(b.x + b.w / 2, b.y + b.h / 2, b.w / 2, b.h / 2, 0, 0, Math.PI * 2); else ctx.rect(b.x, b.y, b.w, b.h);
-    ctx.stroke(); ctx.restore();
+  if (opts.editing) { // no print-area outline: parts outside it show faded, and the window warns about them
     const sel = layers[opts.selected];
     if (sel) drawSelection(ctx, sel, area, W, H, imgs, opts.handles !== false);
   }
@@ -373,4 +376,29 @@ export function renderPrintFile(area, layers, imgs) {
   return { canvas: c, lowRes };
 }
 
-export default { FONT_NAMES, fontFamily, TEXT_SWATCHES, swatchName, areasFor, mockupFor, loadImage, removeWhite, tinted, areaBox, layoutText, layerBox, corners, isOutside, hitLayer, drawComposite, handlePoints, renderPrintFile };
+// The photo spot of a Lacci photo design: the see-through area enclosed by the artwork (transparent
+// pixels not connected to the picture's edges). Returns the spot as fractions of the picture, with
+// round true when it fills about as much of its box as a circle does, or null when there is none.
+export function findPhotoSpot(img) {
+  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height, s = Math.min(1, 400 / Math.max(iw, ih));
+  const w = Math.max(1, Math.round(iw * s)), h = Math.max(1, Math.round(ih * s));
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  const x = c.getContext("2d"); x.drawImage(img, 0, 0, w, h);
+  let d; try { d = x.getImageData(0, 0, w, h).data; } catch { return null; }
+  const clear = (p) => d[p * 4 + 3] < 40, outside = new Uint8Array(w * h), stack = [];
+  for (let i = 0; i < w; i++) stack.push(i, (h - 1) * w + i);
+  for (let j = 0; j < h; j++) stack.push(j * w, j * w + w - 1);
+  while (stack.length) {
+    const p = stack.pop();
+    if (p < 0 || p >= w * h || outside[p] || !clear(p)) continue;
+    outside[p] = 1; const px = p % w;
+    stack.push(p - w, p + w); if (px > 0) stack.push(p - 1); if (px < w - 1) stack.push(p + 1);
+  }
+  let n = 0, x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let p = 0; p < w * h; p++) if (clear(p) && !outside[p]) { n++; const px = p % w, py = (p / w) | 0; if (px < x0) x0 = px; if (px > x1) x1 = px; if (py < y0) y0 = py; if (py > y1) y1 = py; }
+  if (n < w * h * 0.02) return null; // no real opening
+  const bw = x1 - x0 + 1, bh = y1 - y0 + 1;
+  return { x: x0 / w, y: y0 / h, w: bw / w, h: bh / h, round: n / (bw * bh) < 0.86 };
+}
+
+export default { findPhotoSpot, FONT_NAMES, fontFamily, TEXT_SWATCHES, swatchName, areasFor, mockupFor, loadImage, removeWhite, tinted, areaBox, layoutText, layerBox, corners, isOutside, hitLayer, drawComposite, handlePoints, renderPrintFile };
