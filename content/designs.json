@@ -715,6 +715,30 @@
    "active": true,
    "texts": [
     {
+     "text": "MERRY",
+     "placeholder": "MERRY",
+     "x": 0.4995,
+     "y": 0.282,
+     "size": 0.0886,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#2C3D23",
+     "w": 0.379,
+     "role": "top"
+    },
+    {
+     "text": "Christmas",
+     "placeholder": "Christmas",
+     "x": 0.51,
+     "y": 0.4185,
+     "size": 0.1814,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#860000",
+     "w": 0.476,
+     "role": "script"
+    },
+    {
      "text": "YOUR TEXT",
      "placeholder": "YOUR TEXT",
      "x": 0.504,
@@ -753,7 +777,32 @@
      "role": "year"
     }
    ],
-   "ideas": []
+   "ideas": [
+    {
+     "top": "MERRY",
+     "script": "Christmas"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Holidays"
+    },
+    {
+     "top": "SEASON'S",
+     "script": "Greetings"
+    },
+    {
+     "top": "OUR FIRST",
+     "script": "Christmas"
+    },
+    {
+     "top": "HOME FOR",
+     "script": "Christmas"
+    },
+    {
+     "top": "WARM",
+     "script": "Wishes"
+    }
+   ]
   },
   {
    "id": "ghost-with-pumpkin",
