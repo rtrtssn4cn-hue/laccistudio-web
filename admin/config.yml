@@ -134,6 +134,8 @@ collections:
           - { name: "heroTitleLine2", label: "Headline — line 2 (gold)", widget: "string" }
           - { name: "heroLead", label: "Intro sentence under headline", widget: "text" }
           - { name: "heroQuote", label: "Quote on the logo card", widget: "string" }
+          - { name: "heroImage", label: "Hero photo (a real finished product; replaces the logo card)", widget: "image", required: false }
+          - { name: "heroImageAlt", label: "Hero photo description", widget: "string", required: false }
 
   # ---------------- Contact & settings ----------------
   - name: "settings"

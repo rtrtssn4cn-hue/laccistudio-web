@@ -48,27 +48,18 @@
       <h1><span data-c="heroTitleLine1">Personalized gifts,</span><br><span class="accent" data-c="heroTitleLine2">made by you. Finished by us.</span></h1>
       <p class="lead" data-c="heroLead">Upload your photo, artwork or logo, add your words, and see it on the product before you order. We print it, finish it and ship it from Houston.</p>
       <div class="btn-row">
-        <a href="shop.html" class="btn btn-gold">Shop Gifts</a>
-        <a href="contact.html" class="btn btn-outline">Custom Order</a>
+        <a href="shop.html" class="btn btn-gold">Shop Personalized Gifts</a>
+        <a href="contact.html" class="btn btn-outline">Start a Custom Order</a>
       </div>
     </div>
-    <div class="hero-card reveal">
+    <!-- Shows the logo card until a real product photo is set as "heroImage" in content/home.json (assets/js/home.js swaps it in) -->
+    <div class="hero-card reveal" id="hero-visual">
       <img src="assets/logo/lacci-primary.png" alt="Lacci Studio logo">
       <div class="hc-line"></div>
       <p>“<span data-c="heroQuote">Where your ideas become something meaningful.</span>”</p>
     </div>
   </div>
 </section>
-
-<!-- TRUST STRIP -->
-<div class="strip">
-  <div class="wrap strip-inner">
-    <span><b>Your Photo</b> or Artwork</span>
-    <span><b>Live</b> Preview</span>
-    <span><b>Proof</b> Before Printing</span>
-    <span><b>Made</b> in Houston</span>
-  </div>
-</div>
 
 <!-- MAKE IT YOURS -->
 <section>
@@ -86,29 +77,30 @@
       </div>
       <div class="step reveal">
         <span class="num">02</span>
-        <h3>Add your design</h3>
-        <p>Upload a photo, artwork or logo, or type a name or message.</p>
+        <h3>Upload your photo, artwork or design</h3>
+        <p>Or simply type a name or message.</p>
       </div>
       <div class="step reveal">
         <span class="num">03</span>
-        <h3>Preview &amp; order</h3>
-        <p>See your personalization on the product and order securely. Ask for a proof and we’ll send it before anything is printed.</p>
+        <h3>Personalize, preview &amp; order</h3>
+        <p>See it on the product before you buy, and ask for a proof before anything is printed.</p>
       </div>
     </div>
+    <p class="center" style="color:var(--mocha);font-size:.92rem;margin-top:1rem">Ready-made Lacci designs will be added once they’re published.</p>
     <div class="center"><div class="btn-row" style="justify-content:center"><a href="shop.html" class="btn btn-gold">Start Personalizing</a></div></div>
   </div>
 </section>
 
-<!-- POPULAR: filled from the products currently on sale (assets/js/home.js); stays hidden if none -->
+<!-- FEATURED: up to 3 products that are Available AND Featured (assets/js/home.js); hidden when none -->
 <section class="bg-linen" id="home-popular" hidden>
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">Shop</span>
-      <h2>Popular Personalized Gifts</h2>
+      <h2>Featured Gifts</h2>
       <div class="divider"></div>
     </div>
     <div class="shop-grid" id="home-popular-grid"></div>
-    <div class="center"><div class="btn-row" style="justify-content:center"><a href="shop.html" class="btn btn-outline">See All Products</a></div></div>
+    <div class="center"><div class="btn-row" style="justify-content:center"><a href="shop.html" class="btn btn-outline">Shop All</a></div></div>
   </div>
 </section>
 
@@ -116,10 +108,15 @@
 <section class="cta-band">
   <div class="wrap" style="max-width:720px">
     <h2>Ready to make something meaningful?</h2>
+    <ul class="trust-list">
+      <li>Made to order</li>
+      <li>Personalized by you</li>
+      <li>Digital proof where applicable</li>
+      <li>Secure Stripe checkout</li>
+    </ul>
     <p class="lead">Business order, a big set for an event, or something we don’t list? Tell us what you have in mind and we’ll quote it.</p>
     <div class="btn-row center" style="justify-content:center">
       <a href="contact.html" class="btn btn-gold">Start a Custom Order</a>
-      <a href="shop.html" class="btn btn-ghost-gold">Shop Gifts</a>
     </div>
   </div>
 </section>

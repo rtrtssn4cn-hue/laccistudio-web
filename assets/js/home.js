@@ -1,6 +1,7 @@
-/* Homepage "Popular Personalized Gifts": built from the products currently on sale (boot.js only
-   passes active products), so hidden products never appear here. Products marked "featured" in
-   content/products.json come first. The section stays hidden when nothing is on sale. */
+/* Homepage "Featured Gifts": at most 3 products that are both Available (boot.js only passes active
+   products) and Featured (the Admin's Featured switch). Nothing featured = the section stays hidden,
+   so Home never becomes a copy of the Shop. Also swaps the hero logo card for a real product photo
+   when content/home.json has "heroImage". */
 (function () {
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function fromPrice(p) {
@@ -16,11 +17,8 @@
     var shop = window.LACCI_SHOP;
     if (!box || !grid || !shop) return;
     var raw = (window.LACCI_RAW && window.LACCI_RAW.products) || [];
-    var featured = function (p) { var r = raw.find(function (x) { return x.id === p.id; }); return r && r.featured ? 1 : 0; };
-    var list = (shop.products || []).filter(function (p) { return p.image; })
-      .map(function (p, i) { return { p: p, i: i }; })
-      .sort(function (a, b) { return featured(b.p) - featured(a.p) || a.i - b.i; })
-      .slice(0, 6).map(function (x) { return x.p; });
+    var featured = function (p) { var r = raw.find(function (x) { return x.id === p.id; }); return !!(r && r.featured === true); };
+    var list = (shop.products || []).filter(function (p) { return p.image && featured(p); }).slice(0, 3);
     if (!list.length) return;
     grid.innerHTML = list.map(function (p) {
       return '<article class="prod-card reveal in"><a href="shop.html" class="prod-media" style="display:block"><div class="pslide active"><img class="prod-mockphoto" src="' + esc(card(p.image)) + '" onerror="this.onerror=null;this.src=\'' + esc(p.image).replace(/'/g, "%27") + '\'" alt="' + esc(p.name) + '" loading="lazy"></div></a>' +
@@ -29,5 +27,16 @@
     }).join("");
     box.hidden = false;
   }
+  function heroPhoto() {
+    var box = document.querySelector("#hero-visual"); if (!box) return;
+    fetch("/content/home.json", { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (h) {
+      if (!h || typeof h.heroImage !== "string" || !/^(\/|https:\/\/)/.test(h.heroImage)) return;
+      var img = new Image();
+      img.onload = function () { box.classList.add("hero-photo"); box.replaceChildren(img); };
+      img.alt = h.heroImageAlt || "Personalized gift made by Lacci Studio";
+      img.src = h.heroImage;
+    }).catch(function () {});
+  }
+  heroPhoto();
   if (window.LACCI_READY) run(); else document.addEventListener("lacci:ready", run, { once: true });
 })();
