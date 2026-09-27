@@ -9,11 +9,11 @@
 
 export const cents = (dollars) => Math.round(Number(dollars) * 100);
 
-// Product visibility: "status" is one of active | hidden | draft | seasonal (missing = active).
+// Product visibility: "status" is one of active | hidden | draft | seasonal | archived (missing = active).
 // Only active products are shown and sold; the others keep all their data and come back when set
 // to active. Seasonal is off sale until season dates are added. An unknown word counts as hidden,
 // and the older "hidden": true flag still hides, so a product is never put on sale by mistake.
-export const PRODUCT_STATUSES = ["active", "hidden", "draft", "seasonal"];
+export const PRODUCT_STATUSES = ["active", "hidden", "draft", "seasonal", "archived"];
 export function productStatus(product) {
   if (!product) return "hidden";
   const s = String(product.status || "active").trim().toLowerCase();

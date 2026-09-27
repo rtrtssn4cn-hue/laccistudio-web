@@ -9,6 +9,7 @@
 //   GET  /api/order-status?session_id  confirmation page status (asks Stripe directly if still pending)
 //   GET  /api/admin/orders[/:number]   order list / detail for repo editors (GitHub login)
 //   POST /api/admin/orders/:number     mark fulfilled, add a note
+//   /api/admin/content/*               new admin: products, draft / publish (worker/admin-content.js)
 //
 // Prices come from the deployed content/products.json via the same assets/js/pricing.mjs the
 // shop uses. A price sent by the browser is never charged; it is only compared, and a mismatch
@@ -16,6 +17,7 @@
 
 import { priceLine, coasterCount, money } from "../assets/js/pricing.mjs";
 import { stripe, isTestKey, verifyStripeSignature } from "./stripe.js";
+import { handleAdminContent } from "./admin-content.js";
 
 const JSON_HEADERS = { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" };
 const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: JSON_HEADERS });
@@ -305,6 +307,7 @@ function orderView(o, full) {
 async function handleAdmin(request, env, url) {
   const user = await adminUser(request, env);
   if (!user) return json({ error: "Please log in to the Lacci admin first." }, 401);
+  if (url.pathname.startsWith("/api/admin/content/")) return handleAdminContent(request, env, url, (request.headers.get("authorization") || "").slice(7), user);
   const m = url.pathname.match(/^\/api\/admin\/orders(?:\/((?:TEST-)?LS-\d+))?$/);
   if (url.pathname === "/api/admin/whoami") return json({ user });
   if (!m) return json({ error: "Not found." }, 404);
