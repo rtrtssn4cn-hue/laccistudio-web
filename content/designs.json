@@ -11,22 +11,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Your text",
+     "text": "MERRY",
      "x": 0.536,
      "y": 0.4444,
      "size": 0.0593,
      "font": "Monogram",
      "bold": true,
-     "color": "#231F20"
+     "color": "#231F20",
+     "w": 0.382,
+     "placeholder": "Your text",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Christmas",
      "x": 0.536,
      "y": 0.5509,
      "size": 0.1858,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#B27409"
+     "color": "#B27409",
+     "w": 0.294,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "name here",
@@ -35,7 +41,11 @@
      "size": 0.0451,
      "font": "Monogram",
      "bold": true,
-     "color": "#231F20"
+     "color": "#231F20",
+     "w": 0.29,
+     "placeholder": "name here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "year here",
@@ -44,7 +54,37 @@
      "size": 0.0397,
      "font": "Monogram",
      "bold": true,
-     "color": "#231F20"
+     "color": "#231F20",
+     "w": 0.236,
+     "placeholder": "year here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "MERRY",
+     "script": "Christmas"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Holidays"
+    },
+    {
+     "top": "SEASON'S",
+     "script": "Greetings"
+    },
+    {
+     "top": "OUR FIRST",
+     "script": "Christmas"
+    },
+    {
+     "top": "HOME FOR",
+     "script": "Christmas"
+    },
+    {
+     "top": "WARM",
+     "script": "Wishes"
     }
    ]
   },
@@ -59,22 +99,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Your text",
+     "text": "MERRY",
      "x": 0.709,
      "y": 0.3295,
      "size": 0.0625,
      "font": "Monogram",
      "bold": true,
-     "color": "#2E1E19"
+     "color": "#2E1E19",
+     "w": 0.406,
+     "placeholder": "Your text",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Christmas",
      "x": 0.7145,
      "y": 0.46,
      "size": 0.1848,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#C28A30"
+     "color": "#C28A30",
+     "w": 0.337,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "name here",
@@ -83,7 +129,11 @@
      "size": 0.045,
      "font": "Monogram",
      "bold": true,
-     "color": "#2E1E19"
+     "color": "#2E1E19",
+     "w": 0.289,
+     "placeholder": "name here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "year here",
@@ -92,7 +142,37 @@
      "size": 0.0418,
      "font": "Monogram",
      "bold": true,
-     "color": "#2E1E19"
+     "color": "#2E1E19",
+     "w": 0.256,
+     "placeholder": "year here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "MERRY",
+     "script": "Christmas"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Holidays"
+    },
+    {
+     "top": "SEASON'S",
+     "script": "Greetings"
+    },
+    {
+     "top": "OUR FIRST",
+     "script": "Christmas"
+    },
+    {
+     "top": "HOME FOR",
+     "script": "Christmas"
+    },
+    {
+     "top": "WARM",
+     "script": "Wishes"
     }
    ]
   },
@@ -107,22 +187,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Your text",
+     "text": "HAPPY",
      "x": 0.4945,
      "y": 0.4442,
      "size": 0.0607,
      "font": "Monogram",
      "bold": false,
-     "color": "#231815"
+     "color": "#231815",
+     "w": 0.381,
+     "placeholder": "Your text",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Holidays",
      "x": 0.4995,
      "y": 0.5587,
      "size": 0.16,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#B2751D"
+     "color": "#B2751D",
+     "w": 0.299,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "name here",
@@ -131,7 +217,11 @@
      "size": 0.0411,
      "font": "Monogram",
      "bold": false,
-     "color": "#231815"
+     "color": "#231815",
+     "w": 0.266,
+     "placeholder": "name here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "year here",
@@ -140,7 +230,37 @@
      "size": 0.0378,
      "font": "Monogram",
      "bold": false,
-     "color": "#231815"
+     "color": "#231815",
+     "w": 0.22,
+     "placeholder": "year here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "HAPPY",
+     "script": "Holidays"
+    },
+    {
+     "top": "MERRY",
+     "script": "Christmas"
+    },
+    {
+     "top": "SEASON'S",
+     "script": "Greetings"
+    },
+    {
+     "top": "OUR FIRST",
+     "script": "Christmas"
+    },
+    {
+     "top": "HOME FOR",
+     "script": "Christmas"
+    },
+    {
+     "top": "WARM",
+     "script": "Wishes"
     }
    ]
   },
@@ -155,22 +275,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Your text",
+     "text": "HOME FOR",
      "x": 0.508,
      "y": 0.1225,
      "size": 0.0679,
      "font": "Monogram",
      "bold": false,
-     "color": "#1E1E1E"
+     "color": "#1E1E1E",
+     "w": 0.394,
+     "placeholder": "Your text",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Christmas",
      "x": 0.515,
      "y": 0.2385,
      "size": 0.2298,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#A86912"
+     "color": "#A86912",
+     "w": 0.344,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name Here",
@@ -179,7 +305,11 @@
      "size": 0.0515,
      "font": "Monogram",
      "bold": false,
-     "color": "#1E1E1E"
+     "color": "#1E1E1E",
+     "w": 0.321,
+     "placeholder": "Name Here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year Here",
@@ -188,7 +318,37 @@
      "size": 0.048,
      "font": "Monogram",
      "bold": false,
-     "color": "#1E1E1E"
+     "color": "#1E1E1E",
+     "w": 0.269,
+     "placeholder": "Year Here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "HOME FOR",
+     "script": "Christmas"
+    },
+    {
+     "top": "MERRY",
+     "script": "Christmas"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Holidays"
+    },
+    {
+     "top": "SEASON'S",
+     "script": "Greetings"
+    },
+    {
+     "top": "OUR FIRST",
+     "script": "Christmas"
+    },
+    {
+     "top": "WARM",
+     "script": "Wishes"
     }
    ]
   },
@@ -203,22 +363,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Your text",
+     "text": "LET IT",
      "x": 0.52,
      "y": 0.611,
      "size": 0.0616,
      "font": "Monogram",
      "bold": true,
-     "color": "#1C151C"
+     "color": "#1C151C",
+     "w": 0.39,
+     "placeholder": "Your text",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Snow",
      "x": 0.518,
      "y": 0.701,
      "size": 0.1354,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#B87A24"
+     "color": "#B87A24",
+     "w": 0.256,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "name here",
@@ -227,7 +393,11 @@
      "size": 0.043,
      "font": "Monogram",
      "bold": true,
-     "color": "#1C151C"
+     "color": "#1C151C",
+     "w": 0.284,
+     "placeholder": "name here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "year here",
@@ -236,7 +406,37 @@
      "size": 0.041,
      "font": "Monogram",
      "bold": true,
-     "color": "#1C151C"
+     "color": "#1C151C",
+     "w": 0.244,
+     "placeholder": "year here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "LET IT",
+     "script": "Snow"
+    },
+    {
+     "top": "MERRY",
+     "script": "Christmas"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Holidays"
+    },
+    {
+     "top": "SEASON'S",
+     "script": "Greetings"
+    },
+    {
+     "top": "OUR FIRST",
+     "script": "Christmas"
+    },
+    {
+     "top": "HOME FOR",
+     "script": "Christmas"
     }
    ]
   },
@@ -251,22 +451,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Your text",
+     "text": "WINTER",
      "x": 0.504,
      "y": 0.5313,
      "size": 0.0623,
      "font": "Monogram",
      "bold": false,
-     "color": "#3D2C2C"
+     "color": "#3D2C2C",
+     "w": 0.374,
+     "placeholder": "Your text",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Wishes",
      "x": 0.5,
      "y": 0.6359,
      "size": 0.1302,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#B87A24"
+     "color": "#B87A24",
+     "w": 0.256,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name here",
@@ -275,7 +481,11 @@
      "size": 0.0451,
      "font": "Monogram",
      "bold": false,
-     "color": "#3D2C2C"
+     "color": "#3D2C2C",
+     "w": 0.264,
+     "placeholder": "Name here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year here",
@@ -284,7 +494,37 @@
      "size": 0.0423,
      "font": "Monogram",
      "bold": false,
-     "color": "#3D2C2C"
+     "color": "#3D2C2C",
+     "w": 0.228,
+     "placeholder": "Year here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "WINTER",
+     "script": "Wishes"
+    },
+    {
+     "top": "MERRY",
+     "script": "Christmas"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Holidays"
+    },
+    {
+     "top": "SEASON'S",
+     "script": "Greetings"
+    },
+    {
+     "top": "OUR FIRST",
+     "script": "Christmas"
+    },
+    {
+     "top": "HOME FOR",
+     "script": "Christmas"
     }
    ]
   },
@@ -299,22 +539,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Your text",
+     "text": "HOME FOR",
      "x": 0.494,
      "y": 0.5294,
      "size": 0.0587,
      "font": "Monogram",
      "bold": false,
-     "color": "#372A28"
+     "color": "#372A28",
+     "w": 0.368,
+     "placeholder": "Your text",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Christmas",
      "x": 0.493,
      "y": 0.6347,
      "size": 0.1331,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#B2752A"
+     "color": "#B2752A",
+     "w": 0.268,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name here",
@@ -323,7 +569,11 @@
      "size": 0.0441,
      "font": "Monogram",
      "bold": false,
-     "color": "#372A28"
+     "color": "#372A28",
+     "w": 0.298,
+     "placeholder": "Name here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year here",
@@ -332,7 +582,37 @@
      "size": 0.0383,
      "font": "Monogram",
      "bold": false,
-     "color": "#372A28"
+     "color": "#372A28",
+     "w": 0.241,
+     "placeholder": "Year here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "HOME FOR",
+     "script": "Christmas"
+    },
+    {
+     "top": "MERRY",
+     "script": "Christmas"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Holidays"
+    },
+    {
+     "top": "SEASON'S",
+     "script": "Greetings"
+    },
+    {
+     "top": "OUR FIRST",
+     "script": "Christmas"
+    },
+    {
+     "top": "WARM",
+     "script": "Wishes"
     }
    ]
   },
@@ -347,22 +627,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Your text",
+     "text": "MERRY &",
      "x": 0.476,
      "y": 0.568,
      "size": 0.0521,
      "font": "Monogram",
      "bold": true,
-     "color": "#3D3C3C"
+     "color": "#3D3C3C",
+     "w": 0.346,
+     "placeholder": "Your text",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Bright",
      "x": 0.5,
      "y": 0.6519,
      "size": 0.1505,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#B2752A"
+     "color": "#B2752A",
+     "w": 0.254,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name here",
@@ -371,7 +657,11 @@
      "size": 0.0407,
      "font": "Monogram",
      "bold": true,
-     "color": "#3D3C3C"
+     "color": "#3D3C3C",
+     "w": 0.278,
+     "placeholder": "Name here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year here",
@@ -380,7 +670,37 @@
      "size": 0.0357,
      "font": "Monogram",
      "bold": true,
-     "color": "#3D3C3C"
+     "color": "#3D3C3C",
+     "w": 0.23,
+     "placeholder": "Year here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "MERRY &",
+     "script": "Bright"
+    },
+    {
+     "top": "MERRY",
+     "script": "Christmas"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Holidays"
+    },
+    {
+     "top": "SEASON'S",
+     "script": "Greetings"
+    },
+    {
+     "top": "OUR FIRST",
+     "script": "Christmas"
+    },
+    {
+     "top": "HOME FOR",
+     "script": "Christmas"
     }
    ]
   },
@@ -395,31 +715,40 @@
    "active": true,
    "texts": [
     {
-     "text": "Your",
+     "text": "TRICK",
      "x": 0.7495,
      "y": 0.3063,
      "size": 0.0644,
      "font": "Monogram",
      "bold": true,
-     "color": "#000000"
+     "color": "#000000",
+     "w": 0.219,
+     "placeholder": "Your",
+     "role": "top"
     },
     {
-     "text": "Text",
+     "text": "OR",
      "x": 0.7495,
      "y": 0.3867,
      "size": 0.0644,
      "font": "Monogram",
      "bold": true,
-     "color": "#000000"
+     "color": "#000000",
+     "w": 0.219,
+     "placeholder": "Text",
+     "role": "top2"
     },
     {
-     "text": "Here",
+     "text": "Treat",
      "x": 0.7625,
      "y": 0.524,
      "size": 0.1978,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#E66300"
+     "color": "#E66300",
+     "w": 0.331,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name Here",
@@ -428,7 +757,11 @@
      "size": 0.044,
      "font": "Monogram",
      "bold": true,
-     "color": "#000000"
+     "color": "#000000",
+     "w": 0.319,
+     "placeholder": "Name Here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year Here",
@@ -437,7 +770,37 @@
      "size": 0.044,
      "font": "Monogram",
      "bold": true,
-     "color": "#000000"
+     "color": "#000000",
+     "w": 0.319,
+     "placeholder": "Year Here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "TRICK OR",
+     "script": "Treat"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Halloween"
+    },
+    {
+     "top": "STAY",
+     "script": "Spooky"
+    },
+    {
+     "top": "BOO",
+     "script": "Crew"
+    },
+    {
+     "top": "SPOOKY",
+     "script": "Season"
+    },
+    {
+     "top": "WITCHY",
+     "script": "Vibes"
     }
    ]
   },
@@ -452,13 +815,40 @@
    "active": true,
    "texts": [
     {
-     "text": "Here",
+     "text": "",
+     "x": 0.764,
+     "y": 0.2943,
+     "size": 0.0678,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#231F20",
+     "w": 0.206,
+     "placeholder": "Your",
+     "role": "top"
+    },
+    {
+     "text": "HAPPY",
+     "x": 0.764,
+     "y": 0.3757,
+     "size": 0.0678,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#231F20",
+     "w": 0.206,
+     "placeholder": "Text",
+     "role": "top2"
+    },
+    {
+     "text": "Halloween",
      "x": 0.784,
      "y": 0.5295,
      "size": 0.1728,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#D15D14"
+     "color": "#D15D14",
+     "w": 0.306,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name Here",
@@ -467,7 +857,11 @@
      "size": 0.0413,
      "font": "Monogram",
      "bold": true,
-     "color": "#231F20"
+     "color": "#231F20",
+     "w": 0.279,
+     "placeholder": "Name Here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year Here",
@@ -476,25 +870,37 @@
      "size": 0.0421,
      "font": "Monogram",
      "bold": false,
-     "color": "#231F20"
+     "color": "#231F20",
+     "w": 0.262,
+     "placeholder": "Year Here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "HAPPY",
+     "script": "Halloween"
     },
     {
-     "text": "Your",
-     "x": 0.764,
-     "y": 0.2943,
-     "size": 0.0678,
-     "font": "Monogram",
-     "bold": true,
-     "color": "#231F20"
+     "top": "TRICK OR",
+     "script": "Treat"
     },
     {
-     "text": "Text",
-     "x": 0.764,
-     "y": 0.3757,
-     "size": 0.0678,
-     "font": "Monogram",
-     "bold": true,
-     "color": "#231F20"
+     "top": "STAY",
+     "script": "Spooky"
+    },
+    {
+     "top": "BOO",
+     "script": "Crew"
+    },
+    {
+     "top": "SPOOKY",
+     "script": "Season"
+    },
+    {
+     "top": "WITCHY",
+     "script": "Vibes"
     }
    ]
   },
@@ -509,31 +915,40 @@
    "active": true,
    "texts": [
     {
-     "text": "Your",
+     "text": "",
      "x": 0.7,
      "y": 0.3068,
      "size": 0.0577,
      "font": "Monogram",
      "bold": false,
-     "color": "#473C38"
+     "color": "#473C38",
+     "w": 0.17,
+     "placeholder": "Your",
+     "role": "top"
     },
     {
-     "text": "Text",
+     "text": "WITCHY",
      "x": 0.7,
      "y": 0.3761,
      "size": 0.0577,
      "font": "Monogram",
      "bold": false,
-     "color": "#473C38"
+     "color": "#473C38",
+     "w": 0.17,
+     "placeholder": "Text",
+     "role": "top2"
     },
     {
-     "text": "Here",
+     "text": "Vibes",
      "x": 0.725,
      "y": 0.4872,
      "size": 0.16,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#D15D18"
+     "color": "#D15D18",
+     "w": 0.256,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name Here",
@@ -542,7 +957,11 @@
      "size": 0.0355,
      "font": "Monogram",
      "bold": false,
-     "color": "#473C38"
+     "color": "#473C38",
+     "w": 0.218,
+     "placeholder": "Name Here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year Here",
@@ -551,7 +970,37 @@
      "size": 0.0355,
      "font": "Monogram",
      "bold": false,
-     "color": "#473C38"
+     "color": "#473C38",
+     "w": 0.218,
+     "placeholder": "Year Here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "WITCHY",
+     "script": "Vibes"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Halloween"
+    },
+    {
+     "top": "TRICK OR",
+     "script": "Treat"
+    },
+    {
+     "top": "STAY",
+     "script": "Spooky"
+    },
+    {
+     "top": "BOO",
+     "script": "Crew"
+    },
+    {
+     "top": "SPOOKY",
+     "script": "Season"
     }
    ]
   },
@@ -566,22 +1015,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Your Text",
+     "text": "BOO",
      "x": 0.476,
      "y": 0.6079,
      "size": 0.0552,
      "font": "Monogram",
      "bold": false,
-     "color": "#231F20"
+     "color": "#231F20",
+     "w": 0.326,
+     "placeholder": "Your Text",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Crew",
      "x": 0.47,
      "y": 0.6853,
      "size": 0.1375,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#D15317"
+     "color": "#D15317",
+     "w": 0.206,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name Here",
@@ -590,7 +1045,11 @@
      "size": 0.0423,
      "font": "Monogram",
      "bold": false,
-     "color": "#231F20"
+     "color": "#231F20",
+     "w": 0.258,
+     "placeholder": "Name Here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year Here",
@@ -599,7 +1058,37 @@
      "size": 0.0423,
      "font": "Monogram",
      "bold": false,
-     "color": "#231F20"
+     "color": "#231F20",
+     "w": 0.258,
+     "placeholder": "Year Here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "BOO",
+     "script": "Crew"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Halloween"
+    },
+    {
+     "top": "TRICK OR",
+     "script": "Treat"
+    },
+    {
+     "top": "STAY",
+     "script": "Spooky"
+    },
+    {
+     "top": "SPOOKY",
+     "script": "Season"
+    },
+    {
+     "top": "WITCHY",
+     "script": "Vibes"
     }
    ]
   },
@@ -614,31 +1103,40 @@
    "active": true,
    "texts": [
     {
-     "text": "Your",
+     "text": "",
      "x": 0.6895,
      "y": 0.2823,
      "size": 0.0558,
      "font": "Monogram",
      "bold": false,
-     "color": "#473C38"
+     "color": "#473C38",
+     "w": 0.181,
+     "placeholder": "Your",
+     "role": "top"
     },
     {
-     "text": "Text",
+     "text": "STAY",
      "x": 0.6895,
      "y": 0.3465,
      "size": 0.0558,
      "font": "Monogram",
      "bold": false,
-     "color": "#473C38"
+     "color": "#473C38",
+     "w": 0.181,
+     "placeholder": "Text",
+     "role": "top2"
     },
     {
-     "text": "Here",
+     "text": "Spooky",
      "x": 0.7195,
      "y": 0.4497,
      "size": 0.1878,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#D16A2C"
+     "color": "#D16A2C",
+     "w": 0.281,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name Here",
@@ -647,7 +1145,11 @@
      "size": 0.0383,
      "font": "Monogram",
      "bold": false,
-     "color": "#473C38"
+     "color": "#473C38",
+     "w": 0.255,
+     "placeholder": "Name Here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year Here",
@@ -656,7 +1158,37 @@
      "size": 0.0383,
      "font": "Monogram",
      "bold": false,
-     "color": "#473C38"
+     "color": "#473C38",
+     "w": 0.255,
+     "placeholder": "Year Here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "STAY",
+     "script": "Spooky"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Halloween"
+    },
+    {
+     "top": "TRICK OR",
+     "script": "Treat"
+    },
+    {
+     "top": "BOO",
+     "script": "Crew"
+    },
+    {
+     "top": "SPOOKY",
+     "script": "Season"
+    },
+    {
+     "top": "WITCHY",
+     "script": "Vibes"
     }
    ]
   },
@@ -671,22 +1203,28 @@
    "active": true,
    "texts": [
     {
-     "text": "YOUR TEXT",
+     "text": "HAPPY",
      "x": 0.5105,
      "y": 0.5803,
      "size": 0.0544,
      "font": "Monogram",
      "bold": false,
-     "color": "#423930"
+     "color": "#423930",
+     "w": 0.341,
+     "placeholder": "YOUR TEXT",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Halloween",
      "x": 0.5,
      "y": 0.6689,
      "size": 0.1267,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#E16C1B"
+     "color": "#E16C1B",
+     "w": 0.222,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "NAME HERE",
@@ -695,7 +1233,11 @@
      "size": 0.0413,
      "font": "Monogram",
      "bold": false,
-     "color": "#423930"
+     "color": "#423930",
+     "w": 0.256,
+     "placeholder": "NAME HERE",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "YEAR HERE",
@@ -704,7 +1246,37 @@
      "size": 0.0413,
      "font": "Monogram",
      "bold": false,
-     "color": "#423930"
+     "color": "#423930",
+     "w": 0.241,
+     "placeholder": "YEAR HERE",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "HAPPY",
+     "script": "Halloween"
+    },
+    {
+     "top": "TRICK OR",
+     "script": "Treat"
+    },
+    {
+     "top": "STAY",
+     "script": "Spooky"
+    },
+    {
+     "top": "BOO",
+     "script": "Crew"
+    },
+    {
+     "top": "SPOOKY",
+     "script": "Season"
+    },
+    {
+     "top": "WITCHY",
+     "script": "Vibes"
     }
    ]
   },
@@ -719,22 +1291,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Your text",
+     "text": "HAPPY",
      "x": 0.4905,
      "y": 0.6389,
      "size": 0.0552,
      "font": "Monogram",
      "bold": false,
-     "color": "#3D251C"
+     "color": "#3D251C",
+     "w": 0.319,
+     "placeholder": "Your text",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Halloween",
      "x": 0.486,
      "y": 0.7047,
      "size": 0.1044,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#D15300"
+     "color": "#D15300",
+     "w": 0.178,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name here",
@@ -743,7 +1321,11 @@
      "size": 0.0457,
      "font": "Monogram",
      "bold": false,
-     "color": "#3D251C"
+     "color": "#3D251C",
+     "w": 0.262,
+     "placeholder": "Name here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year here",
@@ -752,7 +1334,37 @@
      "size": 0.0457,
      "font": "Monogram",
      "bold": false,
-     "color": "#3D251C"
+     "color": "#3D251C",
+     "w": 0.262,
+     "placeholder": "Year here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "HAPPY",
+     "script": "Halloween"
+    },
+    {
+     "top": "TRICK OR",
+     "script": "Treat"
+    },
+    {
+     "top": "STAY",
+     "script": "Spooky"
+    },
+    {
+     "top": "BOO",
+     "script": "Crew"
+    },
+    {
+     "top": "SPOOKY",
+     "script": "Season"
+    },
+    {
+     "top": "WITCHY",
+     "script": "Vibes"
     }
    ]
   },
@@ -767,22 +1379,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Your text",
+     "text": "HELLO",
      "x": 0.4925,
      "y": 0.5851,
      "size": 0.049,
      "font": "Monogram",
      "bold": true,
-     "color": "#47392F"
+     "color": "#47392F",
+     "w": 0.319,
+     "placeholder": "Your text",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Autumn",
      "x": 0.487,
      "y": 0.669,
      "size": 0.1355,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#D15D15"
+     "color": "#D15D15",
+     "w": 0.206,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "name here",
@@ -791,7 +1409,11 @@
      "size": 0.0414,
      "font": "Monogram",
      "bold": true,
-     "color": "#47392F"
+     "color": "#47392F",
+     "w": 0.265,
+     "placeholder": "name here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "year here",
@@ -800,7 +1422,37 @@
      "size": 0.0414,
      "font": "Monogram",
      "bold": true,
-     "color": "#47392F"
+     "color": "#47392F",
+     "w": 0.265,
+     "placeholder": "year here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "HELLO",
+     "script": "Autumn"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Fall"
+    },
+    {
+     "top": "GIVE",
+     "script": "Thanks"
+    },
+    {
+     "top": "THANKFUL &",
+     "script": "Blessed"
+    },
+    {
+     "top": "GATHER",
+     "script": "Together"
+    },
+    {
+     "top": "PUMPKIN",
+     "script": "Season"
     }
    ]
   },
@@ -815,22 +1467,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Your text",
+     "text": "THANKFUL &",
      "x": 0.508,
      "y": 0.4056,
      "size": 0.0646,
      "font": "Monogram",
      "bold": false,
-     "color": "#3D251C"
+     "color": "#3D251C",
+     "w": 0.37,
+     "placeholder": "Your text",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Blessed",
      "x": 0.5,
      "y": 0.5149,
      "size": 0.119,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#C26C1C"
+     "color": "#C26C1C",
+     "w": 0.26,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name here",
@@ -839,7 +1497,11 @@
      "size": 0.0438,
      "font": "Monogram",
      "bold": false,
-     "color": "#3D251C"
+     "color": "#3D251C",
+     "w": 0.281,
+     "placeholder": "Name here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year here",
@@ -848,7 +1510,37 @@
      "size": 0.0356,
      "font": "Monogram",
      "bold": false,
-     "color": "#3D251C"
+     "color": "#3D251C",
+     "w": 0.226,
+     "placeholder": "Year here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "THANKFUL &",
+     "script": "Blessed"
+    },
+    {
+     "top": "HELLO",
+     "script": "Autumn"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Fall"
+    },
+    {
+     "top": "GIVE",
+     "script": "Thanks"
+    },
+    {
+     "top": "GATHER",
+     "script": "Together"
+    },
+    {
+     "top": "PUMPKIN",
+     "script": "Season"
     }
    ]
   },
@@ -863,13 +1555,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Here",
+     "text": "HELLO",
+     "x": 0.52,
+     "y": 0.1165,
+     "size": 0.0614,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#4D3426",
+     "w": 0.3633,
+     "placeholder": "Your Text",
+     "role": "top"
+    },
+    {
+     "text": "Pumpkin",
      "x": 0.515,
      "y": 0.2299,
      "size": 0.119,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#B2661B"
+     "color": "#B2661B",
+     "w": 0.252,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name Here",
@@ -878,7 +1585,11 @@
      "size": 0.0451,
      "font": "Monogram",
      "bold": true,
-     "color": "#4D3426"
+     "color": "#4D3426",
+     "w": 0.284,
+     "placeholder": "Name Here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year Here",
@@ -887,16 +1598,37 @@
      "size": 0.0378,
      "font": "Monogram",
      "bold": true,
-     "color": "#4D3426"
+     "color": "#4D3426",
+     "w": 0.227,
+     "placeholder": "Year Here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "HELLO",
+     "script": "Pumpkin"
     },
     {
-     "text": "Your Text",
-     "x": 0.52,
-     "y": 0.1165,
-     "size": 0.0614,
-     "font": "Monogram",
-     "bold": true,
-     "color": "#4D3426"
+     "top": "HELLO",
+     "script": "Autumn"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Fall"
+    },
+    {
+     "top": "GIVE",
+     "script": "Thanks"
+    },
+    {
+     "top": "THANKFUL &",
+     "script": "Blessed"
+    },
+    {
+     "top": "GATHER",
+     "script": "Together"
     }
    ]
   },
@@ -911,13 +1643,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Here",
+     "text": "GIVE",
+     "x": 0.525,
+     "y": 0.0993,
+     "size": 0.0593,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#3D251A",
+     "w": 0.4018,
+     "placeholder": "Your Text",
+     "role": "top"
+    },
+    {
+     "text": "Thanks",
      "x": 0.527,
      "y": 0.2069,
      "size": 0.119,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#A85D1C"
+     "color": "#A85D1C",
+     "w": 0.248,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name Here",
@@ -926,7 +1673,11 @@
      "size": 0.0423,
      "font": "Monogram",
      "bold": true,
-     "color": "#3D251A"
+     "color": "#3D251A",
+     "w": 0.288,
+     "placeholder": "Name Here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year Here",
@@ -935,16 +1686,37 @@
      "size": 0.0356,
      "font": "Monogram",
      "bold": true,
-     "color": "#3D251A"
+     "color": "#3D251A",
+     "w": 0.229,
+     "placeholder": "Year Here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "GIVE",
+     "script": "Thanks"
     },
     {
-     "text": "Your Text",
-     "x": 0.525,
-     "y": 0.0993,
-     "size": 0.0593,
-     "font": "Monogram",
-     "bold": true,
-     "color": "#3D251A"
+     "top": "HELLO",
+     "script": "Autumn"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Fall"
+    },
+    {
+     "top": "THANKFUL &",
+     "script": "Blessed"
+    },
+    {
+     "top": "GATHER",
+     "script": "Together"
+    },
+    {
+     "top": "PUMPKIN",
+     "script": "Season"
     }
    ]
   },
@@ -965,7 +1737,11 @@
      "size": 0.0552,
      "font": "Monogram",
      "bold": false,
-     "color": "#5D2C00"
+     "color": "#5D2C00",
+     "w": 0.346,
+     "placeholder": "name here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "year here",
@@ -974,9 +1750,14 @@
      "size": 0.0505,
      "font": "Monogram",
      "bold": false,
-     "color": "#5D2C00"
+     "color": "#5D2C00",
+     "w": 0.286,
+     "placeholder": "year here",
+     "role": "year",
+     "optional": true
     }
-   ]
+   ],
+   "ideas": []
   },
   {
    "id": "grateful-sign",
@@ -989,13 +1770,16 @@
    "active": true,
    "texts": [
     {
-     "text": "your text",
+     "text": "FAMILY",
      "x": 0.515,
      "y": 0.4906,
      "size": 0.0646,
      "font": "Monogram",
      "bold": false,
-     "color": "#F8F0E6"
+     "color": "#F8F0E6",
+     "w": 0.37,
+     "placeholder": "your text",
+     "role": "top"
     },
     {
      "text": "name here",
@@ -1004,7 +1788,11 @@
      "size": 0.0465,
      "font": "Monogram",
      "bold": false,
-     "color": "#3D251C"
+     "color": "#3D251C",
+     "w": 0.278,
+     "placeholder": "name here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "year here",
@@ -1013,7 +1801,28 @@
      "size": 0.0402,
      "font": "Monogram",
      "bold": false,
-     "color": "#3D251C"
+     "color": "#3D251C",
+     "w": 0.223,
+     "placeholder": "year here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "FAMILY"
+    },
+    {
+     "top": "FRIENDS"
+    },
+    {
+     "top": "YOU"
+    },
+    {
+     "top": "LOVE"
+    },
+    {
+     "top": "OUR BLESSINGS"
     }
    ]
   },
@@ -1028,22 +1837,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Your text",
+     "text": "HAPPY",
      "x": 0.515,
      "y": 0.5124,
      "size": 0.0593,
      "font": "Monogram",
      "bold": false,
-     "color": "#372011"
+     "color": "#372011",
+     "w": 0.364,
+     "placeholder": "Your text",
+     "role": "top"
     },
     {
-     "text": "Here",
+     "text": "Fall",
      "x": 0.5145,
      "y": 0.6106,
      "size": 0.1048,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#B26015"
+     "color": "#B26015",
+     "w": 0.229,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name here",
@@ -1052,7 +1867,11 @@
      "size": 0.041,
      "font": "Monogram",
      "bold": false,
-     "color": "#372011"
+     "color": "#372011",
+     "w": 0.268,
+     "placeholder": "Name here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year here",
@@ -1061,7 +1880,37 @@
      "size": 0.0364,
      "font": "Monogram",
      "bold": false,
-     "color": "#372011"
+     "color": "#372011",
+     "w": 0.222,
+     "placeholder": "Year here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "HAPPY",
+     "script": "Fall"
+    },
+    {
+     "top": "HELLO",
+     "script": "Autumn"
+    },
+    {
+     "top": "GIVE",
+     "script": "Thanks"
+    },
+    {
+     "top": "THANKFUL &",
+     "script": "Blessed"
+    },
+    {
+     "top": "GATHER",
+     "script": "Together"
+    },
+    {
+     "top": "PUMPKIN",
+     "script": "Season"
     }
    ]
   },
@@ -1076,13 +1925,28 @@
    "active": true,
    "texts": [
     {
-     "text": "Here",
+     "text": "SWEET AS",
+     "x": 0.5097,
+     "y": 0.0753,
+     "size": 0.0593,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D1F1F",
+     "w": 0.3694,
+     "placeholder": "Your Text",
+     "role": "top"
+    },
+    {
+     "text": "Pie",
      "x": 0.5052,
      "y": 0.1963,
      "size": 0.1337,
      "font": "Script / Cursive",
      "bold": false,
-     "color": "#C26A15"
+     "color": "#C26A15",
+     "w": 0.2661,
+     "placeholder": "Here",
+     "role": "script"
     },
     {
      "text": "Name Here",
@@ -1091,7 +1955,11 @@
      "size": 0.0451,
      "font": "Monogram",
      "bold": false,
-     "color": "#3D1F1F"
+     "color": "#3D1F1F",
+     "w": 0.2921,
+     "placeholder": "Name Here",
+     "role": "name",
+     "optional": true
     },
     {
      "text": "Year Here",
@@ -1100,16 +1968,37 @@
      "size": 0.0379,
      "font": "Monogram",
      "bold": false,
-     "color": "#3D1F1F"
+     "color": "#3D1F1F",
+     "w": 0.2311,
+     "placeholder": "Year Here",
+     "role": "year",
+     "optional": true
+    }
+   ],
+   "ideas": [
+    {
+     "top": "SWEET AS",
+     "script": "Pie"
     },
     {
-     "text": "Your Text",
-     "x": 0.5097,
-     "y": 0.0753,
-     "size": 0.0593,
-     "font": "Monogram",
-     "bold": false,
-     "color": "#3D1F1F"
+     "top": "HELLO",
+     "script": "Autumn"
+    },
+    {
+     "top": "HAPPY",
+     "script": "Fall"
+    },
+    {
+     "top": "GIVE",
+     "script": "Thanks"
+    },
+    {
+     "top": "THANKFUL &",
+     "script": "Blessed"
+    },
+    {
+     "top": "GATHER",
+     "script": "Together"
     }
    ]
   }

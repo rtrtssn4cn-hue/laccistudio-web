@@ -52,7 +52,13 @@ function selected() { return layers()[S.sel] || null; }
 function priced() { return priceLine(rawProduct(), { options: S.options, color: S.color }, raw().colors); }
 const filled = (l) => l.type === "image" || (l.type === "text" && l.text.trim());
 function hasContent(d) { return Object.values(d || {}).some((ls) => (ls || []).some(filled)); }
-function withPlaceholder(l) { return l.type === "text" && !l.text.trim() ? { ...l, text: "Your text", color: "#9A9A9A" } : l; }
+function withPlaceholder(l) {
+  if (l.type !== "text") return l;
+  if (!l.text.trim()) return l.fromDesign ? l : { ...l, text: "Your text", color: "#9A9A9A" };
+  return unusedOptional(l) ? { ...l, color: "#A8A29A" } : l;
+}
+// A design's name / year line still showing its sample wording: not printed.
+const unusedOptional = (l) => l.type === "text" && l.optional && l.text.trim() === l.placeholder;
 function clone(d) { return JSON.parse(JSON.stringify(d || {})); }
 // Lacci designs published for this product (content/designs.json, managed from the Design Library).
 let designList = null;
@@ -586,10 +592,13 @@ function useDesign(d) {
       // The design's wording, placed where it sits in the design (positions are shares of the design picture)
       const a = area(), aspect = a.rect.w / a.rect.h, hFrac = l.w * aspect / (info.w / info.h), left = l.x - l.w / 2, top = l.y - hFrac / 2;
       for (const t of texts) {
-        ls.push({ type: "text", text: t.text, font: t.font || "Serif / Classic", color: t.color || "#231F20", size: round(t.size * hFrac), x: round(left + t.x * l.w), y: round(top + t.y * hFrac),
-          rotation: 0, spacing: 0, curve: 0, bold: !!t.bold, vertical: false, align: "center", placeholder: t.text, fromDesign: d.id });
+        const tl = { type: "text", text: t.text, font: t.font || "Serif / Classic", color: t.color || "#231F20", size: round(t.size * hFrac), x: round(left + t.x * l.w), y: round(top + t.y * hFrac),
+          rotation: 0, spacing: 0, curve: 0, bold: !!t.bold, vertical: false, align: "center", placeholder: t.placeholder || t.text, fromDesign: d.id,
+          role: t.role || "", optional: !!t.optional, baseSize: round(t.size * hFrac), maxW: t.w ? round(t.w * l.w * 1.2) : 0 };
+        fitText(tl); ls.push(tl);
       }
-      S.sel = texts.length ? ls.length - texts.length : ls.length - 1;
+      const firstWords = ls.findIndex((x) => x.fromDesign === d.id && x.text.trim());
+      S.sel = firstWords >= 0 ? firstWords : ls.length - 1;
       if (texts.length) S.tab = "text";
     }
     commit(); render();
@@ -798,14 +807,44 @@ function vinylNote() {
   return c && c.vinyl ? `<p class="lz-note">Dark garments are decorated with heat-transfer vinyl rather than sublimation. Best for logos, text and solid-colour artwork — photographs and gradients are not suitable on dark fabric.</p>` : "";
 }
 
+// Shrinks a design's text line so a longer saying still fits the space it had in the design.
+function fitText(t) {
+  if (!t.maxW || !t.baseSize) return;
+  const ab = R.areaBox(area(), 1000, 1000), c = fitText.ctx || (fitText.ctx = document.createElement("canvas").getContext("2d"));
+  const shown = /Monogram/.test(t.font || "") ? t.text.toUpperCase() : t.text;
+  c.font = `${t.bold ? 700 : 500} 100px ${R.fontFamily(t.font)}`;
+  const wFrac = (c.measureText(shown).width * (t.baseSize * ab.h / 100)) / ab.w;
+  t.size = round(wFrac > t.maxW ? t.baseSize * t.maxW / wFrac : t.baseSize);
+}
+function designIdeas() {
+  const f = layers().find((x) => x.design && !x.locked);
+  const d = f && (designList || []).find((x) => x.id === f.design.id);
+  return d && Array.isArray(d.ideas) && d.ideas.length ? d.ideas : [];
+}
+function applyIdea(idea) {
+  const ls = layers(), by = (r) => ls.find((x) => x.type === "text" && x.fromDesign && x.role === r);
+  const top = by("top"), top2 = by("top2"), script = by("script");
+  if (idea.top != null && top) {
+    if (top2) { const p = idea.top.split(/ (?=\S+$)/); if (p.length > 1) { top.text = p[0]; top2.text = p[1]; } else { top.text = ""; top2.text = p[0]; } fitText(top2); } // one word sits on the lower line, next to the script
+    else top.text = idea.top;
+    fitText(top);
+  }
+  if (idea.script != null && script) { script.text = idea.script; fitText(script); }
+  commit(); render();
+}
+function ideasBlock() {
+  const ideas = designIdeas(); if (!ideas.length) return "";
+  return `<div class="lz-field"><span>Wording ideas</span><div class="lz-ideas">${ideas.map((x, i) => `<button type="button" data-idea="${i}">${esc([x.top, x.script].filter(Boolean).join(" "))}</button>`).join("")}</div></div>`;
+}
 function textPanel() {
   const l = selected();
   const texts = layers().map((x, i) => [x, i]).filter(([x]) => x.type === "text");
-  const list = texts.length ? `<ul class="lz-layers">${texts.map(([x, i]) => `<li class="${i === S.sel ? "on" : ""}"><button type="button" data-select="${i}">T “${esc(x.text.trim() || "Your text")}”</button></li>`).join("")}</ul>` : "";
+  const list = texts.length ? `<ul class="lz-layers">${texts.map(([x, i]) => `<li class="${i === S.sel ? "on" : ""}"><button type="button" data-select="${i}">T “${esc(x.text.trim() || (x.fromDesign ? "empty line" : "Your text"))}”</button></li>`).join("")}</ul>` : "";
   if (!l || l.type !== "text") {
-    return `<button type="button" class="btn btn-gold lz-wide" data-do="addtext">＋ Add text</button>${list || `<p class="lz-note">Add a name, date, message or monogram. Select text on the product to change its font, size, colour, spacing or curve.</p>`}`;
+    return `${ideasBlock()}<button type="button" class="btn btn-gold lz-wide" data-do="addtext">＋ Add text</button>${list || `<p class="lz-note">Add a name, date, message or monogram. Select text on the product to change its font, size, colour, spacing or curve.</p>`}`;
   }
-  return `<label class="lz-field"><span>Your text</span><textarea id="lz-text" rows="2" maxlength="200" placeholder="e.g. The Smith Family">${esc(l.text)}</textarea></label>
+  return `${l.fromDesign ? ideasBlock() : ""}<label class="lz-field"><span>Your text</span><textarea id="lz-text" rows="2" maxlength="200" placeholder="e.g. The Smith Family">${esc(unusedOptional(l) ? "" : l.text)}</textarea></label>
+    ${l.optional ? `<p class="lz-note">Optional. Leave it empty and this line won't be printed.</p>` : ""}
     <p class="lz-note">Use the toolbar under the product for font, size, colour, bold, alignment, spacing and curve.</p>
     <div class="lz-row"><button type="button" class="btn btn-ghost-gold" data-do="addtext">＋ Add another text</button><button type="button" class="btn btn-ghost-gold" data-do="done">Done</button></div>${texts.length > 1 ? list : ""}`;
 }
@@ -872,14 +911,15 @@ function reviewQuality(count, ar) {
 function drawFinals() {
   root.querySelectorAll("canvas[data-final]").forEach((c) => {
     const [i, id] = c.dataset.final.split("|"), a = areas().find((x) => x.id === id);
-    R.drawComposite(c.getContext("2d"), a, layers(id, +i).filter(filled), 300, 300, imgs, { mockup: mockupImage(a, drawFinals) });
+    R.drawComposite(c.getContext("2d"), a, layers(id, +i).filter((l) => filled(l) && !unusedOptional(l)), 300, 300, imgs, { mockup: mockupImage(a, drawFinals) });
   });
 }
 
 function bindPanel(box) {
   box.onclick = (e) => {
     const t = e.target.closest("button"); if (!t) return;
-    if (t.dataset.do === "clearall") clearSide();
+    if (t.dataset.idea != null) { const idea = designIdeas()[+t.dataset.idea]; if (idea) applyIdea(idea); }
+    else if (t.dataset.do === "clearall") clearSide();
     else if (t.dataset.do === "designs") openDesigns();
     else if (t.dataset.do === "upload") pickFile();
     else if (t.dataset.do === "addtext") addText();
@@ -896,7 +936,7 @@ function bindPanel(box) {
   };
   box.oninput = (e) => {
     const t = e.target, l = selected();
-    if (t.id === "lz-text" && l) { l.text = t.value.slice(0, 200); draw(); commitSoon(); }
+    if (t.id === "lz-text" && l) { l.text = t.value.slice(0, 200); if (l.fromDesign) fitText(l); draw(); commitSoon(); }
     else if (t.id === "lz-comments") { S.comments = t.value; saveWip(); }
     else if (t.id === "lz-proof") { S.proof = t.checked; saveWip(); }
   };
@@ -1174,7 +1214,7 @@ function recordLayer(l) {
 function recordAreas(d, ar) {
   const out = {};
   for (const a of ar) {
-    const ls = (d[a.id] || []).filter(filled).map(recordLayer);
+    const ls = (d[a.id] || []).filter((l) => filled(l) && !unusedOptional(l)).map(recordLayer);
     const att = (S.attachments || []).filter((x) => x.area === a.id).map((x) => ({ src: x.src, name: x.name }));
     if (ls.length || att.length) out[a.id] = { layers: ls, ...(att.length ? { attachments: att } : {}) };
   }
@@ -1250,7 +1290,7 @@ async function addToCart() {
     const missing = ar.find((a) => !(S.shared[a.id] || []).some(filled));
     if (missing) { S.area = missing.id; render(); return error(`Add your design for the ${missing.label.toLowerCase()} too, or choose a different print location.`); }
   }
-  const leftover = [...new Set(designs.flatMap((d) => Object.values(d || {}).flat()).filter((l) => l && l.type === "text" && l.placeholder && l.text.trim() === l.placeholder).map((l) => l.text.trim()))];
+  const leftover = [...new Set(designs.flatMap((d) => Object.values(d || {}).flat()).filter((l) => l && l.type === "text" && l.placeholder && !l.optional && l.text.trim() === l.placeholder).map((l) => l.text.trim()))];
   if (leftover.length && !confirm(`Your design still shows the sample wording “${leftover.join("”, “")}”. Add to cart anyway? Tap Cancel to change the text.`)) { S.tab = "text"; render(); return; }
   add.disabled = true; add.textContent = "Saving your design…";
   const rec = { schema: 1, customizationId: S.customizationId, productId: S.pid, layout: each ? "each" : "same", proof: S.proof, comments: S.comments.trim().slice(0, 1000), createdAt: new Date().toISOString() };
