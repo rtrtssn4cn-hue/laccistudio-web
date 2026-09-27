@@ -751,3 +751,16 @@ a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,te
 .trust-list li::before{content:"✦ ";opacity:.8}
 .hero-card.hero-photo{padding:0;overflow:hidden}
 .hero-card.hero-photo img{width:100%;height:100%;max-width:none;object-fit:cover;display:block;aspect-ratio:1}
+
+/* Cart: customized designs, per-coaster thumbnails, edit/duplicate, review step */
+.ci-thumbs{display:flex;gap:4px;flex-wrap:wrap;margin-top:.3rem}
+.ci-thumbs img{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid var(--sandstone)}
+.ci-acts{display:flex;gap:.5rem;margin-top:.35rem}
+.ci-acts button,.rv-edit{background:none;border:0;padding:0;color:var(--gold-deep);font:600 .74rem 'Montserrat',sans-serif;text-decoration:underline;cursor:pointer}
+.rv-title{font:600 1.15rem 'Cormorant Garamond',serif;margin:.4rem 0 .8rem}
+.rv-item{display:grid;grid-template-columns:120px 1fr;gap:.9rem;padding:.9rem 0;border-bottom:1px solid var(--sandstone)}
+.rv-imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:4px;align-content:start}
+.rv-imgs img:only-child{grid-column:1/-1}
+.rv-imgs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--sandstone);background:#fff}
+.rv-info{display:grid;gap:.2rem;font-size:.8rem;color:var(--charcoal);align-content:start}
+.rv-info strong{font-size:.9rem}

@@ -300,7 +300,7 @@
 
     if (CUSTOMIZE) {
       grid.querySelectorAll(".js-customize").forEach(function (b) {
-        b.addEventListener("click", function () { openCustomize(findProduct(b.getAttribute("data-cz"))); });
+        b.addEventListener("click", function () { personalize(findProduct(b.getAttribute("data-cz"))); });
       });
     } else {
       grid.querySelectorAll(".js-add").forEach(function (b) {
@@ -313,7 +313,7 @@
     setupCarousels(grid);
     // shop.html#personalize=<product id> (homepage Featured Gifts) opens that product's customizer
     var want = /^#personalize=([\w-]+)$/.exec(location.hash);
-    if (want && CUSTOMIZE && findProduct(want[1])) setTimeout(function () { openCustomize(findProduct(want[1])); }, 0);
+    if (want && CUSTOMIZE && findProduct(want[1])) setTimeout(function () { personalize(findProduct(want[1])); }, 0);
     if (!CUSTOMIZE) {
       grid.querySelectorAll(".prod-card").forEach(function (card) {
         var addBtn = card.querySelector(".js-add"); if (!addBtn) return;
@@ -326,7 +326,7 @@
         var addBtn = card.querySelector(".js-customize"); if (!addBtn) return;
         var pid = addBtn.getAttribute("data-cz");
         var media = card.querySelector(".prod-media");
-        if (media) { media.style.cursor = "pointer"; media.addEventListener("click", function () { openCustomize(findProduct(pid)); }); }
+        if (media) { media.style.cursor = "pointer"; media.addEventListener("click", function () { personalize(findProduct(pid)); }); }
       });
     }
   }
@@ -488,6 +488,26 @@
   function dropdownHTML(label, id, options, cls) {
     return '<label class="cz-field"><span>' + esc(label) + '</span><select id="' + id + '"' + (cls ? ' class="' + cls + '"' : "") + '>' +
       options.map(function (o) { return "<option>" + esc(o) + "</option>"; }).join("") + "</select></label>";
+  }
+  // Which customizer opens. The visual editor (assets/js/customizer.mjs) runs with Stripe checkout once
+  // switched on in content/settings.json ("customizer": "visual"); ?customizer=visual or =classic
+  // overrides it for this browser tab. The classic form stays as the fallback.
+  function customizerChoice() {
+    try {
+      var q = new URLSearchParams(location.search).get("customizer");
+      if (q === "visual" || q === "classic") sessionStorage.setItem("lacci_customizer", q);
+      var saved = sessionStorage.getItem("lacci_customizer");
+      if (saved) return saved;
+    } catch (e) {}
+    return CO.customizer === "visual" ? "visual" : "classic";
+  }
+  function personalize(p) {
+    if (!p) return;
+    if (STRIPE && customizerChoice() === "visual") {
+      import("/assets/js/customizer.mjs?v=1").then(function (m) { m.open(p.id); }).catch(function () { openCustomize(p); });
+      return;
+    }
+    openCustomize(p);
   }
   function openCustomize(p) {
     if (!p) return;

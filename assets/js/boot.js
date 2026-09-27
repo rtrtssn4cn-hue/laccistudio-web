@@ -179,7 +179,8 @@
         paypalClientId: s.paypalClientId || "",
         snipcartApiKey: s.snipcartApiKey || "",
         uploadEndpoint: s.uploadEndpoint || "",
-        uploadcarePublicKey: s.uploadcarePublicKey || ""
+        uploadcarePublicKey: s.uploadcarePublicKey || "",
+        customizer: s.customizer || "classic"
       },
       products: products
     };

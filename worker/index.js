@@ -15,6 +15,7 @@
 // shop uses. A price sent by the browser is never charged; it is only compared, and a mismatch
 // returns the correct prices instead of creating a payment.
 
+import { cleanCustomization } from "./customization.js";
 import { priceLine, coasterCount, money } from "../assets/js/pricing.mjs";
 import { stripe, isTestKey, verifyStripeSignature } from "./stripe.js";
 import { handleAdminContent } from "./admin-content.js";
@@ -23,7 +24,7 @@ const JSON_HEADERS = { "Content-Type": "application/json; charset=utf-8", "Cache
 const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: JSON_HEADERS });
 const nowIso = () => new Date().toISOString();
 
-const LIMITS = { lines: 25, qty: 50, text: 1000, body: 64 * 1024 };
+const LIMITS = { lines: 25, qty: 50, text: 1000, body: 512 * 1024 };
 const PERSONALIZATION_KEYS = ["text", "font", "textColor", "textColorCode", "placement", "textStyle", "comments", "proof"];
 const FILE_KEYS = ["design", "backDesign", "preview"];
 
@@ -111,12 +112,15 @@ async function validateCart(env, body) {
       if (v === null) return { error: "One of the uploaded files could not be verified. Please upload it again.", status: 400 };
       if (v) files[k] = v;
     }
-    if (!personalization.text && !files.design) return { error: `${product.name}: add your text or upload a design.`, status: 400 };
+    const cz = cleanCustomization(raw.customization, product.id, (u) => cleanFileUrl(env, u));
+    if (cz.error) return { error: `${product.name}: ${cz.error}`, status: 400 };
+    if (!personalization.text && !files.design && !cz.customization) return { error: `${product.name}: add your text or upload a design.`, status: 400 };
     if (raw.expectedUnitCents !== undefined && Number(raw.expectedUnitCents) !== priced.unitCents) mismatch = true;
     fresh.push({ productId: product.id, unitCents: priced.unitCents });
     lines.push({
       productId: product.id, name: product.name, qty, unitCents: priced.unitCents, lineCents: priced.unitCents * qty,
       options: priced.summary, color: priced.color ? priced.color.id : null, personalization, files,
+      ...(cz.customization ? { customization: cz.customization } : {}),
       coasters: coasterCount(product, selections, qty),
       grams: (Number(product.weight) || 0) * qty,
     });
