@@ -12,6 +12,16 @@
 <meta name="apple-mobile-web-app-title" content="Lacci Admin">
 </head>
 <body>
+  <!-- Back to the new Lacci Admin: a button on this page, and straight back after logging in from there -->
+  <a id="to-studio" href="/admin/studio/" style="position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:99999;background:#D79D41;color:#25140F;font:600 14px/1 -apple-system,Segoe UI,sans-serif;padding:12px 16px;border-radius:99px;text-decoration:none;box-shadow:0 6px 18px -8px rgba(0,0,0,.45)">Open Lacci Admin →</a>
+  <script>
+    (function () {
+      if (new URLSearchParams(location.search).get("next") !== "studio") return;
+      var t = setInterval(function () {
+        try { var u = JSON.parse(localStorage.getItem("decap-cms-user") || "null"); if (u && u.token) { clearInterval(t); location.replace("/admin/studio/"); } } catch (e) {}
+      }, 500);
+    })();
+  </script>
   <!-- Login is handled by GitHub through the OAuth worker set in config.yml (base_url) -->
   <!-- The visual editor (Decap CMS) -->
   <!-- Pinned: a floating version could change the editor without warning. Update the version and hash together. -->
