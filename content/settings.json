@@ -6,7 +6,7 @@
   "snipcartApiKey": "Y2YzYTdlYjMtNDA5OC00NTk5LWE0OGEtMjQ4NzU1YzhiZTcwNjM5MjAwNTc3NjY0NTQwNTk1",
   "saleBannerEnd": "2026-09-07",
   "saleBannerImage": "/assets/img/8f0aa63d-b44e-4f75-a25b-e13f6d21f489.png",
-  "checkoutMode": "snipcart",
+  "checkoutMode": "stripe",
   "saleBannerDismissible": true,
   "saleBannerLink": "shop.html",
   "orderEmail": "info@laccistudio.com",
@@ -18,6 +18,7 @@
   "saleBannerSize": "large",
   "etsy": "https://www.etsy.com/shop/LACCIstudio",
   "saleBannerEyebrow": "Limited Time",
+  "saleBannerShortText": "",
   "uploadEndpoint": "",
   "saleBannerTheme": "walnut",
   "paypalClientId": "AQu34nwXc0Gpf1cX2uii9FXKmSTkJZcbZO1pXUTsKxONHow5BDG9iUPzme3edVkJmNoXGibiZaeIM9hR",
@@ -25,6 +26,5 @@
   "saleBannerSubtext": "55% off everything sitewide — tumblers, apparel, and gifts.",
   "pinterest": "",
   "saleBannerLinkText": "Shop now",
-  "email": "info@laccistudio.com",
-  "saleBannerShortText": ""
+  "email": "info@laccistudio.com"
 }
