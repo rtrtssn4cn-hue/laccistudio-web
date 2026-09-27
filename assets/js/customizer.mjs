@@ -1057,6 +1057,12 @@ function maskedCopy(info) {
   x.globalCompositeOperation = "destination-in"; x.drawImage(info.display, 0, 0, c.width, c.height);
   return c;
 }
+// Small picture of the design kept with the cart line, so the cart shows it straight away and
+// without depending on the upload.
+function thumbOf(a, ls) {
+  const c = document.createElement("canvas"); c.width = c.height = 240;
+  try { R.drawComposite(c.getContext("2d"), a, ls, 240, 240, imgs, { mockup: mockupImage(a) }); return c.toDataURL("image/jpeg", 0.8); } catch { return ""; }
+}
 async function uploadCanvas(c, name) {
   const blob = await new Promise((res) => { try { c.toBlob(res, "image/png"); } catch { res(null); } });
   if (!blob || !ucKey()) return "";
@@ -1127,6 +1133,7 @@ async function addToCart() {
   const line = {
     productId: S.pid, name: product().name, image: firstPreview || product().image, qty: S.qty, options: { ...S.options }, color: S.color,
     customizationId: S.customizationId, customization: rec,
+    thumbs: (each ? rec.items.map((it) => it.areas) : [rec.areas]).map((as) => thumbOf(ar[0], (((as || {})[ar[0].id] || {}).layers || []).map(liveLayer))).filter(Boolean),
     personalization: {
       text: texts.map((t) => t.text).join(" / ").slice(0, 1000), font: (texts[0] || {}).font || "",
       textColor: texts[0] ? (R.swatchName(texts[0].color) || "Custom") : "", textColorCode: (texts[0] || {}).color || "",

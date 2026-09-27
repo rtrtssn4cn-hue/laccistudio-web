@@ -21,6 +21,7 @@ const sameLine = (a, b) => JSON.stringify([a.productId, a.options, a.color, a.pe
 // Rendered previews saved with a customized line: one per coaster for sets designed individually.
 function previewsOf(l) {
   const c = l.customization;
+  if (l.thumbs && l.thumbs.length) return l.thumbs; // kept in this browser; the uploaded previews go with the order
   if (!c) return l.files && l.files.preview ? [l.files.preview] : [];
   if (c.items) return c.items.map((it) => Object.values(it.previews || {})[0]).filter(Boolean);
   return Object.values(c.previews || {});
@@ -131,6 +132,7 @@ function add(line) {
     personalization: Object.fromEntries(Object.entries(line.personalization || {}).filter(([, v]) => v)),
     files: Object.fromEntries(Object.entries(line.files || {}).filter(([, v]) => v)),
     ...(line.customization ? { customizationId: line.customizationId, customization: line.customization } : {}),
+    ...(Array.isArray(line.thumbs) && line.thumbs.length ? { thumbs: line.thumbs.filter((t) => /^data:image\/jpeg;base64,/.test(t)).slice(0, 12) } : {}),
   };
   const p = price(clean);
   if (!p.ok) { alert(p.error); return; }
@@ -142,7 +144,7 @@ function add(line) {
 async function checkout() {
   const btn = document.querySelector("#sc-pay") || document.querySelector("#sc-checkout");
   btn.disabled = true; btn.textContent = "Opening secure checkout…";
-  const lines = cart.map((l) => ({ ...l, expectedUnitCents: price(l).unitCents }));
+  const lines = cart.map(({ thumbs, ...l }) => ({ ...l, expectedUnitCents: price(l).unitCents }));
   try {
     const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lines }) });
     const data = await res.json().catch(() => ({}));
