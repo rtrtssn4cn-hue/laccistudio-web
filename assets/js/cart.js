@@ -311,6 +311,9 @@
       });
     }
     setupCarousels(grid);
+    // shop.html#personalize=<product id> (homepage Featured Gifts) opens that product's customizer
+    var want = /^#personalize=([\w-]+)$/.exec(location.hash);
+    if (want && CUSTOMIZE && findProduct(want[1])) setTimeout(function () { openCustomize(findProduct(want[1])); }, 0);
     if (!CUSTOMIZE) {
       grid.querySelectorAll(".prod-card").forEach(function (card) {
         var addBtn = card.querySelector(".js-add"); if (!addBtn) return;

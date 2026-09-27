@@ -23,7 +23,7 @@
     grid.innerHTML = list.map(function (p) {
       return '<article class="prod-card reveal in"><a href="shop.html" class="prod-media" style="display:block"><div class="pslide active"><img class="prod-mockphoto" src="' + esc(card(p.image)) + '" onerror="this.onerror=null;this.src=\'' + esc(p.image).replace(/'/g, "%27") + '\'" alt="' + esc(p.name) + '" loading="lazy"></div></a>' +
         '<div class="prod-body"><h3>' + esc(p.name) + '</h3><div class="prod-foot"><span class="prod-price">' + fromPrice(p) + '</span></div>' +
-        '<a href="shop.html" class="btn btn-gold">Personalize</a></div></article>';
+        '<a href="shop.html#personalize=' + encodeURIComponent(p.id) + '" class="btn btn-gold">Personalize</a></div></article>';
     }).join("");
     box.hidden = false;
   }
