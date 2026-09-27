@@ -365,6 +365,21 @@ await test("30. Hidden products: every one is refused by checkout; draft/seasona
   ok(off.every((p) => !listed.includes(p.id)), "no hidden product on the Snipcart page");
 });
 
+await test("31. Coaster shapes switched off (Heart, Hexagon) are kept in the data, never offered, and refused by checkout", async () => {
+  const shape = P("ceramic-coasters").optionGroups.find((g) => g.label === "Shape");
+  for (const n of ["Heart", "Hexagon"]) {
+    const c = shape.choices.find((x) => x.name === n);
+    ok(c && c.hidden === true, n + " kept and switched off");
+    const r = await checkout([line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: n })]);
+    eq(r.status, 400, "checkout refuses " + n);
+  }
+  const offered = pricing.visibleGroups(P("ceramic-coasters")).find((g) => g.label === "Shape").choices.map((c) => c.name);
+  eq(offered.join(","), "Round,Square", "customers see Round and Square only");
+  const priced = await checkout([line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Square" })]);
+  eq(priced.status, 200, "Square still sells");
+  eq(pricing.fromPriceCents(P("ceramic-coasters")), 699, "switched-off shapes don't change the from-price");
+});
+
 for (const [r, n] of results) console.log(`${r}  ${n}`);
 console.log(`\n${pass} passed, ${fail} failed; simulated Stripe calls: ${stripeState.calls.length}`);
 process.exit(fail ? 1 : 0);
