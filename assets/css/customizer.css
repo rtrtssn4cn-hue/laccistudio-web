@@ -182,3 +182,12 @@ html.lz-lock, html.lz-lock body { overflow: hidden; }
 .lz-zoom button { border: 0; background: none; min-width: 36px; height: 34px; padding: 0 8px; font-size: 1rem; font-weight: 600; }
 .lz-zoom #lz-zoomlvl { font-size: .72rem; min-width: 48px; border-left: 1px solid var(--lz-line); border-right: 1px solid var(--lz-line); }
 .lz-zoom[hidden] { display: none; }
+
+/* touch up (restore / erase brush) */
+.lz-touch .lz-crop-box { width: min(560px, 100%); box-sizing: border-box; }
+.lz-touch .lz-seg { margin-bottom: 4px; }
+.lz-touch-stage { background: repeating-conic-gradient(#e9e2da 0 25%, #fff 0 50%) 0 0 / 16px 16px; border-radius: 8px; overflow: hidden; cursor: none; }
+.lz-brush { position: absolute; border: 2px solid var(--lz-gold-deep); border-radius: 50%; pointer-events: none; box-shadow: 0 0 0 1px #fff; }
+.lz-brush[hidden] { display: none; }
+.lz-touch-size input { width: 100%; accent-color: var(--lz-gold-deep); }
+.lz-touch .lz-row { flex-wrap: wrap; }

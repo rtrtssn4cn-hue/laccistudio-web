@@ -117,7 +117,14 @@ function restoreImages(d) {
   for (const ls of Object.values(d || {})) for (const l of ls || []) {
     if (l.type !== "image" || imgs[l.src]) continue;
     const info = imgs[l.src] = { url: l.src, w: l.naturalW, h: l.naturalH, name: l.name || "Your upload" };
-    R.loadImage(ucDisplay(l.src)).then((img) => { info.img = img; info.display = R.removeWhite(img); draw(); }).catch(() => { info.failed = true; draw(); });
+    R.loadImage(ucDisplay(l.src)).then((img) => {
+      info.img = img; info.display = R.removeWhite(img); draw();
+      if (l.cutout && info.display.bgKind !== "transparent") R.loadImage(ucDisplay(l.cutout)).then((cut) => {
+        const c = document.createElement("canvas"); c.width = info.display.width; c.height = info.display.height;
+        c.getContext("2d").drawImage(cut, 0, 0, c.width, c.height); c.bgKind = "plain";
+        info.display = c; info.touched = true; draw();
+      }).catch(() => {});
+    }).catch(() => { info.failed = true; draw(); });
   }
 }
 
@@ -415,7 +422,7 @@ function renderCtx() {
   const ls = layers(), i = S.sel;
   const order = (ls.length > 1 ? btn("forward", "Forward", "⬆", i === ls.length - 1 ? "disabled" : "") + btn("backward", "Back", "⬇", i === 0 ? "disabled" : "") : "");
   box.innerHTML = l.type === "image"
-    ? btn("replace", "Replace", "⇄") + (bgKind(l) === "plain" ? btn("bg", "Remove bg", "◩", l.removeWhite !== false ? 'aria-pressed="true"' : "") : "") + btn("crop", "Crop", "⌗") + btn("flip", "Flip", "⇋") + btn("fit", "Fit", "⤢") + btn("fill", "Fill", "⛶") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("reset", "Reset", "↺") + btn("delete", "Delete", "🗑", 'class="lz-danger"')
+    ? btn("replace", "Replace", "⇄") + (bgKind(l) === "plain" ? btn("bg", "Remove bg", "◩", l.removeWhite !== false ? 'aria-pressed="true"' : "") : "") + ((imgs[l.src] || {}).img ? btn("touchup", "Touch up", "🖌") : "") + btn("crop", "Crop", "⌗") + btn("flip", "Flip", "⇋") + btn("fit", "Fit", "⤢") + btn("fill", "Fill", "⛶") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("reset", "Reset", "↺") + btn("delete", "Delete", "🗑", 'class="lz-danger"')
     : btn("edittext", "Edit", "✎") + btn("t-font", "Font", "Aa", S.tool === "t-font" ? 'aria-pressed="true"' : "") + btn("t-size", "Size", "↕", S.tool === "t-size" ? 'aria-pressed="true"' : "") + btn("t-color", "Color", "●", (S.tool === "t-color" ? 'aria-pressed="true" ' : "") + `style="--dot:${esc(l.color)}"`) +
       btn("bold", "Bold", "B", l.bold ? 'aria-pressed="true"' : "") + btn("align", "Align", l.align === "left" ? "⇤" : l.align === "right" ? "⇥" : "≡") + btn("t-spacing", "Spacing", "↔", S.tool === "t-spacing" ? 'aria-pressed="true"' : "") +
       btn("t-curve", "Curve", "◠", S.tool === "t-curve" ? 'aria-pressed="true"' : "") + btn("vertical", l.vertical ? "Across" : "Down", l.vertical ? "⇥" : "⇩") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("delete", "Delete", "🗑", 'class="lz-danger"');
@@ -458,6 +465,7 @@ function tool(act, el) {
   if (act === "edittext") { S.tab = "text"; if (isMobile()) S.sheet = true; render(); const ta = root.querySelector("#lz-text"); if (ta) { ta.focus(); ta.select(); } return; }
   if (act === "replace") return root.querySelector("#lz-replace").click();
   if (act === "crop") return openCrop(l);
+  if (act === "touchup") return openTouchUp(l);
   if (act === "flip") l.flipX = !l.flipX;
   if (act === "bg") l.removeWhite = l.removeWhite === false;
   if (act === "bold") l.bold = !l.bold;
@@ -485,6 +493,93 @@ function fitLayer(l, how, scale = 1) {
   l.x = 0.5; l.y = 0.5; l.rotation = 0;
 }
 
+// ---------------------------------------------------------------- touch up
+// Brush over the picture to bring back parts the background removal took away (Restore) or to
+// remove leftovers by hand (Erase). Removed areas show faintly so it is clear what can be restored.
+// The result replaces the picture's background-removed version; Reset returns to the automatic one.
+function openTouchUp(l) {
+  const info = imgs[l.src]; if (!info || !info.img) return;
+  const auto = () => R.removeWhite(info.img);
+  const startFrom = l.removeWhite === false ? auto() : info.display || auto();
+  const Wk = startFrom.width, Hk = startFrom.height;
+  const work = document.createElement("canvas"); work.width = Wk; work.height = Hk;
+  const wctx = work.getContext("2d"); wctx.drawImage(startFrom, 0, 0);
+  const orig = document.createElement("canvas"); orig.width = Wk; orig.height = Hk;
+  orig.getContext("2d").drawImage(info.img, 0, 0, Wk, Hk);
+  const ov = document.createElement("div");
+  ov.className = "lz-crop lz-touch";
+  ov.innerHTML = `<div class="lz-crop-box"><h3>Touch up</h3>
+    <div class="lz-seg" data-bind="brush"><button type="button" data-v="restore" aria-pressed="true">Restore</button><button type="button" data-v="erase" aria-pressed="false">Erase</button></div>
+    <p class="lz-note" id="lz-touch-tip">Brush over parts that should be kept. Faded areas are removed.</p>
+    <div class="lz-crop-stage lz-touch-stage"><canvas></canvas><span class="lz-brush" hidden></span></div>
+    <label class="lz-field lz-touch-size"><span>Brush size</span><input type="range" min="8" max="90" value="28"></label>
+    <div class="lz-row"><button type="button" class="btn btn-ghost-gold" data-c="undo" disabled>Undo</button><button type="button" class="btn btn-ghost-gold" data-c="reset">Reset</button><button type="button" class="btn btn-ghost-gold" data-c="cancel">Cancel</button><button type="button" class="btn btn-gold" data-c="apply">Done</button></div></div>`;
+  root.querySelector(".lz").appendChild(ov);
+  const stage = ov.querySelector(".lz-touch-stage"), cv = ov.querySelector("canvas"), dot = ov.querySelector(".lz-brush");
+  const size = ov.querySelector("input[type=range]"), undoBtn = ov.querySelector('[data-c="undo"]');
+  const maxW = Math.min(520, window.innerWidth - 64), maxH = Math.min(420, window.innerHeight * 0.5); // 64 = frame and box padding
+  const sc = Math.min(maxW / Wk, maxH / Hk), dw = Math.round(Wk * sc), dh = Math.round(Hk * sc);
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(dw * dpr); cv.height = Math.round(dh * dpr); cv.style.width = dw + "px"; cv.style.height = dh + "px";
+  stage.style.width = dw + "px"; stage.style.height = dh + "px";
+  const cctx = cv.getContext("2d");
+  let mode = "restore", frame = 0;
+  const undo = [];
+  const show = () => { if (frame) return; frame = requestAnimationFrame(() => {
+    frame = 0; cctx.clearRect(0, 0, cv.width, cv.height);
+    cctx.globalAlpha = 0.22; cctx.drawImage(orig, 0, 0, cv.width, cv.height);
+    cctx.globalAlpha = 1; cctx.drawImage(work, 0, 0, cv.width, cv.height);
+  }); };
+  show();
+  const radius = () => (Number(size.value) / 2) / sc; // brush radius in picture pixels
+  function dab(x, y) {
+    const r = radius(), bx = Math.max(0, Math.floor(x - r)), by = Math.max(0, Math.floor(y - r));
+    const bw = Math.min(Wk, Math.ceil(x + r)) - bx, bh = Math.min(Hk, Math.ceil(y + r)) - by;
+    if (bw <= 0 || bh <= 0) return;
+    wctx.save(); wctx.beginPath(); wctx.arc(x, y, r, 0, Math.PI * 2);
+    if (mode === "erase") { wctx.globalCompositeOperation = "destination-out"; wctx.fill(); }
+    else { wctx.clip(); wctx.clearRect(bx, by, bw, bh); wctx.drawImage(orig, bx, by, bw, bh, bx, by, bw, bh); }
+    wctx.restore();
+  }
+  const at = (e) => { const b = cv.getBoundingClientRect(); return { x: (e.clientX - b.left) / sc, y: (e.clientY - b.top) / sc, sx: e.clientX - b.left, sy: e.clientY - b.top }; };
+  const moveDot = (p) => { const d = Number(size.value); dot.hidden = false; Object.assign(dot.style, { width: d + "px", height: d + "px", left: p.sx - d / 2 + "px", top: p.sy - d / 2 + "px" }); };
+  let last = null;
+  cv.addEventListener("pointerdown", (e) => {
+    e.preventDefault(); cv.setPointerCapture(e.pointerId);
+    undo.push(wctx.getImageData(0, 0, Wk, Hk)); if (undo.length > 5) undo.shift(); undoBtn.disabled = false;
+    last = at(e); dab(last.x, last.y); moveDot(last); show();
+  });
+  cv.addEventListener("pointermove", (e) => {
+    const p = at(e); moveDot(p);
+    if (!last) return;
+    const steps = Math.max(1, Math.ceil(Math.hypot(p.x - last.x, p.y - last.y) / (radius() / 3)));
+    for (let i = 1; i <= steps; i++) dab(last.x + (p.x - last.x) * i / steps, last.y + (p.y - last.y) * i / steps);
+    last = p; show();
+  });
+  const stop = () => { last = null; };
+  cv.addEventListener("pointerup", stop); cv.addEventListener("pointercancel", stop);
+  cv.addEventListener("pointerleave", () => { if (!last) dot.hidden = true; });
+  ov.querySelector('[data-bind="brush"]').onclick = (e) => {
+    const b = e.target.closest("[data-v]"); if (!b) return;
+    mode = b.dataset.v;
+    ov.querySelectorAll('[data-bind="brush"] [data-v]').forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    ov.querySelector("#lz-touch-tip").textContent = mode === "restore" ? "Brush over parts that should be kept. Faded areas are removed." : "Brush over anything that should not be printed.";
+  };
+  ov.onclick = (e) => {
+    const b = e.target.closest("[data-c]"); if (!b) return;
+    const c = b.dataset.c;
+    if (c === "undo") { const s = undo.pop(); if (s) wctx.putImageData(s, 0, 0); undoBtn.disabled = !undo.length; show(); return; }
+    if (c === "reset") { undo.push(wctx.getImageData(0, 0, Wk, Hk)); undoBtn.disabled = false; wctx.clearRect(0, 0, Wk, Hk); wctx.drawImage(auto(), 0, 0, Wk, Hk); show(); return; }
+    if (c === "apply") {
+      work.bgKind = "plain";
+      info.display = work; info.touched = true;
+      layers().forEach((x) => { if (x.src === l.src) x.removeWhite = true; });
+      commit(); render();
+    }
+    ov.remove();
+  };
+}
+
 // ---------------------------------------------------------------- crop
 function openCrop(l) {
   const info = imgs[l.src]; if (!info || !(info.display || info.img)) return;
@@ -496,7 +591,7 @@ function openCrop(l) {
   root.querySelector(".lz").appendChild(ov);
   const stage = ov.querySelector(".lz-crop-stage"), cv = ov.querySelector("canvas"), rect = ov.querySelector(".lz-crop-rect");
   const sw = src.naturalWidth || src.width, sh = src.naturalHeight || src.height;
-  const maxW = Math.min(520, window.innerWidth - 48), maxH = Math.min(420, window.innerHeight * 0.55);
+  const maxW = Math.min(520, window.innerWidth - 64), maxH = Math.min(420, window.innerHeight * 0.55);
   const sc = Math.min(maxW / sw, maxH / sh), dw = Math.round(sw * sc), dh = Math.round(sh * sc);
   cv.width = dw; cv.height = dh; stage.style.width = dw + "px"; stage.style.height = dh + "px";
   cv.getContext("2d").drawImage(src, 0, 0, dw, dh);
@@ -951,6 +1046,17 @@ async function renderAndUpload(a, ls, name) {
   R.drawComposite(c.getContext("2d"), a, ls, size, size, imgs, { mockup: mk && hex ? R.tinted(mk, hex) : mk });
   return uploadCanvas(c, name);
 }
+// Full-size print copy that follows a touched-up picture: the original pixels, with the edited
+// version's transparency scaled up over them.
+function maskedCopy(info) {
+  const iw = info.img.naturalWidth || info.img.width, ih = info.img.naturalHeight || info.img.height;
+  const s = Math.min(1, 4000 / Math.max(iw, ih)), c = document.createElement("canvas");
+  c.width = Math.round(iw * s); c.height = Math.round(ih * s);
+  const x = c.getContext("2d");
+  x.drawImage(info.img, 0, 0, c.width, c.height);
+  x.globalCompositeOperation = "destination-in"; x.drawImage(info.display, 0, 0, c.width, c.height);
+  return c;
+}
 async function uploadCanvas(c, name) {
   const blob = await new Promise((res) => { try { c.toBlob(res, "image/png"); } catch { res(null); } });
   if (!blob || !ucKey()) return "";
@@ -1010,7 +1116,7 @@ async function addToCart() {
     const key = liveLayer(l).src, info = imgs[key];
     if (cuts[l.src] || !info || !info.img || bgKind({ src: key }) !== "plain") continue;
     const base = (l.name || "design").replace(/\.[^.]+$/, "").replace(/[^\w-]+/g, "-").slice(0, 60) || "design";
-    cuts[l.src] = uploadCanvas(R.removeWhite(info.img, 4000), base + "-no-background.png");
+    cuts[l.src] = uploadCanvas(info.touched ? maskedCopy(info) : R.removeWhite(info.img, 4000), base + "-no-background.png");
   }
   jobs.push(...Object.entries(cuts).map(([src, p]) => p.then((u) => { if (u) recLayers.filter((l) => l.src === src).forEach((l) => (l.cutout = u)); })));
   await Promise.all(jobs);
