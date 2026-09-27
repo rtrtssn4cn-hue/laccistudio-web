@@ -37,7 +37,7 @@ await test("3. Saving hides a product on the draft only; live is untouched; mess
   eq(s.status, 200, "save " + JSON.stringify(s.body)); ok(gh.branches.draft, "draft branch created");
   ok(JSON.parse(gh.files.draft["content/products.json"].text).products.find((p) => p.id === "sublimation-mug").status === "hidden", "draft has the change");
   eq(gh.files.main["content/products.json"].text, realProducts, "live file unchanged");
-  ok(/Personalized Mug: .*price \$16\.99 → \$19\.99/.test(gh.commits[0].message) && /active → hidden/.test(gh.commits[0].message), "readable change message: " + gh.commits[0].message.split("\n")[0]);
+  ok(/Personalized Mug: .*price \$18\.99 → \$19\.99/.test(gh.commits[0].message) && /active → hidden/.test(gh.commits[0].message), "readable change message: " + gh.commits[0].message.split("\n")[0]);
   const st = await call("/api/admin/content/state"); eq(st.body.unpublished, 1, "one unpublished change");
 });
 await test("4. Removing a product is refused (archive instead); bad status and price are refused", async () => {
@@ -95,7 +95,7 @@ await test("9. Colours and sizes switch on/off without losing anything; only edi
   const t2 = out.find((p) => p.id === "apparel-t-shirt");
   eq(t2.colors.length, tee.colors.length, "every colour kept"); eq(t2.colors.find((c) => c.id === "black").visible, true, "black on");
   eq(t2.optionGroups[1].choices.length, size.choices.length, "every size kept"); eq(t2.optionGroups[1].choices.find((c) => c.name === "XS").hidden, true, "XS off");
-  ok(/colours on: black/.test(gh.commits[0].message) && /XS off/.test(gh.commits[0].message) && /3XL \$28\.99 → \$38\.5/.test(gh.commits[0].message), "plain message: " + gh.commits[0].message.split("\n")[0]);
+  ok(/colours on: black/.test(gh.commits[0].message) && /XS off/.test(gh.commits[0].message) && /3XL \$37\.98 → \$38\.5/.test(gh.commits[0].message), "plain message: " + gh.commits[0].message.split("\n")[0]);
   ok(t2.updatedAt, "edited product dated"); ok(!out.find((p) => p.id === "sublimation-mug").updatedAt, "untouched product not dated");
 });
 await test("10. Removing a size/colour, unknown colours, and a for-sale product with every choice off are refused", async () => {

@@ -51,20 +51,10 @@
     for (var i = 0; i < cs.length; i++) { var c = cs[i]; if (typeof c === "object" && c.name === opt && c.price != null) return c.price; }
     return p.price;
   }
-  // Lowest and highest price across every option on sale (hidden choices never reach here, see boot.js).
-  // "from" only when the choices customers can pick really cost different amounts.
-  function priceRangeFor(p) {
-    var lo = Number(p.price), hi = lo;
-    (p.optionGroups || []).forEach(function (g) {
-      var mods = (g.choices || []).map(function (c) { return choiceMod(p, c); });
-      if (!mods.length) return;
-      lo += Math.min.apply(null, mods); hi += Math.max.apply(null, mods);
-    });
-    return [Math.round(lo * 100) / 100, Math.round(hi * 100) / 100];
-  }
   function priceLabelFor(p) {
-    var r = priceRangeFor(p);
-    return (r[1] > r[0] ? "from " : "") + money(r[0]);
+    var priced = choicesOf(p).filter(function (c) { return typeof c === "object" && c.price != null; });
+    if (priced.length) { var m = Math.min.apply(null, priced.map(function (c) { return c.price; })); return "from " + money(m); }
+    return money(p.price);
   }
   // Price change a single choice applies. `price` = absolute unit price; `add` = flat surcharge.
   function choiceMod(p, c) {

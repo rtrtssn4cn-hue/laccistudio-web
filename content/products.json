@@ -1,24 +1,24 @@
 {
   "products": [
     {
-      "price": 25.99,
+      "price": 27.99,
       "optionGroups": [
         {
           "label": "Size",
           "choices": [
             {
               "name": "20 oz",
-              "price": 25.99,
+              "price": 27.99,
               "img": "assets/img/mock/mock-sublimation-tumbler.png?v=12"
             },
             {
               "name": "30 oz",
-              "price": 29.99,
+              "price": 31.99,
               "img": "assets/img/mock/mock-variant-tumbler-30.png?v=12"
             },
             {
               "name": "40 oz",
-              "price": 32.99,
+              "price": 34.99,
               "img": "assets/img/mock/mock-variant-tumbler-40.png?v=12"
             }
           ]
@@ -57,18 +57,18 @@
       "category": "Drinkware"
     },
     {
-      "price": 16.99,
+      "price": 18.99,
       "optionGroups": [
         {
           "label": "Size",
           "choices": [
             {
               "name": "11 oz",
-              "price": 16.99
+              "price": 18.99
             },
             {
               "name": "15 oz",
-              "price": 19.99
+              "price": 20.99
             }
           ]
         },
@@ -114,7 +114,7 @@
       "category": "Drinkware"
     },
     {
-      "price": 24.99,
+      "price": 26.98,
       "optionGroups": [
         {
           "label": "Print location",
@@ -136,31 +136,31 @@
           "choices": [
             {
               "name": "XS",
-              "price": 24.99
+              "price": 26.98
             },
             {
               "name": "S",
-              "price": 24.99
+              "price": 27.98
             },
             {
               "name": "M",
-              "price": 24.99
+              "price": 29.98
             },
             {
               "name": "L",
-              "price": 24.99
+              "price": 31.98
             },
             {
               "name": "XL",
-              "price": 24.99
+              "price": 33.98
             },
             {
               "name": "2XL",
-              "price": 26.99
+              "price": 35.98
             },
             {
               "name": "3XL",
-              "price": 28.99
+              "price": 37.98
             }
           ]
         }
@@ -1174,7 +1174,7 @@
       "category": "Apparel"
     },
     {
-      "price": 39.99,
+      "price": 39.98,
       "optionGroups": [
         {
           "label": "Print location",
@@ -1196,31 +1196,31 @@
           "choices": [
             {
               "name": "XS",
-              "price": 39.99
+              "price": 39.98
             },
             {
               "name": "S",
-              "price": 39.99
+              "price": 40.98
             },
             {
               "name": "M",
-              "price": 39.99
+              "price": 42.98
             },
             {
               "name": "L",
-              "price": 39.99
+              "price": 44.98
             },
             {
               "name": "XL",
-              "price": 39.99
+              "price": 46.98
             },
             {
               "name": "2XL",
-              "price": 41.99
+              "price": 48.98
             },
             {
               "name": "3XL",
-              "price": 43.99
+              "price": 50.98
             }
           ]
         }
@@ -1487,7 +1487,7 @@
       "category": "Apparel"
     },
     {
-      "price": 18.99,
+      "price": 20.99,
       "optionGroups": [],
       "name": "Custom Tote Bag",
       "mockupPhoto": "assets/img/mock/mock-apparel-tote-bag.png?v=12",
@@ -2132,11 +2132,11 @@
             },
             {
               "name": "Pack of 10",
-              "add": 20
+              "add": 22
             },
             {
               "name": "Pack of 25",
-              "add": 40
+              "add": 45
             },
             {
               "name": "Pack of 50",
