@@ -1,24 +1,24 @@
 {
   "products": [
     {
-      "price": 27.99,
+      "price": 18.99,
       "optionGroups": [
         {
           "label": "Size",
           "choices": [
             {
               "name": "20 oz",
-              "price": 27.99,
+              "price": 18.99,
               "img": "assets/img/mock/mock-sublimation-tumbler.png?v=12"
             },
             {
               "name": "30 oz",
-              "price": 31.99,
+              "price": 21.99,
               "img": "assets/img/mock/mock-variant-tumbler-30.png?v=12"
             },
             {
               "name": "40 oz",
-              "price": 34.99,
+              "price": 24.99,
               "img": "assets/img/mock/mock-variant-tumbler-40.png?v=12"
             }
           ]
@@ -54,21 +54,34 @@
       "id": "sublimation-tumbler",
       "description": "Keep drinks ice-cold for hours in a double-wall insulated stainless tumbler, custom-printed with your name, photo, or design. Lid & straw included — the perfect personalized gift for birthdays, bridesmaids, teachers & travel.",
       "status": "active",
-      "category": "Drinkware"
+      "category": "Drinkware",
+      "pricePlan": {
+        "stage": "growth",
+        "balanced": {
+          "Size / 20 oz": 27.99,
+          "Size / 30 oz": 31.99,
+          "Size / 40 oz": 34.99
+        },
+        "premium": {
+          "Size / 20 oz": 29.99,
+          "Size / 30 oz": 33.99,
+          "Size / 40 oz": 37.99
+        }
+      }
     },
     {
-      "price": 18.99,
+      "price": 11.99,
       "optionGroups": [
         {
           "label": "Size",
           "choices": [
             {
               "name": "11 oz",
-              "price": 18.99
+              "price": 11.99
             },
             {
               "name": "15 oz",
-              "price": 20.99
+              "price": 13.99
             }
           ]
         },
@@ -111,10 +124,21 @@
       "id": "sublimation-mug",
       "description": "Start every morning with a one-of-a-kind ceramic mug featuring your photo, pet portrait, or custom text. Dishwasher & microwave safe — a heartfelt gift for coffee lovers, holidays, Mother's & Father's Day.",
       "status": "active",
-      "category": "Drinkware"
+      "category": "Drinkware",
+      "pricePlan": {
+        "stage": "growth",
+        "balanced": {
+          "Size / 11 oz": 17.99,
+          "Size / 15 oz": 20.99
+        },
+        "premium": {
+          "Size / 11 oz": 18.99,
+          "Size / 15 oz": 21.99
+        }
+      }
     },
     {
-      "price": 26.98,
+      "price": 17.99,
       "optionGroups": [
         {
           "label": "Print location",
@@ -136,31 +160,31 @@
           "choices": [
             {
               "name": "XS",
-              "price": 26.98
+              "price": 17.99
             },
             {
               "name": "S",
-              "price": 27.98
+              "price": 17.99
             },
             {
               "name": "M",
-              "price": 29.98
+              "price": 17.99
             },
             {
               "name": "L",
-              "price": 31.98
+              "price": 17.99
             },
             {
               "name": "XL",
-              "price": 33.98
+              "price": 17.99
             },
             {
               "name": "2XL",
-              "price": 35.98
+              "price": 19.99
             },
             {
               "name": "3XL",
-              "price": 37.98
+              "price": 21.99
             }
           ]
         }
@@ -245,7 +269,28 @@
       "id": "apparel-t-shirt",
       "description": "Custom t-shirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
       "status": "active",
-      "category": "Apparel"
+      "category": "Apparel",
+      "pricePlan": {
+        "stage": "growth",
+        "balanced": {
+          "Size / XS": 27.99,
+          "Size / S": 27.99,
+          "Size / M": 27.99,
+          "Size / L": 27.99,
+          "Size / XL": 27.99,
+          "Size / 2XL": 29.99,
+          "Size / 3XL": 31.99
+        },
+        "premium": {
+          "Size / XS": 29.99,
+          "Size / S": 29.99,
+          "Size / M": 29.99,
+          "Size / L": 29.99,
+          "Size / XL": 29.99,
+          "Size / 2XL": 32.99,
+          "Size / 3XL": 34.99
+        }
+      }
     },
     {
       "price": 26.98,
@@ -1174,7 +1219,7 @@
       "category": "Apparel"
     },
     {
-      "price": 39.98,
+      "price": 24.99,
       "optionGroups": [
         {
           "label": "Print location",
@@ -1196,31 +1241,31 @@
           "choices": [
             {
               "name": "XS",
-              "price": 39.98
+              "price": 24.99
             },
             {
               "name": "S",
-              "price": 40.98
+              "price": 24.99
             },
             {
               "name": "M",
-              "price": 42.98
+              "price": 24.99
             },
             {
               "name": "L",
-              "price": 44.98
+              "price": 24.99
             },
             {
               "name": "XL",
-              "price": 46.98
+              "price": 24.99
             },
             {
               "name": "2XL",
-              "price": 48.98
+              "price": 26.99
             },
             {
               "name": "3XL",
-              "price": 50.98
+              "price": 28.99
             }
           ]
         }
@@ -1305,7 +1350,28 @@
       "id": "apparel-hoodie",
       "description": "Custom hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
       "status": "active",
-      "category": "Apparel"
+      "category": "Apparel",
+      "pricePlan": {
+        "stage": "growth",
+        "balanced": {
+          "Size / XS": 42.99,
+          "Size / S": 42.99,
+          "Size / M": 44.99,
+          "Size / L": 46.99,
+          "Size / XL": 48.99,
+          "Size / 2XL": 50.99,
+          "Size / 3XL": 52.99
+        },
+        "premium": {
+          "Size / XS": 45.99,
+          "Size / S": 45.99,
+          "Size / M": 47.99,
+          "Size / L": 49.99,
+          "Size / XL": 51.99,
+          "Size / 2XL": 53.99,
+          "Size / 3XL": 55.99
+        }
+      }
     },
     {
       "price": 44.98,
@@ -1487,7 +1553,7 @@
       "category": "Apparel"
     },
     {
-      "price": 20.99,
+      "price": 12.99,
       "optionGroups": [],
       "name": "Custom Tote Bag",
       "mockupPhoto": "assets/img/mock/mock-apparel-tote-bag.png?v=12",
@@ -1499,7 +1565,16 @@
       "id": "apparel-tote-bag",
       "description": "Custom tote bag printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
       "status": "active",
-      "category": "Apparel"
+      "category": "Apparel",
+      "pricePlan": {
+        "stage": "growth",
+        "balanced": {
+          "Base price": 20.99
+        },
+        "premium": {
+          "Base price": 22.99
+        }
+      }
     },
     {
       "price": 26.99,
@@ -1591,7 +1666,7 @@
       "category": "Gifts"
     },
     {
-      "price": 7.99,
+      "price": 6.99,
       "optionGroups": [],
       "name": "Personalized Fridge Magnet",
       "mockupPhoto": "assets/img/mock/mock-gift-fridge-magnet.png?v=12",
@@ -1603,7 +1678,16 @@
       "id": "gift-fridge-magnet",
       "description": "Personalized fridge magnet made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
       "status": "active",
-      "category": "Gifts"
+      "category": "Gifts",
+      "pricePlan": {
+        "stage": "growth",
+        "balanced": {
+          "Base price": 9.99
+        },
+        "premium": {
+          "Base price": 10.99
+        }
+      }
     },
     {
       "price": 8.99,
@@ -1786,7 +1870,7 @@
       "category": "Gifts"
     },
     {
-      "price": 14.99,
+      "price": 10.99,
       "optionGroups": [],
       "name": "Personalized Socks",
       "mockupPhoto": "assets/img/mock/mock-gift-socks.png?v=12",
@@ -1798,10 +1882,19 @@
       "id": "gift-socks",
       "description": "Personalized socks made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
       "status": "active",
-      "category": "Gifts"
+      "category": "Gifts",
+      "pricePlan": {
+        "stage": "growth",
+        "balanced": {
+          "Base price": 16.99
+        },
+        "premium": {
+          "Base price": 17.99
+        }
+      }
     },
     {
-      "price": 14.99,
+      "price": 9.99,
       "optionGroups": [],
       "name": "Personalized Mouse Pad",
       "mockupPhoto": "assets/img/mock/mock-gift-mouse-pad.png?v=12",
@@ -1813,7 +1906,16 @@
       "id": "gift-mouse-pad",
       "description": "Personalized mouse pad made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
       "status": "active",
-      "category": "Gifts"
+      "category": "Gifts",
+      "pricePlan": {
+        "stage": "growth",
+        "balanced": {
+          "Base price": 15.99
+        },
+        "premium": {
+          "Base price": 16.99
+        }
+      }
     },
     {
       "price": 16.99,
@@ -2045,7 +2147,24 @@
       "id": "ceramic-coasters",
       "description": "Protect your table in style with personalized coasters made from your design or photo. Singles or gift sets in ceramic, sandstone, cork, neoprene, acrylic or slate — a thoughtful housewarming & wedding gift.",
       "status": "active",
-      "category": "Home"
+      "category": "Home",
+      "pricePlan": {
+        "stage": "growth",
+        "balanced": {
+          "Quantity / Single": 8.99,
+          "Quantity / Set of 2": 15.99,
+          "Quantity / Set of 4": 24.99,
+          "Quantity / Set of 6": 34.99,
+          "Quantity / Set of 8": 44.99
+        },
+        "premium": {
+          "Quantity / Single": 9.99,
+          "Quantity / Set of 2": 16.99,
+          "Quantity / Set of 4": 27.99,
+          "Quantity / Set of 6": 38.99,
+          "Quantity / Set of 8": 48.99
+        }
+      }
     },
     {
       "price": 3.99,
@@ -2059,19 +2178,19 @@
             },
             {
               "name": "3 inch",
-              "price": 4.99
+              "price": 3.99
             },
             {
               "name": "4 inch",
-              "price": 5.99
+              "price": 4.99
             },
             {
               "name": "5 inch",
-              "price": 7.99
+              "price": 5.99
             },
             {
               "name": "6 inch",
-              "price": 9.99
+              "price": 7.99
             }
           ]
         },
@@ -2124,23 +2243,23 @@
             },
             {
               "name": "Pack of 3",
-              "add": 7
+              "add": 5
             },
             {
               "name": "Pack of 5",
-              "add": 12
+              "add": 7
             },
             {
               "name": "Pack of 10",
-              "add": 22
+              "add": 11
             },
             {
               "name": "Pack of 25",
-              "add": 45
+              "add": 24
             },
             {
               "name": "Pack of 50",
-              "add": 80
+              "add": 44
             }
           ]
         }
@@ -2155,7 +2274,24 @@
       "id": "custom-stickers",
       "description": "Bring your artwork to life with durable die-cut vinyl stickers & decals — waterproof options and finishes like holographic & glitter. Sizes 2\"–6\", singles or packs — perfect for tumblers, laptops, cars, water bottles & small-business branding.",
       "status": "active",
-      "category": "Stickers"
+      "category": "Stickers",
+      "pricePlan": {
+        "stage": "growth",
+        "balanced": {
+          "Size / 2 inch": 3.99,
+          "Size / 3 inch": 4.99,
+          "Size / 4 inch": 5.99,
+          "Size / 5 inch": 7.99,
+          "Size / 6 inch": 9.99
+        },
+        "premium": {
+          "Size / 2 inch": 4.99,
+          "Size / 3 inch": 5.99,
+          "Size / 4 inch": 6.99,
+          "Size / 5 inch": 8.99,
+          "Size / 6 inch": 10.99
+        }
+      }
     }
   ]
 }
