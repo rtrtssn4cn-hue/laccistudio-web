@@ -106,8 +106,8 @@ async function chain(lines, expectUnits) {
 }
 
 // ---------------------------------------------------------------- tests
-await test("1. Single coaster $6.99 with text", async () => {
-  const { r } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })], [699]);
+await test("1. Single coaster $7.99 with text", async () => {
+  const { r } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })], [799]);
   ok(/^TEST-LS-\d+$/.test(r.body.orderNumber), "sandbox order number format");
 });
 await test("2. Coaster quantities: Set of 4 x2, Set of 8 x1, Single x3", async () => {
@@ -115,10 +115,10 @@ await test("2. Coaster quantities: Set of 4 x2, Set of 8 x1, Single x3", async (
     line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Square" }, { qty: 2 }),
     line("ceramic-coasters", { Quantity: "Set of 8", Material: "Ceramic", Shape: "Round" }),
     line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" }, { qty: 3 }),
-  ], [2499, 4499, 699]);
+  ], [2199, 3999, 799]);
 });
 await test("3. Personalized coaster with uploaded artwork (no text)", async () => {
-  const { o } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" }, { personalization: {}, files: { design: UC, preview: UC } })], [699]);
+  const { o } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" }, { personalization: {}, files: { design: UC, preview: UC } })], [799]);
   eq(JSON.parse(o.lines_json)[0].files.design, UC, "artwork link stored on the order");
 });
 await test("4. Artwork link from an unknown host is refused", async () => {
@@ -149,7 +149,7 @@ await test("11. Cart with multiple different products", async () => {
     line("sublimation-mug", { Size: "11 oz", Style: "Standard White" }, { qty: 2 }),
     line("sublimation-tumbler", { Size: "20 oz", Finish: "Glossy" }),
     line("apparel-t-shirt", { "Print location": "Front only", Size: "M" }, { color: "white" }),
-  ], [2499, 1899, 2799, 2998]);
+  ], [2199, 1899, 2799, 2998]);
 });
 await test("12. Shipping: owner's Snipcart bands chosen by weight", async () => {
   await checkout([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })]); // 260 g
@@ -207,13 +207,13 @@ await test("17. Webhook with a bad signature is rejected and changes nothing", a
   eq(r.status, 400, "status"); eq((await order(s.id)).status, "pending", "still pending");
 });
 await test("18. Successful payment: webhook marks the order paid with everything needed to fulfil it", async () => {
-  const { s } = await chain([line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Round" }, { files: { design: UC } })], [2499]);
+  const { s } = await chain([line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Round" }, { files: { design: UC } })], [2199]);
   pay(s.id, { tax: 206, shipping: 895 });
   const r = await webhook({ id: "evt_ok_1", type: "checkout.session.completed", data: { object: s } });
   eq(r.status, 200, "status");
   const o = await order(s.id);
   eq(o.status, "paid", "paid"); eq(o.customer_email, "buyer@example.com", "email"); eq(o.customer_name, "Test Buyer", "name");
-  eq(o.shipping_cents, 895, "shipping"); eq(o.tax_cents, 206, "tax"); eq(o.total_cents, 2499 + 895 + 206, "total"); eq(o.total_cents, s.amount_total, "order total = Stripe total");
+  eq(o.shipping_cents, 895, "shipping"); eq(o.tax_cents, 206, "tax"); eq(o.total_cents, 2199 + 895 + 206, "total"); eq(o.total_cents, s.amount_total, "order total = Stripe total");
   const ship = JSON.parse(o.shipping_json); eq(ship.address.postal_code, "90210", "address"); ok(/Ground/.test(ship.method), "shipping method recorded");
   eq(JSON.parse(o.packing_json).suggestedBox, "9 x 6 x 2 in", "4 coasters -> 9x6x2 box");
   ok(!o.notes, "no warnings");
@@ -244,7 +244,7 @@ await test("20. Declined card: order stays unpaid; failed async payment and expi
   eq((await order(s2.id)).status, "payment_failed", "payment_failed");
 });
 await test("21. Confirmation page before the webhook: server asks Stripe, then confirms", async () => {
-  const { s } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })], [699]);
+  const { s } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })], [799]);
   pay(s.id, { shipping: 895, zip: "77020" });
   const r = await call("/api/order-status?session_id=" + s.id);
   eq(r.body.status, "paid", "paid via server-side Stripe lookup"); eq(r.body.email, "b…@example.com", "email masked");
@@ -282,17 +282,21 @@ await test("25. Static files still served; worker source and secrets are not", a
 });
 
 await test("26. Cart captured from the real browser flow: customizer -> cart -> server -> Stripe -> paid order", async () => {
-  // tools/fixtures/cart-from-browser.json is the exact request the shop sent (customizer: $6.99, $24.99 x2, $31.98; cart subtotal $88.95).
+  // tools/fixtures/cart-from-browser.json is the exact request the shop sent before the Growth coaster
+  // prices (customizer: $6.99, $24.99 x2, $31.98). A cart saved at old prices is refused with the fresh
+  // prices (nobody is charged a price they didn't see); re-sent with those prices it goes through.
   const body = JSON.parse(readFileSync(new URL("./fixtures/cart-from-browser.json", import.meta.url)));
-  const r = await checkout(body.lines);
+  const stale = await checkout(body.lines);
+  eq(stale.status, 409, "old-price cart refused"); eq(stale.body.fresh.map((f) => f.unitCents).join(","), "799,2199,3198", "fresh prices returned");
+  const r = await checkout(body.lines.map((l, i) => ({ ...l, expectedUnitCents: stale.body.fresh[i].unitCents })));
   eq(r.status, 200, "checkout " + JSON.stringify(r.body));
   const s = stripeState.created.at(-1);
-  eq(s.amount_subtotal, 8895, "Stripe subtotal = cart subtotal $88.95");
-  [699, 2499, 3198].forEach((c, i) => eq(Number(s.params[`line_items[${i}][price_data][unit_amount]`]), c, "Stripe unit line " + i));
+  eq(s.amount_subtotal, 8395, "Stripe subtotal = cart subtotal $83.95");
+  [799, 2199, 3198].forEach((c, i) => eq(Number(s.params[`line_items[${i}][price_data][unit_amount]`]), c, "Stripe unit line " + i));
   pay(s.id, { tax: 0, shipping: 1195 });
   await webhook({ id: "evt_browser_cart", type: "checkout.session.completed", data: { object: s } });
   const o = await order(s.id);
-  eq(o.subtotal_cents, 8895, "order subtotal"); eq(o.total_cents, 8895 + 1195, "order total"); eq(o.total_cents, s.amount_total, "order total = Stripe total");
+  eq(o.subtotal_cents, 8395, "order subtotal"); eq(o.total_cents, 8395 + 1195, "order total"); eq(o.total_cents, s.amount_total, "order total = Stripe total");
   const lines = JSON.parse(o.lines_json);
   eq(lines[2].options.find((x) => x.label === "Garment colour").value, "White", "garment colour on the order");
   eq(lines[0].personalization.text, "Smith", "personalization on the order");
@@ -363,6 +367,26 @@ await test("30. Hidden products: every one is refused by checkout; draft/seasona
   const listed = [...page.matchAll(/data-item-id="([^"]+)"/g)].map((m) => m[1]);
   eq(listed.length, products.filter((p) => p.status === "active").length, "Snipcart page lists active products only");
   ok(off.every((p) => !listed.includes(p.id)), "no hidden product on the Snipcart page");
+});
+
+await test("32. Coaster Growth ladder: 1 $7.99 · 2 $13.99 · 4 $21.99 · 6 $31.99 · 8 $39.99; sets of 10 and 12 kept but off", async () => {
+  const q = P("ceramic-coasters").optionGroups.find((g) => g.label === "Quantity");
+  eq(pricing.visibleGroups(P("ceramic-coasters")).find((g) => g.label === "Quantity").choices.map((c) => c.name).join(","), "Single,Set of 2,Set of 4,Set of 6,Set of 8", "customers see 1, 2, 4, 6, 8");
+  const { o } = await chain([
+    line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" }),
+    line("ceramic-coasters", { Quantity: "Set of 2", Material: "Ceramic", Shape: "Round" }),
+    line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Round" }),
+    line("ceramic-coasters", { Quantity: "Set of 6", Material: "Ceramic", Shape: "Round" }),
+    line("ceramic-coasters", { Quantity: "Set of 8", Material: "Ceramic", Shape: "Round" }),
+  ], [799, 1399, 2199, 3199, 3999]);
+  eq(o.subtotal_cents, 799 + 1399 + 2199 + 3199 + 3999, "order subtotal matches the ladder");
+  const two = await checkout([line("ceramic-coasters", { Quantity: "Set of 2", Material: "Ceramic", Shape: "Round" })]);
+  eq(two.status, 200, "set of 2 sells on its own");
+  for (const n of ["Set of 10", "Set of 12"]) {
+    const c = q.choices.find((x) => x.name === n); ok(c && c.hidden === true && c.price > 0, n + " kept with its price, switched off");
+    eq((await checkout([line("ceramic-coasters", { Quantity: n, Material: "Ceramic", Shape: "Round" })])).status, 400, "checkout refuses " + n);
+  }
+  eq(pricing.fromPriceCents(P("ceramic-coasters")), 799, "shop card shows from $7.99");
 });
 
 for (const [r, n] of results) console.log(`${r}  ${n}`);
