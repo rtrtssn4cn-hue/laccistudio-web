@@ -410,7 +410,7 @@ await test("33. Growth prices for every product on sale reach Stripe exactly; no
     ["sublimation-mug", { Size: "11 oz", Style: "Standard White" }, null, 1699], ["sublimation-mug", { Size: "15 oz", Style: "Standard White" }, null, 1999],
     ["apparel-t-shirt", { "Print location": "Front only", Size: "XL" }, "white", 2499], ["apparel-t-shirt", { "Print location": "Front only", Size: "3XL" }, "white", 2899],
     ["apparel-hoodie", { "Print location": "Front only", Size: "M" }, "white", 3999], ["apparel-hoodie", { "Print location": "Front only", Size: "3XL" }, "white", 4399],
-    ["apparel-tote-bag", {}, null, 1899], ["gift-fridge-magnet", {}, null, 799], ["gift-socks", {}, null, 1499], ["gift-mouse-pad", {}, null, 1499],
+    ["apparel-tote-bag", {}, null, 1499], ["gift-fridge-magnet", {}, null, 799], ["gift-socks", {}, null, 1499], ["gift-mouse-pad", {}, null, 1499],
     ["custom-stickers", { Size: "3 inch", Type: "Die-Cut", Pack: "Pack of 10" }, null, 2499], ["custom-stickers", { Size: "3 inch", Type: "Die-Cut", Pack: "Pack of 25" }, null, 4499],
   ];
   await chain(cases.map(([id, o, color]) => line(id, o, { color })), cases.map((c) => c[3]));
