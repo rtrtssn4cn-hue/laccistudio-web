@@ -1,3 +1,1117 @@
 {
-  "designs": []
+ "designs": [
+  {
+   "id": "christmas-wreath-red-bow",
+   "name": "Christmas wreath",
+   "collection": "Christmas",
+   "type": "art",
+   "image": "/assets/img/designs/christmas-wreath-red-bow.png",
+   "thumb": "/assets/img/designs/christmas-wreath-red-bow-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your text",
+     "x": 0.536,
+     "y": 0.4444,
+     "size": 0.0593,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#231F20"
+    },
+    {
+     "text": "Here",
+     "x": 0.536,
+     "y": 0.5509,
+     "size": 0.1858,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#B27409"
+    },
+    {
+     "text": "name here",
+     "x": 0.539,
+     "y": 0.7271,
+     "size": 0.0451,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#231F20"
+    },
+    {
+     "text": "year here",
+     "x": 0.538,
+     "y": 0.779,
+     "size": 0.0397,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#231F20"
+    }
+   ]
+  },
+  {
+   "id": "christmas-tree-gifts",
+   "name": "Christmas tree",
+   "collection": "Christmas",
+   "type": "art",
+   "image": "/assets/img/designs/christmas-tree-gifts.png",
+   "thumb": "/assets/img/designs/christmas-tree-gifts-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your text",
+     "x": 0.709,
+     "y": 0.3295,
+     "size": 0.0625,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#2E1E19"
+    },
+    {
+     "text": "Here",
+     "x": 0.7145,
+     "y": 0.46,
+     "size": 0.1848,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#C28A30"
+    },
+    {
+     "text": "name here",
+     "x": 0.7355,
+     "y": 0.655,
+     "size": 0.045,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#2E1E19"
+    },
+    {
+     "text": "year here",
+     "x": 0.742,
+     "y": 0.7085,
+     "size": 0.0418,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#2E1E19"
+    }
+   ]
+  },
+  {
+   "id": "holly-wreath-gold-bow",
+   "name": "Holly wreath",
+   "collection": "Christmas",
+   "type": "art",
+   "image": "/assets/img/designs/holly-wreath-gold-bow.png",
+   "thumb": "/assets/img/designs/holly-wreath-gold-bow-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your text",
+     "x": 0.4945,
+     "y": 0.4442,
+     "size": 0.0607,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#231815"
+    },
+    {
+     "text": "Here",
+     "x": 0.4995,
+     "y": 0.5587,
+     "size": 0.16,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#B2751D"
+    },
+    {
+     "text": "name here",
+     "x": 0.5,
+     "y": 0.7376,
+     "size": 0.0411,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#231815"
+    },
+    {
+     "text": "year here",
+     "x": 0.5,
+     "y": 0.7847,
+     "size": 0.0378,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#231815"
+    }
+   ]
+  },
+  {
+   "id": "red-truck-christmas-tree",
+   "name": "Red truck",
+   "collection": "Christmas",
+   "type": "art",
+   "image": "/assets/img/designs/red-truck-christmas-tree.png",
+   "thumb": "/assets/img/designs/red-truck-christmas-tree-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your text",
+     "x": 0.508,
+     "y": 0.1225,
+     "size": 0.0679,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#1E1E1E"
+    },
+    {
+     "text": "Here",
+     "x": 0.515,
+     "y": 0.2385,
+     "size": 0.2298,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#A86912"
+    },
+    {
+     "text": "Name Here",
+     "x": 0.4925,
+     "y": 0.83,
+     "size": 0.0515,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#1E1E1E"
+    },
+    {
+     "text": "Year Here",
+     "x": 0.4945,
+     "y": 0.888,
+     "size": 0.048,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#1E1E1E"
+    }
+   ]
+  },
+  {
+   "id": "snowman-plaid-scarf",
+   "name": "Snowman",
+   "collection": "Christmas",
+   "type": "art",
+   "image": "/assets/img/designs/snowman-plaid-scarf.png",
+   "thumb": "/assets/img/designs/snowman-plaid-scarf-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your text",
+     "x": 0.52,
+     "y": 0.611,
+     "size": 0.0616,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#1C151C"
+    },
+    {
+     "text": "Here",
+     "x": 0.518,
+     "y": 0.701,
+     "size": 0.1354,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#B87A24"
+    },
+    {
+     "text": "name here",
+     "x": 0.526,
+     "y": 0.8355,
+     "size": 0.043,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#1C151C"
+    },
+    {
+     "text": "year here",
+     "x": 0.528,
+     "y": 0.8905,
+     "size": 0.041,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#1C151C"
+    }
+   ]
+  },
+  {
+   "id": "golden-snowflake",
+   "name": "Golden snowflake",
+   "collection": "Christmas",
+   "type": "art",
+   "image": "/assets/img/designs/golden-snowflake.png",
+   "thumb": "/assets/img/designs/golden-snowflake-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your text",
+     "x": 0.504,
+     "y": 0.5313,
+     "size": 0.0623,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D2C2C"
+    },
+    {
+     "text": "Here",
+     "x": 0.5,
+     "y": 0.6359,
+     "size": 0.1302,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#B87A24"
+    },
+    {
+     "text": "Name here",
+     "x": 0.505,
+     "y": 0.7831,
+     "size": 0.0451,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D2C2C"
+    },
+    {
+     "text": "Year here",
+     "x": 0.507,
+     "y": 0.8298,
+     "size": 0.0423,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D2C2C"
+    }
+   ]
+  },
+  {
+   "id": "christmas-cottage",
+   "name": "Christmas cottage",
+   "collection": "Christmas",
+   "type": "art",
+   "image": "/assets/img/designs/christmas-cottage.png",
+   "thumb": "/assets/img/designs/christmas-cottage-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your text",
+     "x": 0.494,
+     "y": 0.5294,
+     "size": 0.0587,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#372A28"
+    },
+    {
+     "text": "Here",
+     "x": 0.493,
+     "y": 0.6347,
+     "size": 0.1331,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#B2752A"
+    },
+    {
+     "text": "Name here",
+     "x": 0.497,
+     "y": 0.788,
+     "size": 0.0441,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#372A28"
+    },
+    {
+     "text": "Year here",
+     "x": 0.4955,
+     "y": 0.8398,
+     "size": 0.0383,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#372A28"
+    }
+   ]
+  },
+  {
+   "id": "christmas-ornaments",
+   "name": "Christmas ornaments",
+   "collection": "Christmas",
+   "type": "art",
+   "image": "/assets/img/designs/christmas-ornaments.png",
+   "thumb": "/assets/img/designs/christmas-ornaments-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your text",
+     "x": 0.476,
+     "y": 0.568,
+     "size": 0.0521,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#3D3C3C"
+    },
+    {
+     "text": "Here",
+     "x": 0.5,
+     "y": 0.6519,
+     "size": 0.1505,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#B2752A"
+    },
+    {
+     "text": "Name here",
+     "x": 0.5,
+     "y": 0.7966,
+     "size": 0.0407,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#3D3C3C"
+    },
+    {
+     "text": "Year here",
+     "x": 0.5,
+     "y": 0.8439,
+     "size": 0.0357,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#3D3C3C"
+    }
+   ]
+  },
+  {
+   "id": "ghost-with-pumpkin",
+   "name": "Ghost with pumpkin",
+   "collection": "Halloween",
+   "type": "art",
+   "image": "/assets/img/designs/ghost-with-pumpkin.png",
+   "thumb": "/assets/img/designs/ghost-with-pumpkin-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your",
+     "x": 0.7495,
+     "y": 0.3063,
+     "size": 0.0644,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#000000"
+    },
+    {
+     "text": "Text",
+     "x": 0.7495,
+     "y": 0.3867,
+     "size": 0.0644,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#000000"
+    },
+    {
+     "text": "Here",
+     "x": 0.7625,
+     "y": 0.524,
+     "size": 0.1978,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#E66300"
+    },
+    {
+     "text": "Name Here",
+     "x": 0.7335,
+     "y": 0.7654,
+     "size": 0.044,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#000000"
+    },
+    {
+     "text": "Year Here",
+     "x": 0.7335,
+     "y": 0.8226,
+     "size": 0.044,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#000000"
+    }
+   ]
+  },
+  {
+   "id": "witch-hat-pumpkins",
+   "name": "Witch hat pumpkins",
+   "collection": "Halloween",
+   "type": "art",
+   "image": "/assets/img/designs/witch-hat-pumpkins.png",
+   "thumb": "/assets/img/designs/witch-hat-pumpkins-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Here",
+     "x": 0.784,
+     "y": 0.5295,
+     "size": 0.1728,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#D15D14"
+    },
+    {
+     "text": "Name Here",
+     "x": 0.7625,
+     "y": 0.7495,
+     "size": 0.0413,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#231F20"
+    },
+    {
+     "text": "Year Here",
+     "x": 0.759,
+     "y": 0.8065,
+     "size": 0.0421,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#231F20"
+    },
+    {
+     "text": "Your",
+     "x": 0.764,
+     "y": 0.2943,
+     "size": 0.0678,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#231F20"
+    },
+    {
+     "text": "Text",
+     "x": 0.764,
+     "y": 0.3757,
+     "size": 0.0678,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#231F20"
+    }
+   ]
+  },
+  {
+   "id": "black-cat-witch-hat",
+   "name": "Black cat",
+   "collection": "Halloween",
+   "type": "art",
+   "image": "/assets/img/designs/black-cat-witch-hat.png",
+   "thumb": "/assets/img/designs/black-cat-witch-hat-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your",
+     "x": 0.7,
+     "y": 0.3068,
+     "size": 0.0577,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#473C38"
+    },
+    {
+     "text": "Text",
+     "x": 0.7,
+     "y": 0.3761,
+     "size": 0.0577,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#473C38"
+    },
+    {
+     "text": "Here",
+     "x": 0.725,
+     "y": 0.4872,
+     "size": 0.16,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#D15D18"
+    },
+    {
+     "text": "Name Here",
+     "x": 0.724,
+     "y": 0.6962,
+     "size": 0.0355,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#473C38"
+    },
+    {
+     "text": "Year Here",
+     "x": 0.724,
+     "y": 0.7388,
+     "size": 0.0355,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#473C38"
+    }
+   ]
+  },
+  {
+   "id": "three-ghosts",
+   "name": "Three ghosts",
+   "collection": "Halloween",
+   "type": "art",
+   "image": "/assets/img/designs/three-ghosts.png",
+   "thumb": "/assets/img/designs/three-ghosts-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your Text",
+     "x": 0.476,
+     "y": 0.6079,
+     "size": 0.0552,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#231F20"
+    },
+    {
+     "text": "Here",
+     "x": 0.47,
+     "y": 0.6853,
+     "size": 0.1375,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#D15317"
+    },
+    {
+     "text": "Name Here",
+     "x": 0.478,
+     "y": 0.8331,
+     "size": 0.0423,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#231F20"
+    },
+    {
+     "text": "Year Here",
+     "x": 0.478,
+     "y": 0.8839,
+     "size": 0.0423,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#231F20"
+    }
+   ]
+  },
+  {
+   "id": "skeleton-peace-sign",
+   "name": "Skeleton peace sign",
+   "collection": "Halloween",
+   "type": "art",
+   "image": "/assets/img/designs/skeleton-peace-sign.png",
+   "thumb": "/assets/img/designs/skeleton-peace-sign-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your",
+     "x": 0.6895,
+     "y": 0.2823,
+     "size": 0.0558,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#473C38"
+    },
+    {
+     "text": "Text",
+     "x": 0.6895,
+     "y": 0.3465,
+     "size": 0.0558,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#473C38"
+    },
+    {
+     "text": "Here",
+     "x": 0.7195,
+     "y": 0.4497,
+     "size": 0.1878,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#D16A2C"
+    },
+    {
+     "text": "Name Here",
+     "x": 0.7025,
+     "y": 0.6712,
+     "size": 0.0383,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#473C38"
+    },
+    {
+     "text": "Year Here",
+     "x": 0.7025,
+     "y": 0.7171,
+     "size": 0.0383,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#473C38"
+    }
+   ]
+  },
+  {
+   "id": "haunted-house",
+   "name": "Haunted house",
+   "collection": "Halloween",
+   "type": "art",
+   "image": "/assets/img/designs/haunted-house.png",
+   "thumb": "/assets/img/designs/haunted-house-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "YOUR TEXT",
+     "x": 0.5105,
+     "y": 0.5803,
+     "size": 0.0544,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#423930"
+    },
+    {
+     "text": "Here",
+     "x": 0.5,
+     "y": 0.6689,
+     "size": 0.1267,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#E16C1B"
+    },
+    {
+     "text": "NAME HERE",
+     "x": 0.508,
+     "y": 0.8016,
+     "size": 0.0413,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#423930"
+    },
+    {
+     "text": "YEAR HERE",
+     "x": 0.5085,
+     "y": 0.8486,
+     "size": 0.0413,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#423930"
+    }
+   ]
+  },
+  {
+   "id": "spooky-season-mug",
+   "name": "Spooky season",
+   "collection": "Halloween",
+   "type": "art",
+   "image": "/assets/img/designs/spooky-season-mug.png",
+   "thumb": "/assets/img/designs/spooky-season-mug-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your text",
+     "x": 0.4905,
+     "y": 0.6389,
+     "size": 0.0552,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D251C"
+    },
+    {
+     "text": "Here",
+     "x": 0.486,
+     "y": 0.7047,
+     "size": 0.1044,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#D15300"
+    },
+    {
+     "text": "Name here",
+     "x": 0.488,
+     "y": 0.8166,
+     "size": 0.0457,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D251C"
+    },
+    {
+     "text": "Year here",
+     "x": 0.488,
+     "y": 0.8646,
+     "size": 0.0457,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D251C"
+    }
+   ]
+  },
+  {
+   "id": "pumpkin-check-bow",
+   "name": "Pumpkin with check bow",
+   "collection": "Fall & Thanksgiving",
+   "type": "art",
+   "image": "/assets/img/designs/pumpkin-check-bow.png",
+   "thumb": "/assets/img/designs/pumpkin-check-bow-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your text",
+     "x": 0.4925,
+     "y": 0.5851,
+     "size": 0.049,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#47392F"
+    },
+    {
+     "text": "Here",
+     "x": 0.487,
+     "y": 0.669,
+     "size": 0.1355,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#D15D15"
+    },
+    {
+     "text": "name here",
+     "x": 0.4965,
+     "y": 0.8018,
+     "size": 0.0414,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#47392F"
+    },
+    {
+     "text": "year here",
+     "x": 0.4965,
+     "y": 0.8494,
+     "size": 0.0414,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#47392F"
+    }
+   ]
+  },
+  {
+   "id": "autumn-leaf-wreath",
+   "name": "Autumn leaf wreath",
+   "collection": "Fall & Thanksgiving",
+   "type": "art",
+   "image": "/assets/img/designs/autumn-leaf-wreath.png",
+   "thumb": "/assets/img/designs/autumn-leaf-wreath-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your text",
+     "x": 0.508,
+     "y": 0.4056,
+     "size": 0.0646,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D251C"
+    },
+    {
+     "text": "Here",
+     "x": 0.5,
+     "y": 0.5149,
+     "size": 0.119,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#C26C1C"
+    },
+    {
+     "text": "Name here",
+     "x": 0.5085,
+     "y": 0.68,
+     "size": 0.0438,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D251C"
+    },
+    {
+     "text": "Year here",
+     "x": 0.508,
+     "y": 0.7269,
+     "size": 0.0356,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D251C"
+    }
+   ]
+  },
+  {
+   "id": "pumpkin-trio",
+   "name": "Pumpkin trio",
+   "collection": "Fall & Thanksgiving",
+   "type": "art",
+   "image": "/assets/img/designs/pumpkin-trio.png",
+   "thumb": "/assets/img/designs/pumpkin-trio-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Here",
+     "x": 0.515,
+     "y": 0.2299,
+     "size": 0.119,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#B2661B"
+    },
+    {
+     "text": "Name Here",
+     "x": 0.513,
+     "y": 0.8041,
+     "size": 0.0451,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#4D3426"
+    },
+    {
+     "text": "Year Here",
+     "x": 0.5135,
+     "y": 0.8517,
+     "size": 0.0378,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#4D3426"
+    },
+    {
+     "text": "Your Text",
+     "x": 0.52,
+     "y": 0.1165,
+     "size": 0.0614,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#4D3426"
+    }
+   ]
+  },
+  {
+   "id": "thanksgiving-turkey",
+   "name": "Turkey",
+   "collection": "Fall & Thanksgiving",
+   "type": "art",
+   "image": "/assets/img/designs/thanksgiving-turkey.png",
+   "thumb": "/assets/img/designs/thanksgiving-turkey-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Here",
+     "x": 0.527,
+     "y": 0.2069,
+     "size": 0.119,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#A85D1C"
+    },
+    {
+     "text": "Name Here",
+     "x": 0.506,
+     "y": 0.8058,
+     "size": 0.0423,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#3D251A"
+    },
+    {
+     "text": "Year Here",
+     "x": 0.5065,
+     "y": 0.8524,
+     "size": 0.0356,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#3D251A"
+    },
+    {
+     "text": "Your Text",
+     "x": 0.525,
+     "y": 0.0993,
+     "size": 0.0593,
+     "font": "Monogram",
+     "bold": true,
+     "color": "#3D251A"
+    }
+   ]
+  },
+  {
+   "id": "give-thanks-wreath",
+   "name": "Give thanks",
+   "collection": "Fall & Thanksgiving",
+   "type": "art",
+   "image": "/assets/img/designs/give-thanks-wreath.png",
+   "thumb": "/assets/img/designs/give-thanks-wreath-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "name here",
+     "x": 0.5,
+     "y": 0.63,
+     "size": 0.0552,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#5D2C00"
+    },
+    {
+     "text": "year here",
+     "x": 0.503,
+     "y": 0.684,
+     "size": 0.0505,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#5D2C00"
+    }
+   ]
+  },
+  {
+   "id": "grateful-sign",
+   "name": "Grateful sign",
+   "collection": "Fall & Thanksgiving",
+   "type": "art",
+   "image": "/assets/img/designs/grateful-sign.png",
+   "thumb": "/assets/img/designs/grateful-sign-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "your text",
+     "x": 0.515,
+     "y": 0.4906,
+     "size": 0.0646,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#F8F0E6"
+    },
+    {
+     "text": "name here",
+     "x": 0.504,
+     "y": 0.7839,
+     "size": 0.0465,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D251C"
+    },
+    {
+     "text": "year here",
+     "x": 0.5045,
+     "y": 0.831,
+     "size": 0.0402,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D251C"
+    }
+   ]
+  },
+  {
+   "id": "plaid-pumpkin-wreath",
+   "name": "Plaid pumpkin wreath",
+   "collection": "Fall & Thanksgiving",
+   "type": "art",
+   "image": "/assets/img/designs/plaid-pumpkin-wreath.png",
+   "thumb": "/assets/img/designs/plaid-pumpkin-wreath-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Your text",
+     "x": 0.515,
+     "y": 0.5124,
+     "size": 0.0593,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#372011"
+    },
+    {
+     "text": "Here",
+     "x": 0.5145,
+     "y": 0.6106,
+     "size": 0.1048,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#B26015"
+    },
+    {
+     "text": "Name here",
+     "x": 0.514,
+     "y": 0.7566,
+     "size": 0.041,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#372011"
+    },
+    {
+     "text": "Year here",
+     "x": 0.514,
+     "y": 0.8001,
+     "size": 0.0364,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#372011"
+    }
+   ]
+  },
+  {
+   "id": "pumpkin-pie",
+   "name": "Pumpkin pie",
+   "collection": "Fall & Thanksgiving",
+   "type": "art",
+   "image": "/assets/img/designs/pumpkin-pie.png",
+   "thumb": "/assets/img/designs/pumpkin-pie-thumb.png",
+   "products": [],
+   "active": true,
+   "texts": [
+    {
+     "text": "Here",
+     "x": 0.5052,
+     "y": 0.1963,
+     "size": 0.1337,
+     "font": "Script / Cursive",
+     "bold": false,
+     "color": "#C26A15"
+    },
+    {
+     "text": "Name Here",
+     "x": 0.5052,
+     "y": 0.7835,
+     "size": 0.0451,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D1F1F"
+    },
+    {
+     "text": "Year Here",
+     "x": 0.5077,
+     "y": 0.8311,
+     "size": 0.0379,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D1F1F"
+    },
+    {
+     "text": "Your Text",
+     "x": 0.5097,
+     "y": 0.0753,
+     "size": 0.0593,
+     "font": "Monogram",
+     "bold": false,
+     "color": "#3D1F1F"
+    }
+   ]
+  }
+ ]
 }
