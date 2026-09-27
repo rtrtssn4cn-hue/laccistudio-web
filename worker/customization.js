@@ -7,7 +7,7 @@ const MAX_BYTES = 24 * 1024;
 const AREA_IDS = new Set(["main", "front", "back"]);
 const LIMITS = { layers: 10, items: 12, attachments: 5, text: 200, comments: 1000, name: 120 };
 
-const DESIGN_SRC = /^\/assets\/img\/designs\/[a-z0-9-]{1,80}\.(png|jpg|webp)$/;
+export const DESIGN_SRC = /^\/assets\/img\/designs\/[a-z0-9-]{1,80}\.(png|jpg|webp)$/;
 const num = (v, lo, hi) => (typeof v === "number" && Number.isFinite(v) && v >= lo && v <= hi ? Math.round(v * 10000) / 10000 : null);
 const str = (v, n) => (typeof v === "string" ? v.slice(0, n) : "");
 const hex = (v) => (typeof v === "string" && /^#[0-9a-fA-F]{6}$/.test(v) ? v.toUpperCase() : null);
