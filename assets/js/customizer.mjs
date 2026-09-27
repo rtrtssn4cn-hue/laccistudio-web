@@ -539,14 +539,15 @@ function openDesigns() {
   ov.className = "lz-crop lz-designs";
   ov.innerHTML = `<div class="lz-crop-box"><div class="lz-crop-head"><h3>Lacci designs</h3><button type="button" class="lz-crop-x" data-c="cancel" aria-label="Close">&times;</button></div>
     ${cols.length > 1 ? `<div class="lz-chips">${["All", ...cols].map((c, i) => `<button type="button" data-col="${esc(c)}" aria-pressed="${i === 0}">${esc(c)}</button>`).join("")}</div>` : ""}
-    <div class="lz-dgrid">${list.map((d) => `<button type="button" data-design="${esc(d.id)}" data-colof="${esc(d.collection || "Designs")}"><img src="${esc(d.thumb || d.image)}" alt="" loading="lazy"><span>${esc(d.name || "")}</span>${d.type === "photo" ? `<small>Add your photo</small>` : ""}</button>`).join("")}</div></div>`;
+    <div class="lz-dsections">${cols.map((c) => `<div class="lz-dsec" data-colof="${esc(c)}">${cols.length > 1 ? `<h4>${esc(c)}</h4>` : ""}<div class="lz-dgrid">${list.filter((d) => (d.collection || "Designs") === c).map((d) => `<button type="button" data-design="${esc(d.id)}"><img src="${esc(d.thumb || d.image)}" alt="" loading="lazy"><span>${esc(d.name || "")}</span>${d.type === "photo" ? `<small>Add your photo</small>` : ""}</button>`).join("")}</div></div>`).join("")}</div></div>`;
   root.querySelector(".lz").appendChild(ov);
   escToClose(ov);
   ov.onclick = (e) => {
     const col = e.target.closest("[data-col]");
     if (col) {
       ov.querySelectorAll("[data-col]").forEach((b) => b.setAttribute("aria-pressed", String(b === col)));
-      ov.querySelectorAll("[data-design]").forEach((b) => { b.hidden = col.dataset.col !== "All" && b.dataset.colof !== col.dataset.col; });
+      ov.querySelectorAll(".lz-dsec").forEach((s) => { s.hidden = col.dataset.col !== "All" && s.dataset.colof !== col.dataset.col; });
+      ov.querySelector(".lz-dsections").scrollTop = 0;
       return;
     }
     const pick = e.target.closest("[data-design]");

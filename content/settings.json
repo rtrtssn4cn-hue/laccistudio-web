@@ -7,6 +7,7 @@
   "saleBannerEnd": "2026-09-07",
   "saleBannerImage": "/assets/img/8f0aa63d-b44e-4f75-a25b-e13f6d21f489.png",
   "checkoutMode": "stripe",
+  "customizer": "visual",
   "saleBannerDismissible": true,
   "saleBannerLink": "shop.html",
   "orderEmail": "info@laccistudio.com",
