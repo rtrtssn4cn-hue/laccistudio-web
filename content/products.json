@@ -2017,6 +2017,14 @@
             {
               "name": "Square",
               "img": "assets/img/mock/mock-variant-coaster-square.png?v=12"
+            },
+            {
+              "name": "Heart",
+              "hidden": true
+            },
+            {
+              "name": "Hexagon",
+              "hidden": true
             }
           ]
         }
