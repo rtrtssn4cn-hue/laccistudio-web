@@ -57,3 +57,5 @@ How to act on it: tell us which products you can make and ship today. Everything
 Totals: 45 products — 27 visible (4 of them sold on Etsy), 18 hidden.
 
 **Update 2026-09-26 (owner request):** 12 more hidden, not deleted: License Plate, Can Cooler, Zip Pouch, Ornament, Bookmark, Dad Cap, Trucker Hat, Beanie, Zip-Up Hoodie, Youth Tee, V-Neck Tee, Ladies' Fitted Tee. Now 15 active, 30 hidden. Visibility is the product `status` field.
+
+**Update 2026-09-26 (owner request):** Custom Apron also hidden, not deleted. Now 14 active, 31 hidden.
