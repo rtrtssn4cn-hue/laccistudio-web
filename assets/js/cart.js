@@ -278,7 +278,7 @@
     if (!grid) return;
     grid.innerHTML = (SHOP.products || []).map(function (p) {
       var btn = CUSTOMIZE
-        ? '<button class="btn btn-gold js-customize" data-cz="' + esc(p.id) + '">Add to Cart</button>'
+        ? '<button class="btn btn-gold js-customize" data-cz="' + esc(p.id) + '">Personalize</button>'
         : '<button class="btn btn-gold js-add" data-add="' + esc(p.id) + '">Add to Cart</button>';
       return '<article class="prod-card reveal in" data-category="' + esc(p.category || "") + '" data-subcategory="' + esc(p.subcategory || "") + '" title="' + esc(p.description || "") + '">' +
         mediaHTML(p) +

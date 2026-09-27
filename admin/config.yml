@@ -134,8 +134,6 @@ collections:
           - { name: "heroTitleLine2", label: "Headline — line 2 (gold)", widget: "string" }
           - { name: "heroLead", label: "Intro sentence under headline", widget: "text" }
           - { name: "heroQuote", label: "Quote on the logo card", widget: "string" }
-          - { name: "introTitle", label: "Welcome section — title", widget: "string" }
-          - { name: "introText", label: "Welcome section — paragraph", widget: "text" }
 
   # ---------------- Contact & settings ----------------
   - name: "settings"
