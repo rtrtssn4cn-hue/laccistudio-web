@@ -30,6 +30,7 @@ const setSize = (options) => { const q = (options || {}).Quantity || ""; const m
 const isMobile = () => window.matchMedia("(max-width: 899px)").matches;
 
 let S = null;          // the design being edited
+const seen = {};      // uploaded URL → loaded picture, kept for this visit so Edit design opens instantly
 let imgs = {};         // image key → { img, display, w, h, url, uploading, failed, name }
 let localSeq = 0;
 let root = null, canvas = null, ctx = null, W = 0;
@@ -116,6 +117,7 @@ function clearWip(pid) { const all = wipAll(); delete all[pid]; try { localStora
 function restoreImages(d) {
   for (const ls of Object.values(d || {})) for (const l of ls || []) {
     if (l.type !== "image" || imgs[l.src]) continue;
+    if (seen[l.src] && seen[l.src].img) { imgs[l.src] = seen[l.src]; continue; }
     const info = imgs[l.src] = { url: l.src, w: l.naturalW, h: l.naturalH, name: l.name || "Your upload" };
     R.loadImage(ucDisplay(l.src)).then((img) => {
       info.img = img; info.display = R.removeWhite(img); draw();
@@ -252,6 +254,7 @@ function mount() {
   requestAnimationFrame(() => root.classList.add("show"));
   canvas = root.querySelector("#lz-canvas");
   ctx = canvas.getContext("2d");
+  W = 0; zoom = 1; // a new canvas: size it again (reopening at the same size left it at the browser default)
   root.querySelector("#lz-close").onclick = close;
   root.querySelector("#lz-undo").onclick = undo;
   root.querySelector("#lz-redo").onclick = redo;
@@ -869,6 +872,7 @@ function addUpload(file, replaceLayer) {
     .then((d) => {
       if (!d || !d.file) throw new Error("upload failed");
       info.url = UCCDN + d.file + "/-/inline/no/";
+      seen[info.url] = info;
       info.uploading = false;
       if (info.needsServerPreview) serverPreview(info, place, 0);
       render();
