@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FBF7F1">
+<title>Lacci Studio Admin</title>
+<link rel="icon" href="/assets/logo/favicon.png" type="image/png">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="app" class="app">
+  <aside class="sidebar" aria-label="Admin sections">
+    <img class="logo" src="/assets/logo/lacci-primary-gold.png" alt="Lacci Studio">
+    <nav class="side-nav">
+      <a href="#home" data-nav="home">Home</a>
+      <a href="#products" data-nav="products">Products</a>
+      <a href="/admin/orders.html">Orders</a>
+      <a href="#more" data-nav="more">More</a>
+    </nav>
+  </aside>
+  <main id="view" class="view" tabindex="-1" aria-live="polite"></main>
+  <nav class="bottom-nav" aria-label="Admin sections">
+    <a href="#home" data-nav="home"><span class="i">⌂</span>Home</a>
+    <a href="#products" data-nav="products"><span class="i">▦</span>Products</a>
+    <a href="/admin/orders.html"><span class="i">✉</span>Orders</a>
+    <a href="#more" data-nav="more"><span class="i">⋯</span>More</a>
+  </nav>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<dialog id="confirm" class="confirm">
+  <form method="dialog">
+    <h2 id="confirm-title"></h2>
+    <p id="confirm-text"></p>
+    <div class="row-end">
+      <button value="cancel" id="confirm-cancel" class="btn">Cancel</button>
+      <button value="ok" id="confirm-ok" class="btn primary"></button>
+    </div>
+  </form>
+</dialog>
+<script type="module" src="app.js"></script>
+</body>
+</html>
