@@ -119,6 +119,15 @@ function checkProduct(p, colorIds) {
     if (p.seo.title !== undefined && (typeof p.seo.title !== "string" || p.seo.title.length > 120)) return `${who}: SEO title is too long (120 max).`;
     if (p.seo.description !== undefined && (typeof p.seo.description !== "string" || p.seo.description.length > 320)) return `${who}: SEO description is too long (320 max).`;
   }
+  if (p.pricePlan !== undefined) {
+    const z = p.pricePlan;
+    if (!z || typeof z !== "object" || Array.isArray(z)) return `${who}: price plan is invalid.`;
+    for (const [k, v] of Object.entries(z)) {
+      if (k === "stage") { if (!["growth", "balanced", "premium"].includes(v)) return `${who}: unknown price stage.`; continue; }
+      if (!["growth", "balanced", "premium"].includes(k) || !v || typeof v !== "object") return `${who}: price plan "${k}" is invalid.`;
+      for (const [label, price] of Object.entries(v)) if (label.length > 160 || !num(price, 0.5, 10000)) return `${who}: planned price for "${label}" is invalid.`;
+    }
+  }
   if (p.personalization !== undefined) {
     const z = p.personalization;
     if (!z || typeof z !== "object") return `${who}: personalization settings are invalid.`;

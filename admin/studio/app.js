@@ -21,7 +21,7 @@ const state = {
   remote: { unpublished: 0, draftCommits: [], recentLive: [] },
   filter: "all", cat: "", q: "", selected: new Set(), loading: true, error: "",
   tab: "overview", colorQ: "", colorView: "available", colorSel: new Set(), showHiddenColors: false, previewOpen: false,
-  blobs: {},
+  blobs: {}, openInactive: new Set(),
 };
 
 // ---------------------------------------------------------------- helpers
@@ -56,9 +56,17 @@ async function draftFile(path) {
     return state.blobs[path];
   } catch { return ""; }
 }
-function img(src, attrs = {}) {
-  const el = h("img", { src: imgSrc(src), alt: "", loading: "lazy", ...attrs });
-  el.addEventListener("error", async () => { const b = await draftFile(src); if (b && el.src !== b) el.src = b; }, { once: true });
+// The shop grid shows a small JPEG copy of each product mockup (assets/img/card/, same rule as
+// cart.js mediaHTML); the admin card preview and thumbnails use the same copy so they match the Shop.
+function cardSrc(src) { return String(src || "").replace(/^(https?:\/\/[^\/]+)?\/?assets\/img\/mock\/([\w-]+)\.png(\?.*)?$/, "/assets/img/card/$2.jpg"); }
+function img(src, attrs = {}, asCard) {
+  const first = asCard && cardSrc(src) !== src ? cardSrc(src) : imgSrc(src);
+  const el = h("img", { src: first, alt: "", loading: "lazy", ...attrs });
+  // fallbacks: card copy missing → original file → a picture uploaded in this draft
+  el.addEventListener("error", async function retry() {
+    if (el.getAttribute("src") === first && first !== imgSrc(src)) { el.addEventListener("error", retry, { once: true }); el.src = imgSrc(src); return; }
+    const b = await draftFile(src); if (b && el.src !== b) el.src = b;
+  }, { once: true });
   return el;
 }
 function mainImage(p) { return (p.images || [])[0] || p.mockupPhoto || ""; }
@@ -178,11 +186,18 @@ async function discard() {
   try { await api("/discard", { method: "POST" }); localStorage.removeItem(WORK_KEY); toast("Draft discarded."); await load(); } catch (e) { toast(e.message); }
 }
 function readFile(file) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.onerror = rej; r.readAsDataURL(file); }); }
+function pixelSize(file) {
+  return new Promise((res) => { const u = URL.createObjectURL(file), i = new Image(); i.onload = () => res([i.naturalWidth, i.naturalHeight]); i.onerror = () => res([0, 0]); i.src = u; });
+}
 async function upload(file) {
   const types = ["image/jpeg", "image/png", "image/webp", "video/mp4"];
   if (!types.includes(file.type)) { toast("Use a JPG, PNG or WebP picture, or an MP4 video."); return null; }
   const limit = file.type === "video/mp4" ? 20 : 8;
   if (file.size > limit * 1024 * 1024) { toast(`That file is over ${limit} MB.`); return null; }
+  if (file.type.startsWith("image/")) {
+    const [w, hgt] = await pixelSize(file);
+    if (w && Math.min(w, hgt) < 600 && !(await confirmBox("This picture is small", `It is ${w} × ${hgt} pixels. Shop pictures look best at 1000 pixels or more; this one may look blurry or blocky. Upload anyway?`, "Upload anyway"))) return null;
+  }
   try {
     toast("Uploading " + file.name + "…");
     const r = await api("/media", { method: "POST", body: JSON.stringify({ name: file.name, type: file.type, data: await readFile(file) }) });
@@ -294,7 +309,7 @@ function productRow(p, isChanged) {
   const openBtn = (kids, cls) => h("a", { class: cls, href, onclick: () => { state.tab = "overview"; state.colorSel.clear(); } }, kids);
   return h("div", { class: "prow" + (sel ? " sel" : ""), role: "row" },
     h("label", { class: "check c-sel", "aria-label": "Select " + p.name }, h("input", { type: "checkbox", checked: sel, onchange: (e) => { e.target.checked ? state.selected.add(p.id) : state.selected.delete(p.id); render(); } })),
-    openBtn(img(mainImage(p), { class: "thumb" }), "c-img"),
+    openBtn(img(mainImage(p), { class: "thumb" }, true), "c-img"),
     openBtn([h("span", { class: "name", text: p.name }),
       h("span", { class: "meta" }, s !== "active" ? h("span", { class: "pill " + s, text: STATUS_LABEL[s] }) : null, isChanged ? h("span", { class: "pill changed", text: "Edited" }) : null, h("span", { class: "m-only", text: (p.category || "") + " · " + priceLabel(p) }))], "c-name"),
     h("div", { class: "c-on" }, h("span", { class: "m-lab", text: "Available" }),
@@ -330,7 +345,7 @@ function previewCard(p) {
   return h("div", { class: "pv" },
     h("div", { class: "pv-label muted", text: "Shop card preview" }),
     h("div", { class: "pv-card" + (s === "active" ? "" : " off") },
-      h("div", { class: "pv-img" }, img(mainImage(p)), s !== "active" ? h("span", { class: "pv-ribbon", text: s === "archived" ? "Archived — not shown or sold" : "Hidden — not shown or sold" }) : null),
+      h("div", { class: "pv-img" }, img(mainImage(p), { loading: "eager" }, true), s !== "active" ? h("span", { class: "pv-ribbon", text: s === "archived" ? "Archived — not shown or sold" : "Hidden — not shown or sold" }) : null),
       h("div", { class: "pv-body" }, h("div", { class: "pv-name", text: p.name || "Untitled" }), h("div", { class: "pv-price", text: priceLabel(p) }),
         cols.length ? h("div", { class: "pv-dots" }, cols.slice(0, 10).map((c) => h("span", { title: c.name, style: `background:${c.hex}` })), cols.length > 10 ? h("small", { text: "+" + (cols.length - 10) }) : null) : null,
         h("div", { class: "pv-btn", text: "Personalize" }))),
@@ -391,7 +406,7 @@ function pricingTab(p) {
     const mode = groupPriceMode(g);
     const isSets = /^quantity$/i.test(g.label) && g.choices.every((c) => setCount(choiceName(c)) != null);
     const liveG = live && (live.optionGroups || []).find((x) => x.label === g.label);
-    const rows = g.choices.map((c, ci) => {
+    const rowFor = (c, ci) => {
       const name = choiceName(c), obj = typeof c === "object" ? c : { name };
       const pays = fromCents(p, g.label, c), liveC = liveG && liveG.choices.find((x) => choiceName(x) === name), livePays = liveC ? fromCents(live, g.label, liveC) : null;
       const val = mode === "price" ? (obj.price ?? "") : (obj.add ?? "");
@@ -403,16 +418,60 @@ function pricingTab(p) {
           onchange: (e) => { const raw = e.target.value.trim(); const v = raw === "" ? undefined : Math.round(Number(raw) * 100) / 100; if (raw !== "" && !Number.isFinite(v)) return toast("Enter a number."); mutate(p.id, (x) => setChoice(x, gi, ci, { [mode]: v })); } })),
         h("td", { class: "num" }, money(pays), livePays != null && livePays !== pays ? h("div", { class: "was", text: "was " + money(livePays) }) : null),
         isSets ? h("td", { class: "num muted", text: n ? money(Math.round(pays / n)) : "—" }) : null);
-    });
+    };
+    // What customers can buy first; switched-off choices fold away under "Inactive".
+    const cols = isSets ? 5 : 4, key = p.id + "|" + g.label;
+    const active = g.choices.map((c, ci) => [c, ci]).filter(([c]) => isVisible(c)), inactive = g.choices.map((c, ci) => [c, ci]).filter(([c]) => !isVisible(c));
+    const open = state.openInactive.has(key);
+    const rows = [...active.map(([c, ci]) => rowFor(c, ci)),
+      inactive.length ? h("tr", { class: "fold" }, h("td", { colspan: String(cols) }, h("button", { type: "button", class: "cg-h link", "aria-expanded": String(open), onclick: () => { open ? state.openInactive.delete(key) : state.openInactive.add(key); render(); } },
+        `INACTIVE ${isSets ? "QUANTITIES" : "CHOICES"} (${inactive.length}) — ${open ? "Hide" : "Show"}`))) : null,
+      ...(open ? inactive.map(([c, ci]) => rowFor(c, ci)) : [])];
     return h("div", { class: "card" },
       h("div", { class: "card-h" }, h("b", { text: g.label }), h("span", { class: "muted", text: mode === "price" ? "Each choice has its own price" : "Extra charge on top of the price" })),
       h("div", { class: "tscroll" }, h("table", { class: "grid" },
         h("thead", {}, h("tr", {}, h("th", { text: isSets ? "Quantity" : g.label }), h("th", { text: "On" }), h("th", { text: mode === "price" ? "Price $" : "Extra $" }), h("th", { class: "num", text: isSets ? "Total" : "Pays" }), isSets ? h("th", { class: "num", text: "Per item" }) : null)),
         h("tbody", {}, rows))));
   });
-  return h("div", {}, base, ...tables,
-    h("div", { class: "card" }, h("b", { text: "Price stages (Growth · Balanced · Premium)" }),
-      h("p", { class: "muted", text: "The three-stage prices will appear here once you approve the Growth prices from the pricing audit. Today every product uses the prices above." })));
+  return h("div", {}, base, ...tables, stagePlanner(p));
+}
+
+// Growth / Balanced / Premium planning. Only the live prices above are charged; Balanced and Premium
+// are notes until the owner copies a plan into the live prices (with a confirmation).
+const STAGES = [["balanced", "Balanced"], ["premium", "Premium"]];
+function planKey(g, c) { return g.label + " / " + choiceName(c); }
+function stagePlanner(p) {
+  const plan = p.pricePlan || {};
+  const priced = (p.optionGroups || []).map((g, gi) => ({ g, gi })).filter(({ g }) => groupPriceMode(g) === "price");
+  const lines = priced.length
+    ? priced.flatMap(({ g, gi }) => g.choices.map((c, ci) => ({ c, g, gi, ci })).filter(({ c }) => isVisible(c)).map((x) => ({ ...x, label: planKey(x.g, x.c), live: Number(x.c.price) })))
+    : [{ label: "Base price", live: Number(p.price), base: true }];
+  const setPlan = (stage, label, raw) => mutate(p.id, (x) => {
+    const v = raw === "" ? undefined : Math.round(Number(raw) * 100) / 100;
+    x.pricePlan = x.pricePlan || {}; x.pricePlan[stage] = { ...(x.pricePlan[stage] || {}) };
+    if (v === undefined || !Number.isFinite(v)) delete x.pricePlan[stage][label]; else x.pricePlan[stage][label] = v;
+    if (!Object.keys(x.pricePlan[stage]).length) delete x.pricePlan[stage];
+    if (!Object.keys(x.pricePlan).length) delete x.pricePlan;
+  }, { quiet: true });
+  const apply = async (stage, name) => {
+    const vals = plan[stage] || {};
+    if (!lines.every((l) => Number.isFinite(vals[l.label]))) return toast(`Fill in every ${name} price first.`);
+    if (!(await confirmBox(`Use ${name} prices?`, `The live prices for ${p.name} change to your ${name} plan. Customers pay them once you save and publish. The current prices are kept as your Growth plan.`, `Use ${name} prices`))) return;
+    mutate(p.id, (x) => {
+      x.pricePlan = x.pricePlan || {};
+      x.pricePlan.growth = Object.fromEntries(lines.map((l) => [l.label, l.live]));
+      for (const l of lines) { if (l.base) x.price = vals[l.label]; else setChoice(x, l.gi, l.ci, { price: vals[l.label] }); }
+      x.pricePlan.stage = stage;
+    }, { message: `${p.name} now uses ${name} prices (not live until published).` });
+  };
+  return h("div", { class: "card" },
+    h("div", { class: "card-h" }, h("b", { text: "Price planning" }), h("span", { class: "muted", text: "Live stage: " + (plan.stage === "balanced" ? "Balanced" : plan.stage === "premium" ? "Premium" : "Growth") })),
+    h("p", { class: "muted", text: "Only the live prices are charged at checkout. Balanced and Premium are your plans for later; nothing moves on its own." }),
+    h("div", { class: "tscroll" }, h("table", { class: "grid" },
+      h("thead", {}, h("tr", {}, h("th", { text: "Choice" }), h("th", { class: "num", text: "Live" }), STAGES.map(([, n]) => h("th", { text: n + " plan $" })))),
+      h("tbody", {}, lines.map((l) => h("tr", {}, h("td", { text: l.label.replace(/^.* \/ /, "") }), h("td", { class: "num", text: money(cents(l.live)) }),
+        STAGES.map(([k, n]) => h("td", {}, h("input", { class: "money", type: "number", step: "0.01", inputmode: "decimal", value: (plan[k] || {})[l.label] ?? "", placeholder: "—", "aria-label": n + " plan for " + l.label, onchange: (e) => setPlan(k, l.label, e.target.value.trim()) })))))))),
+    h("div", { class: "row-end", style: "margin-top:10px" }, STAGES.map(([k, n]) => h("button", { class: "btn sm", type: "button", text: `Use ${n} prices…`, onclick: () => apply(k, n) }))));
 }
 function setChoice(x, gi, ci, patch) {
   const g = x.optionGroups[gi];
