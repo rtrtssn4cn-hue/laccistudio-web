@@ -361,6 +361,28 @@ function mockupImage(a, cb) {
   return null;
 }
 
+// A Lacci design and its wording move as one: when the design picture is moved, resized or rotated,
+// its text lines follow (same offset, scale and turn). A text line selected on its own moves alone.
+function followDesigns() {
+  const ls = layers(), a = area(), A = a.rect.w / a.rect.h;
+  for (const d of ls) {
+    if (d.type !== "image" || !d.design || d.locked) continue;
+    const g = d._g, cur = { x: d.x, y: d.y, w: d.w, rotation: d.rotation || 0 };
+    d._g = cur;
+    if (!g || (g.x === cur.x && g.y === cur.y && g.w === cur.w && g.rotation === cur.rotation)) continue;
+    const s = cur.w / (g.w || cur.w), dr = cur.rotation - g.rotation, rad = dr * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad);
+    for (const t of ls) {
+      if (t.type !== "text" || t.fromDesign !== d.design.id) continue;
+      const X = t.x - g.x, Y = (t.y - g.y) / A; // offsets in print-area-width units, so turning keeps the shape
+      t.x = round(cur.x + s * (X * cos - Y * sin));
+      t.y = round(cur.y + s * (X * sin + Y * cos) * A);
+      t.size = round(t.size * s);
+      if (t.baseSize) t.baseSize = round(t.baseSize * s);
+      if (t.maxW) t.maxW = round(t.maxW * s);
+      t.rotation = snapRot((t.rotation || 0) + dr);
+    }
+  }
+}
 let raf = 0;
 function draw() {
   if (raf) return;
@@ -368,6 +390,7 @@ function draw() {
     raf = 0;
     if (!ctx || !W || !S) return;
     const a = area();
+    followDesigns();
     R.drawComposite(ctx, a, layers().map(withPlaceholder), W, W, imgs, { mockup: mockupImage(a), editing: true, selected: S.sel, selectedAll: !!S.all });
     const out = layers().some((l) => filled(l) && R.isOutside(l, a, W, W, imgs));
     root.querySelector("#lz-warn").hidden = !out;
@@ -503,7 +526,7 @@ function tool(act, el) {
   if (act === "center") { l.x = 0.5; l.y = 0.5; }
   if (act === "fit" && l.type === "image") fitLayer(l, "fit");
   if (act === "fill" && l.type === "image") fitLayer(l, "fill");
-  if (act === "reset") { if (l.type === "image") { delete l.crop; delete l.flipX; fitLayer(l, "fit", 0.85); } else Object.assign(l, { x: 0.5, y: 0.5, rotation: 0, size: 0.14, curve: 0, spacing: 0 }); }
+  if (act === "reset") { if (l.type === "image") { delete l.crop; delete l.flipX; fitLayer(l, "fit", l.design ? 1 : 0.85); } else Object.assign(l, { x: 0.5, y: 0.5, rotation: 0, size: 0.14, curve: 0, spacing: 0 }); }
   if (act === "duplicate") { if (ls.length >= MAX_LAYERS) return error(`Up to ${MAX_LAYERS} items per side.`); const c = clone(l); c.x = round(clamp(c.x + 0.05, 0, 1)); c.y = round(clamp(c.y + 0.05, 0, 1)); ls.splice(i + 1, 0, c); S.sel = i + 1; }
   if (act === "forward" && i < ls.length - 1) { [ls[i], ls[i + 1]] = [ls[i + 1], ls[i]]; S.sel = i + 1; }
   if (act === "backward" && i > 0) { [ls[i], ls[i - 1]] = [ls[i - 1], ls[i]]; S.sel = i - 1; }
