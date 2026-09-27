@@ -1951,34 +1951,40 @@
       "category": "Gifts"
     },
     {
-      "price": 6.99,
+      "price": 7.99,
       "optionGroups": [
         {
           "label": "Quantity",
           "choices": [
             {
               "name": "Single",
-              "price": 6.99
+              "price": 7.99
+            },
+            {
+              "name": "Set of 2",
+              "price": 13.99
             },
             {
               "name": "Set of 4",
-              "price": 24.99
+              "price": 19.99
             },
             {
               "name": "Set of 6",
-              "price": 34.99
+              "price": 29.99
             },
             {
               "name": "Set of 8",
-              "price": 44.99
+              "price": 39.99
             },
             {
               "name": "Set of 10",
-              "price": 52.99
+              "price": 52.99,
+              "hidden": true
             },
             {
               "name": "Set of 12",
-              "price": 60.99
+              "price": 60.99,
+              "hidden": true
             }
           ]
         },
