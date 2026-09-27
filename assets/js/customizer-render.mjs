@@ -38,8 +38,9 @@ const DEFAULT_AREAS = {
   "gift-fridge-magnet": [A("main", "Magnet", { x: 0.12, y: 0.1, w: 0.76, h: 0.76 }, { widthIn: 3, heightIn: 3 })],
   "gift-socks": [A("main", "Socks", { x: 0.25, y: 0.08, w: 0.5, h: 0.42 }, { widthIn: 7, heightIn: 5.9 })],
   "gift-mouse-pad": [A("main", "Mouse pad", { x: 0.08, y: 0.15, w: 0.84, h: 0.7 }, { widthIn: 9.25, heightIn: 7.7 })],
-  "ceramic-coasters": [A("main", "Coaster", { x: 0.1, y: 0.08, w: 0.8, h: 0.8 }, { widthIn: 4, heightIn: 4 },
-    { shape: "ellipse", shapeBy: { Shape: { Square: { shape: "rect", rect: { x: 0.09, y: 0.09, w: 0.78, h: 0.78 } } } } })],
+  // Centred on the coaster face in the photos (centre 46.5% across, 47.3% down; the shadow sits to the right)
+  "ceramic-coasters": [A("main", "Coaster", { x: 0.085, y: 0.093, w: 0.76, h: 0.76 }, { widthIn: 4, heightIn: 4 },
+    { shape: "ellipse", shapeBy: { Shape: { Square: { shape: "rect", rect: { x: 0.084, y: 0.093, w: 0.76, h: 0.76 } } } } })],
   "custom-stickers": [A("main", "Sticker", { x: 0.15, y: 0.15, w: 0.7, h: 0.7 }, { widthIn: 3, heightIn: 3 },
     { base: "sticker", printFromOption: "Size" })],
 };
