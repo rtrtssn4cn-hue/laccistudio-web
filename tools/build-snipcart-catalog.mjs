@@ -13,6 +13,7 @@
 // Usage: node tools/build-snipcart-catalog.mjs   (from the repository root)
 
 import { readFileSync, writeFileSync } from "node:fs";
+import { isProductOnSale } from "../assets/js/pricing.mjs";
 
 const FONTS = ["No preference", "Script / Cursive", "Serif / Classic", "Sans-serif / Modern", "Handwritten", "Bold / Block", "Monogram", "Match my sample (note below)"];
 const COLORS = ["No preference", "White", "Black", "Gold", "Silver", "Rose Gold", "Red", "Navy", "Pink", "Green", "Custom (note below)"];
@@ -73,7 +74,9 @@ function customFieldDefs(pr) {
 }
 
 const data = JSON.parse(readFileSync("content/products.json", "utf8"));
-const products = data.products || [];
+// Only products on sale are listed: Snipcart refuses an order for anything not on this page, so a
+// hidden, draft or seasonal product can't be bought by editing the page in the browser.
+const products = (data.products || []).filter(isProductOnSale);
 const problems = [];
 
 const buttons = products.map((pr) => {

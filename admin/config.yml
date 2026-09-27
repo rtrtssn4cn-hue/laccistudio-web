@@ -26,7 +26,7 @@ collections:
             label: "Products"
             label_singular: "Product"
             widget: "list"
-            summary: "{{fields.name}} — ${{fields.price}}"
+            summary: "{{fields.name}} — ${{fields.price}} — {{fields.status | default('active')}}"
             fields:
               - { name: "name", label: "Product name", widget: "string" }
               - { name: "price", label: "Price ($)", widget: "number", value_type: "float", min: 0, hint: "Base price. If you use per-choice prices below, this is the lowest ('from') price." }
@@ -40,7 +40,7 @@ collections:
               - { name: "category", label: "Category", widget: "string", hint: "Type your own — e.g. Drinkware, Apparel, Gifts. This makes the filter buttons. Spell it the same across products to group them." }
               - { name: "subcategory", label: "Subcategory (optional)", widget: "string", required: false, hint: "Optional second-level filter, e.g. Tumblers under Drinkware. Appears after you click its category." }
               - { name: "description", label: "Short description", widget: "text" }
-              - { name: "hidden", label: "Hide this product from the shop", widget: "boolean", required: false, hint: "Hidden products keep all their details and come back when you switch this off." }
+              - { name: "status", label: "Visibility", widget: "select", required: false, default: "active", options: [{ label: "Active — shown and for sale", value: "active" }, { label: "Hidden — kept, not shown or sold", value: "hidden" }, { label: "Draft — being prepared, not shown or sold", value: "draft" }, { label: "Seasonal — kept for its season, not shown or sold", value: "seasonal" }], hint: "Only Active products appear in the shop and can be bought. Everything else keeps all its details and comes back when set to Active." }
               - name: "optionGroups"
                 label: "Options (sizes, quantities, finishes…)"
                 label_singular: "Option"

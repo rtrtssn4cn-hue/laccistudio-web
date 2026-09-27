@@ -9,6 +9,19 @@
 
 export const cents = (dollars) => Math.round(Number(dollars) * 100);
 
+// Product visibility: "status" is one of active | hidden | draft | seasonal (missing = active).
+// Only active products are shown and sold; the others keep all their data and come back when set
+// to active. Seasonal is off sale until season dates are added. An unknown word counts as hidden,
+// and the older "hidden": true flag still hides, so a product is never put on sale by mistake.
+export const PRODUCT_STATUSES = ["active", "hidden", "draft", "seasonal"];
+export function productStatus(product) {
+  if (!product) return "hidden";
+  const s = String(product.status || "active").trim().toLowerCase();
+  const status = PRODUCT_STATUSES.includes(s) ? s : "hidden";
+  return status === "active" && product.hidden === true ? "hidden" : status;
+}
+export const isProductOnSale = (product) => productStatus(product) === "active";
+
 // A choice or colour is off sale when marked hidden. Hidden entries stay in the data.
 export function isVisible(choice) {
   return !(choice && typeof choice === "object" && (choice.hidden === true || choice.visible === false));
@@ -47,7 +60,7 @@ export function visibleColors(product, colorLibrary) {
 // selections: { options: { "<group label>": "<choice name>" }, color: "<colour id>" | null }
 export function priceLine(product, selections, colorLibrary) {
   if (!product) return { ok: false, error: "This product is no longer available." };
-  if (product.hidden === true) return { ok: false, error: `${product.name} is no longer available.` };
+  if (!isProductOnSale(product)) return { ok: false, error: `${product.name} is no longer available.` };
   const base = cents(product.price);
   if (!Number.isFinite(base) || base <= 0) return { ok: false, error: `${product.name} has no valid price.` };
 
@@ -103,6 +116,6 @@ export function coasterCount(product, selections, qty) {
   return (m ? Number(m[1]) : 1) * qty;
 }
 
-const api = { cents, isVisible, choiceName, visibleGroups, choiceModCents, visibleColors, priceLine, fromPriceCents, money, coasterCount };
+const api = { cents, PRODUCT_STATUSES, productStatus, isProductOnSale, isVisible, choiceName, visibleGroups, choiceModCents, visibleColors, priceLine, fromPriceCents, money, coasterCount };
 if (typeof window !== "undefined") window.LacciPricing = api;
 export default api;

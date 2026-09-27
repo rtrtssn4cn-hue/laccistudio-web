@@ -157,7 +157,7 @@ One reusable rule: **hiding never deletes.** Three levels, same idea:
 
 | Level | Data | Admin control today | Visual editor (future) |
 |---|---|---|---|
-| Product | `products[].hidden` | "Hide this product from the shop" switch | Product card 👁 / ⊘ |
+| Product | `products[].status` (`active` / `hidden` / `draft` / `seasonal`; older `hidden: true` still hides) | "Visibility" dropdown; status shown in the product list | Product card 👁 / ⊘ toggle; filter All / Active / Hidden / Draft / Seasonal |
 | Option choice (size, quantity, finish, set…) | `optionGroups[].choices[].hidden` (`visible: false` also accepted) | "Hidden from customers" switch per choice | PRODUCT → OPTIONS → choice 👁 / ⊘ |
 | Garment colour | library `content/colors.json` `garmentColors[] {id, name, hex, method}` + per product `colors[] {id, visible}` in display order | Garment Colours library screen; per product a colour list with drag-to-reorder and a "Visible to customers" switch | PRODUCT → OPTIONS → COLOURS: ☰ reorder, swatch, 👁 Visible / ⊘ Hidden, add or edit colour |
 

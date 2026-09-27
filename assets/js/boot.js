@@ -147,7 +147,13 @@
         return lib ? { id: lib.id, name: lib.name, hex: lib.hex, vinyl: lib.method === "vinyl" } : null;
       }).filter(Boolean);
     }
-    var products = (p.products || []).filter(function (pr) { return !pr.hidden; }).map(function (pr) {
+    // Product visibility: only "status": "active" (or no status) is shown. Same rule as
+    // productStatus() in pricing.mjs, which the checkout server also applies.
+    function onSale(pr) {
+      var s = String(pr.status || "active").trim().toLowerCase();
+      return s === "active" && pr.hidden !== true;
+    }
+    var products = (p.products || []).filter(onSale).map(function (pr) {
       var groups = [];
       if (pr.optionGroups && pr.optionGroups.length) {
         groups = pr.optionGroups.map(mapGroup);
