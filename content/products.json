@@ -165,14 +165,6 @@
       ],
       "name": "Custom T-Shirt",
       "mockupPhoto": "assets/img/mock/mock-apparel-t-shirt.png?v=12",
-      "images": [
-        "https://laccistudio.com/assets/img/mock/mock-apparel-t-shirt.png"
-      ],
-      "weight": 200,
-      "video": "",
-      "id": "apparel-t-shirt",
-      "description": "Custom t-shirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel",
       "colors": [
         {
           "id": "white",
@@ -242,7 +234,15 @@
           "id": "red",
           "visible": false
         }
-      ]
+      ],
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-t-shirt.png"
+      ],
+      "weight": 200,
+      "video": "",
+      "id": "apparel-t-shirt",
+      "description": "Custom t-shirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
     },
     {
       "price": 26.98,
@@ -296,16 +296,9 @@
           ]
         }
       ],
+      "hidden": true,
       "name": "Custom V-Neck Tee",
       "mockupPhoto": "assets/img/mock/mock-apparel-v-neck-tee.png?v=12",
-      "images": [
-        "https://laccistudio.com/assets/img/mock/mock-apparel-v-neck-tee.png"
-      ],
-      "weight": 200,
-      "video": "",
-      "id": "apparel-v-neck-tee",
-      "description": "Custom v-neck tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel",
       "colors": [
         {
           "id": "white",
@@ -375,7 +368,15 @@
           "id": "red",
           "visible": false
         }
-      ]
+      ],
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-v-neck-tee.png"
+      ],
+      "weight": 200,
+      "video": "",
+      "id": "apparel-v-neck-tee",
+      "description": "Custom v-neck tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
     },
     {
       "price": 27.98,
@@ -429,16 +430,9 @@
           ]
         }
       ],
+      "hidden": true,
       "name": "Custom Ladies' Fitted Tee",
       "mockupPhoto": "assets/img/mock/mock-apparel-ladies-fitted-tee.png?v=12",
-      "images": [
-        "https://laccistudio.com/assets/img/mock/mock-apparel-ladies-fitted-tee.png"
-      ],
-      "weight": 180,
-      "video": "",
-      "id": "apparel-ladies-fitted-tee",
-      "description": "Custom ladies' fitted tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel",
       "colors": [
         {
           "id": "white",
@@ -508,7 +502,15 @@
           "id": "red",
           "visible": false
         }
-      ]
+      ],
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-ladies-fitted-tee.png"
+      ],
+      "weight": 180,
+      "video": "",
+      "id": "apparel-ladies-fitted-tee",
+      "description": "Custom ladies' fitted tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
     },
     {
       "price": 25.98,
@@ -564,14 +566,6 @@
       ],
       "name": "Custom Tank Top",
       "mockupPhoto": "assets/img/mock/mock-apparel-tank-top.png?v=12",
-      "images": [
-        "https://laccistudio.com/assets/img/mock/mock-apparel-tank-top.png"
-      ],
-      "weight": 140,
-      "video": "",
-      "id": "apparel-tank-top",
-      "description": "Custom tank top printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel",
       "colors": [
         {
           "id": "white",
@@ -641,7 +635,15 @@
           "id": "red",
           "visible": false
         }
-      ]
+      ],
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-tank-top.png"
+      ],
+      "weight": 140,
+      "video": "",
+      "id": "apparel-tank-top",
+      "description": "Custom tank top printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
     },
     {
       "price": 30.98,
@@ -697,14 +699,6 @@
       ],
       "name": "Custom Long-Sleeve Tee",
       "mockupPhoto": "assets/img/mock/mock-apparel-long-sleeve-tee.png?v=12",
-      "images": [
-        "https://laccistudio.com/assets/img/mock/mock-apparel-long-sleeve-tee.png"
-      ],
-      "weight": 260,
-      "video": "",
-      "id": "apparel-long-sleeve-tee",
-      "description": "Custom long-sleeve tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel",
       "colors": [
         {
           "id": "white",
@@ -774,7 +768,15 @@
           "id": "red",
           "visible": false
         }
-      ]
+      ],
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-long-sleeve-tee.png"
+      ],
+      "weight": 260,
+      "video": "",
+      "id": "apparel-long-sleeve-tee",
+      "description": "Custom long-sleeve tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
     },
     {
       "price": 21.98,
@@ -822,14 +824,6 @@
       ],
       "name": "Custom Youth Tee",
       "mockupPhoto": "assets/img/mock/mock-apparel-youth-tee.png?v=12",
-      "images": [
-        "https://laccistudio.com/assets/img/mock/mock-apparel-youth-tee.png"
-      ],
-      "weight": 130,
-      "video": "",
-      "id": "apparel-youth-tee",
-      "description": "Custom youth tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel",
       "colors": [
         {
           "id": "white",
@@ -899,7 +893,15 @@
           "id": "red",
           "visible": false
         }
-      ]
+      ],
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-youth-tee.png"
+      ],
+      "weight": 130,
+      "video": "",
+      "id": "apparel-youth-tee",
+      "description": "Custom youth tee printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
     },
     {
       "price": 19.98,
@@ -951,14 +953,6 @@
       ],
       "name": "Custom Baby Onesie",
       "mockupPhoto": "assets/img/mock/mock-apparel-baby-onesie.png?v=12",
-      "images": [
-        "https://laccistudio.com/assets/img/mock/mock-apparel-baby-onesie.png"
-      ],
-      "weight": 100,
-      "video": "",
-      "id": "apparel-baby-onesie",
-      "description": "Custom baby onesie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel",
       "colors": [
         {
           "id": "white",
@@ -1028,7 +1022,15 @@
           "id": "red",
           "visible": false
         }
-      ]
+      ],
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-baby-onesie.png"
+      ],
+      "weight": 100,
+      "video": "",
+      "id": "apparel-baby-onesie",
+      "description": "Custom baby onesie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
     },
     {
       "price": 36.98,
@@ -1084,14 +1086,6 @@
       ],
       "name": "Custom Crewneck Sweatshirt",
       "mockupPhoto": "assets/img/mock/mock-apparel-crewneck-sweatshirt.png?v=12",
-      "images": [
-        "https://laccistudio.com/assets/img/mock/mock-apparel-crewneck-sweatshirt.png"
-      ],
-      "weight": 560,
-      "video": "",
-      "id": "apparel-crewneck-sweatshirt",
-      "description": "Custom crewneck sweatshirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel",
       "colors": [
         {
           "id": "white",
@@ -1161,7 +1155,15 @@
           "id": "red",
           "visible": false
         }
-      ]
+      ],
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-crewneck-sweatshirt.png"
+      ],
+      "weight": 560,
+      "video": "",
+      "id": "apparel-crewneck-sweatshirt",
+      "description": "Custom crewneck sweatshirt printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
     },
     {
       "price": 39.98,
@@ -1217,14 +1219,6 @@
       ],
       "name": "Custom Hoodie",
       "mockupPhoto": "assets/img/mock/mock-apparel-hoodie.png?v=12",
-      "images": [
-        "https://laccistudio.com/assets/img/mock/mock-apparel-hoodie.png"
-      ],
-      "weight": 700,
-      "video": "",
-      "id": "apparel-hoodie",
-      "description": "Custom hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel",
       "colors": [
         {
           "id": "white",
@@ -1294,7 +1288,15 @@
           "id": "red",
           "visible": false
         }
-      ]
+      ],
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-hoodie.png"
+      ],
+      "weight": 700,
+      "video": "",
+      "id": "apparel-hoodie",
+      "description": "Custom hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
     },
     {
       "price": 44.98,
@@ -1350,14 +1352,6 @@
       ],
       "name": "Custom Zip-Up Hoodie",
       "mockupPhoto": "assets/img/mock/mock-apparel-zip-up-hoodie.png?v=12",
-      "images": [
-        "https://laccistudio.com/assets/img/mock/mock-apparel-zip-up-hoodie.png"
-      ],
-      "weight": 780,
-      "video": "",
-      "id": "apparel-zip-up-hoodie",
-      "description": "Custom zip-up hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "category": "Apparel",
       "colors": [
         {
           "id": "white",
@@ -1427,7 +1421,15 @@
           "id": "red",
           "visible": false
         }
-      ]
+      ],
+      "images": [
+        "https://laccistudio.com/assets/img/mock/mock-apparel-zip-up-hoodie.png"
+      ],
+      "weight": 780,
+      "video": "",
+      "id": "apparel-zip-up-hoodie",
+      "description": "Custom zip-up hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
+      "category": "Apparel"
     },
     {
       "price": 22.99,
