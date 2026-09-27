@@ -102,20 +102,47 @@ export function loadImage(src) {
 
 // Near-white pixels made transparent so artwork sits cleanly on the product (preview only; the
 // original upload is what gets printed).
-export function removeWhite(img) {
-  const scale = Math.min(1, 2200 / (img.naturalWidth || img.width));
-  const w = Math.max(1, Math.round((img.naturalWidth || img.width) * scale)), h = Math.max(1, Math.round((img.naturalHeight || img.height) * scale));
+// Removes a plain background: the single colour (white, black or any other) that surrounds the
+// artwork along its edges. Only background connected to the edges is cleared, so white letters or
+// details inside a design stay. A picture whose edges are not one colour (a photo of a scene) is left
+// unchanged and marked bgKind "busy"; one already transparent at the edges is marked "transparent".
+// maxSide limits the working size: the preview uses 2200, the print file the full picture.
+export function removeWhite(img, maxSide = 2200) {
+  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+  const scale = Math.min(1, maxSide / Math.max(iw, ih));
+  const w = Math.max(1, Math.round(iw * scale)), h = Math.max(1, Math.round(ih * scale));
   const c = document.createElement("canvas"); c.width = w; c.height = h;
   const ctx = c.getContext("2d"); ctx.drawImage(img, 0, 0, w, h);
-  try {
-    const id = ctx.getImageData(0, 0, w, h), d = id.data;
-    for (let i = 0; i < d.length; i += 4) {
-      const mn = Math.min(d[i], d[i + 1], d[i + 2]);
-      if (mn >= 242) d[i + 3] = 0;
-      else if (mn >= 224) d[i + 3] = Math.min(d[i + 3], Math.round((242 - mn) / 18 * 255));
+  c.bgKind = "none";
+  let id;
+  try { id = ctx.getImageData(0, 0, w, h); } catch { return c; } // cross-origin image without CORS: shown as is
+  const d = id.data, edge = [];
+  for (let x = 0; x < w; x++) edge.push(x, (h - 1) * w + x);
+  for (let y = 1; y < h - 1; y++) edge.push(y * w, y * w + w - 1);
+  let clear = 0;
+  for (const p of edge) if (d[p * 4 + 3] < 16) clear++;
+  if (clear > edge.length * 0.3) { c.bgKind = "transparent"; return c; }
+  const med = [0, 1, 2].map((k) => { const v = edge.map((p) => d[p * 4 + k]).sort((m, n) => m - n); return v[v.length >> 1]; });
+  const diff = (p) => Math.max(Math.abs(d[p * 4] - med[0]), Math.abs(d[p * 4 + 1] - med[1]), Math.abs(d[p * 4 + 2] - med[2]));
+  const T1 = 34, T2 = 64; // same colour up to T1 (JPEG noise); T1–T2 is the soft edge
+  let same = 0;
+  for (const p of edge) if (diff(p) <= T1) same++;
+  if (same < edge.length * 0.6) { c.bgKind = "busy"; return c; }
+  const seen = new Uint8Array(w * h), stack = [];
+  for (const p of edge) if (!seen[p] && diff(p) <= T1) { seen[p] = 1; stack.push(p); }
+  while (stack.length) {
+    const p = stack.pop(), x = p % w;
+    d[p * 4 + 3] = 0;
+    for (const q of [x > 0 ? p - 1 : -1, x < w - 1 ? p + 1 : -1, p - w, p + w]) {
+      if (q < 0 || q >= w * h || seen[q]) continue;
+      seen[q] = 1;
+      const e = diff(q);
+      if (e <= T1) stack.push(q);
+      else if (e <= T2) d[q * 4 + 3] = Math.min(d[q * 4 + 3], Math.round((e - T1) / (T2 - T1) * 255));
     }
-    ctx.putImageData(id, 0, 0);
-  } catch { /* cross-origin image without CORS: show as is */ }
+  }
+  ctx.putImageData(id, 0, 0);
+  c.bgKind = "plain";
   return c;
 }
 
@@ -262,7 +289,7 @@ function drawLayer(ctx, layer, area, W, H, imgs) {
     for (const g of L.glyphs) { ctx.save(); ctx.translate(g.x, g.y); ctx.rotate(g.r); ctx.fillText(g.ch, 0, 0); ctx.restore(); }
   } else {
     const info = imgs && imgs[layer.src];
-    const src = info && (info.display || info.img);
+    const src = info && (layer.removeWhite === false ? info.img || info.display : info.display || info.img);
     if (src) {
       const c = layer.crop, sw = src.naturalWidth || src.width, sh = src.naturalHeight || src.height;
       if (c) ctx.drawImage(src, c.x * sw, c.y * sh, c.w * sw, c.h * sh, -box.w / 2, -box.h / 2, box.w, box.h);
@@ -324,14 +351,18 @@ function drawSelection(ctx, layer, area, W, H, imgs, handles) {
 }
 
 // Production print file for one area: physical size x DPI, transparent background, drawn from the
-// original uploads (imgs[src].img, not the white-removed preview). Returns { canvas, lowRes[] }.
+// original uploads at full size, with the plain background removed wherever the customer kept it
+// removed (as in the preview). Returns { canvas, lowRes[] }.
 export function renderPrintFile(area, layers, imgs) {
   const dpi = area.print.dpi || 300, W = Math.round(area.print.widthIn * dpi), H = Math.round(area.print.heightIn * dpi);
   const c = document.createElement("canvas"); c.width = W; c.height = H;
   const ctx = c.getContext("2d");
   const full = { ...area, rect: { x: 0, y: 0, w: 1, h: 1 } };
   const orig = {};
-  for (const [k, v] of Object.entries(imgs || {})) orig[k] = { ...v, display: v.img };
+  for (const [k, v] of Object.entries(imgs || {})) {
+    const cut = v.img && layers.some((l) => l.src === k && l.removeWhite !== false) ? removeWhite(v.img, 4000) : null;
+    orig[k] = { ...v, display: cut && cut.bgKind === "plain" ? cut : v.img };
+  }
   ctx.save(); clipArea(ctx, full, { x: 0, y: 0, w: W, h: H });
   layers.forEach((l) => drawLayer(ctx, l, full, W, H, orig));
   ctx.restore();

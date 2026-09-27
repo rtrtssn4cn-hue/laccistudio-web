@@ -28,6 +28,7 @@ function cleanLayer(l, cleanUrl) {
       out.crop = c;
     }
     if (l.flipX === true) out.flipX = true;
+    if (l.cutout) { const cut = cleanUrl(l.cutout); if (!cut) return { error: "One of the uploaded files could not be verified. Please upload it again." }; out.cutout = cut; }
     return { layer: out };
   }
   if (l.type === "text") {

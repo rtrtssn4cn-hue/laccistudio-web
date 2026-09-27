@@ -428,7 +428,7 @@ await test("33. Aggressive Growth prices for every product on sale reach Stripe 
 await test("34. Customizer design record: kept on the order, checked, and never changes the price", async () => {
   const rec = (extra = {}) => ({ schema: 1, customizationId: "c_abc123def456", productId: "sublimation-tumbler", layout: "same", proof: true, comments: "",
     areas: { main: { layers: [
-      { type: "image", src: UC, name: "photo.jpg", naturalW: 2400, naturalH: 1600, x: 0.5, y: 0.5, w: 0.8, rotation: 0, removeWhite: true, price: 1 },
+      { type: "image", src: UC, cutout: UC, name: "photo.jpg", naturalW: 2400, naturalH: 1600, x: 0.5, y: 0.5, w: 0.8, rotation: 0, removeWhite: true, price: 1 },
       { type: "text", text: "Smith", font: "Montserrat", color: "#25140f", size: 0.1, x: 0.5, y: 0.8, rotation: 0 } ] } },
     previews: { main: UC }, ...extra });
   const base = { ...line("sublimation-tumbler", { Size: "20 oz", Finish: "Glossy" }), personalization: {}, files: {} };
@@ -438,12 +438,13 @@ await test("34. Customizer design record: kept on the order, checked, and never 
   eq(Number(s.params["line_items[0][price_data][unit_amount]"]), 1899, "price from products.json only");
   const c = JSON.parse((await order(s.id)).lines_json)[0].customization;
   eq(c.areas.main.layers.length, 2, "both layers stored"); eq(c.areas.main.layers[0].price, undefined, "unknown fields dropped");
-  eq(c.areas.main.layers[1].color, "#25140F", "colour normalised"); eq(c.previews.main, UC, "preview stored");
+  eq(c.areas.main.layers[1].color, "#25140F", "colour normalised"); eq(c.previews.main, UC, "preview stored"); eq(c.areas.main.layers[0].cutout, UC, "background-removed print copy stored");
   const before = stripeState.created.length;
   const bad = [
     [rec({ productId: "custom-mug" }), "design for another product"],
     [rec({ areas: { main: { layers: [{ type: "image", src: "https://example.com/x.png", x: 0.5, y: 0.5, w: 0.5 }] } } }), "picture from another host"],
     [rec({ areas: { main: { layers: [] } } }), "empty design"],
+    [rec({ areas: { main: { layers: [{ type: "image", src: UC, cutout: "https://example.com/x.png", x: 0.5, y: 0.5, w: 0.5 }] } } }), "print copy from another host"],
     [rec({ schema: 2 }), "unknown record version"],
     [rec({ comments: "x".repeat(30000) }), "oversized record"],
     [rec({ areas: { side: { layers: [] } } }), "unknown print area"],

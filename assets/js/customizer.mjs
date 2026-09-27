@@ -117,7 +117,7 @@ function restoreImages(d) {
   for (const ls of Object.values(d || {})) for (const l of ls || []) {
     if (l.type !== "image" || imgs[l.src]) continue;
     const info = imgs[l.src] = { url: l.src, w: l.naturalW, h: l.naturalH, name: l.name || "Your upload" };
-    R.loadImage(ucDisplay(l.src)).then((img) => { info.img = img; info.display = l.removeWhite === false ? img : R.removeWhite(img); draw(); }).catch(() => { info.failed = true; draw(); });
+    R.loadImage(ucDisplay(l.src)).then((img) => { info.img = img; info.display = R.removeWhite(img); draw(); }).catch(() => { info.failed = true; draw(); });
   }
 }
 
@@ -415,7 +415,7 @@ function renderCtx() {
   const ls = layers(), i = S.sel;
   const order = (ls.length > 1 ? btn("forward", "Forward", "⬆", i === ls.length - 1 ? "disabled" : "") + btn("backward", "Back", "⬇", i === 0 ? "disabled" : "") : "");
   box.innerHTML = l.type === "image"
-    ? btn("replace", "Replace", "⇄") + btn("crop", "Crop", "⌗") + btn("flip", "Flip", "⇋") + btn("fit", "Fit", "⤢") + btn("fill", "Fill", "⛶") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("reset", "Reset", "↺") + btn("delete", "Delete", "🗑", 'class="lz-danger"')
+    ? btn("replace", "Replace", "⇄") + (bgKind(l) === "plain" ? btn("bg", "Remove bg", "◩", l.removeWhite !== false ? 'aria-pressed="true"' : "") : "") + btn("crop", "Crop", "⌗") + btn("flip", "Flip", "⇋") + btn("fit", "Fit", "⤢") + btn("fill", "Fill", "⛶") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("reset", "Reset", "↺") + btn("delete", "Delete", "🗑", 'class="lz-danger"')
     : btn("edittext", "Edit", "✎") + btn("t-font", "Font", "Aa", S.tool === "t-font" ? 'aria-pressed="true"' : "") + btn("t-size", "Size", "↕", S.tool === "t-size" ? 'aria-pressed="true"' : "") + btn("t-color", "Color", "●", (S.tool === "t-color" ? 'aria-pressed="true" ' : "") + `style="--dot:${esc(l.color)}"`) +
       btn("bold", "Bold", "B", l.bold ? 'aria-pressed="true"' : "") + btn("align", "Align", l.align === "left" ? "⇤" : l.align === "right" ? "⇥" : "≡") + btn("t-spacing", "Spacing", "↔", S.tool === "t-spacing" ? 'aria-pressed="true"' : "") +
       btn("t-curve", "Curve", "◠", S.tool === "t-curve" ? 'aria-pressed="true"' : "") + btn("vertical", l.vertical ? "Across" : "Down", l.vertical ? "⇥" : "⇩") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("delete", "Delete", "🗑", 'class="lz-danger"');
@@ -459,6 +459,7 @@ function tool(act, el) {
   if (act === "replace") return root.querySelector("#lz-replace").click();
   if (act === "crop") return openCrop(l);
   if (act === "flip") l.flipX = !l.flipX;
+  if (act === "bg") l.removeWhite = l.removeWhite === false;
   if (act === "bold") l.bold = !l.bold;
   if (act === "align") l.align = l.align === "left" ? "center" : l.align === "right" ? "left" : l.align === "center" || !l.align ? "right" : "center";
   if (act === "vertical") l.vertical = !l.vertical;
@@ -561,8 +562,16 @@ function designPanel() {
     ${ls.length ? `<div class="lz-field"><span>Layers (top first)</span><ul class="lz-layers">${list}</ul></div>` : `<p class="lz-note">Nothing on ${esc(area().label.toLowerCase())} yet.</p>`}
     ${qualityNotes(ls, area())}
     ${att.length ? `<p class="lz-note">Attached for us to place: ${att.map((a) => esc(a.name)).join(", ")}</p>` : ""}
-    ${ls.some((l) => l.type === "image") ? `<p class="lz-note">White backgrounds are removed in this preview so your artwork sits on the product. We print from your original file.</p>` : ""}
+    ${bgNote(ls)}
     ${vinylNote()}`;
+}
+const bgKind = (l) => ((imgs[l.src] || {}).display || {}).bgKind || "";
+function bgNote(ls) {
+  const im = ls.filter((l) => l.type === "image"), kinds = im.map((l) => [l, bgKind(l)]);
+  if (kinds.some(([l, k]) => k === "plain" && l.removeWhite !== false)) return `<p class="lz-note">The plain background around your picture is removed, so only your design is printed. Tap <b>Remove bg</b> to keep it.</p>`;
+  if (kinds.some(([, k]) => k === "plain")) return `<p class="lz-note">The background around your picture is kept and will be printed. Tap <b>Remove bg</b> to remove it.</p>`;
+  if (kinds.some(([, k]) => k === "busy")) return `<p class="lz-note">This photo has a detailed background, so it's printed as it is.</p>`;
+  return "";
 }
 function statusOf(l) { const i = imgs[l.src] || {}; return i.uploading ? " · uploading…" : i.failed ? " · upload failed" : ""; }
 // Print sharpness of a picture at its current size: pixels across ÷ printed inches across.
@@ -940,6 +949,9 @@ async function renderAndUpload(a, ls, name) {
   const mk = a.mockup ? await R.loadImage(a.mockup).catch(() => null) : null;
   const hex = garmentHex();
   R.drawComposite(c.getContext("2d"), a, ls, size, size, imgs, { mockup: mk && hex ? R.tinted(mk, hex) : mk });
+  return uploadCanvas(c, name);
+}
+async function uploadCanvas(c, name) {
   const blob = await new Promise((res) => { try { c.toBlob(res, "image/png"); } catch { res(null); } });
   if (!blob || !ucKey()) return "";
   const fd = new FormData();
@@ -991,6 +1003,16 @@ async function addToCart() {
   const jobs = [];
   if (each) rec.items.forEach((it, i) => ar.forEach((a) => jobs.push(renderAndUpload(a, ((it.areas[a.id] || {}).layers || []).map(liveLayer), `coaster-${i + 1}-${a.id}.png`).then((u) => { if (u) (it.previews = it.previews || {})[a.id] = u; }))));
   else { rec.previews = {}; ar.forEach((a) => jobs.push(renderAndUpload(a, ((rec.areas[a.id] || {}).layers || []).map(liveLayer), `design-${a.id}.png`).then((u) => { if (u) rec.previews[a.id] = u; }))); }
+  // Print copy with the plain background removed, for every picture the customer kept it removed on.
+  const recLayers = (each ? rec.items.flatMap((it) => Object.values(it.areas)) : Object.values(rec.areas)).flatMap((d) => d.layers).filter((l) => l.type === "image" && l.removeWhite);
+  const cuts = {};
+  for (const l of recLayers) {
+    const key = liveLayer(l).src, info = imgs[key];
+    if (cuts[l.src] || !info || !info.img || bgKind({ src: key }) !== "plain") continue;
+    const base = (l.name || "design").replace(/\.[^.]+$/, "").replace(/[^\w-]+/g, "-").slice(0, 60) || "design";
+    cuts[l.src] = uploadCanvas(R.removeWhite(info.img, 4000), base + "-no-background.png");
+  }
+  jobs.push(...Object.entries(cuts).map(([src, p]) => p.then((u) => { if (u) recLayers.filter((l) => l.src === src).forEach((l) => (l.cutout = u)); })));
   await Promise.all(jobs);
   const firstPreview = each ? Object.values((rec.items[0] || {}).previews || {})[0] : rec.previews[ar[0].id];
   const allLayers = (each ? rec.items.flatMap((it) => Object.values(it.areas)) : Object.values(rec.areas)).flatMap((d) => d.layers);
