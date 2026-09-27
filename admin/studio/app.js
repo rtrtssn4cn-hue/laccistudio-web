@@ -262,14 +262,14 @@ function homeView() {
   const count = (fn) => state.products.filter(fn).length;
   const stat = (n, label, filter) => h("a", { class: "stat", href: "#products", onclick: () => { state.filter = filter; } }, h("b", { text: String(n) }), h("span", { text: label }));
   return h("div", {},
-    h("h1", { text: "Hello" + (state.user ? ", " + state.user : "") }),
+    h("h1", { text: "Hello, Lacci Admin" }),
     h("div", { class: "stats" }, stat(count(isOn), "Available for sale", "active"), stat(count((p) => statusOf(p) === "hidden"), "Hidden", "hidden"), stat(count((p) => p.featured && statusOf(p) !== "archived"), "Featured", "featured"), stat(count((p) => statusOf(p) === "draft"), "Draft", "draft")),
     h("div", { class: "card" }, h("b", { text: "Quick actions" }),
       h("div", { class: "row-end", style: "justify-content:flex-start;margin-top:10px" },
         h("a", { class: "btn primary", href: "#products" }, "Manage products"), h("a", { class: "btn", href: "/admin/orders.html" }, "Orders"), h("a", { class: "btn", href: "/", target: "_blank", rel: "noopener" }, "View website"))),
     state.remote.draftCommits.length ? h("div", { class: "card" }, h("b", { text: "Saved, not live yet" }), h("ul", { class: "list-plain" }, state.remote.draftCommits.slice(0, 6).map((c) => h("li", { text: c.message })))) : null,
     h("div", { class: "card" }, h("b", { text: "Recent live changes" }),
-      state.remote.recentLive.length ? h("ul", { class: "list-plain" }, state.remote.recentLive.slice(0, 6).map((c) => h("li", {}, c.message, h("div", { class: "muted", text: c.date ? new Date(c.date).toLocaleString() : "" })))) : h("p", { class: "muted", text: "No recent changes." })));
+      state.remote.recentLive.length ? h("ul", { class: "list-plain" }, state.remote.recentLive.filter((c) => !/^Merge /.test(c.message || "")).slice(0, 6).map((c) => h("li", {}, c.message, h("div", { class: "muted", text: c.date ? new Date(c.date).toLocaleString() : "" })))) : h("p", { class: "muted", text: "No recent changes." })));
 }
 
 // ---------------------------------------------------------------- products table
