@@ -269,3 +269,4 @@ table.matrix td.no, table.matrix th.off { color: #b8b0a4; }
   table.grid th { font-size: .68rem; }
   input.money { width: 68px; }
 }
+.vcard .noimg { width: 80px; height: 80px; border: 1px dashed var(--line); border-radius: 8px; display: grid; place-items: center; font-size: .72rem; color: var(--muted); text-align: center; padding: 4px; }

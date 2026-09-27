@@ -503,7 +503,7 @@ function optionCard(p, g, gi) {
   const onCount = g.choices.filter(isVisible).length;
   const flip = (ci, on) => mutate(p.id, (x) => setChoice(x, gi, ci, { hidden: on ? undefined : true }));
   const body = withImg
-    ? h("div", { class: "vcards" }, g.choices.map((c, ci) => h("div", { class: "vcard" + (isVisible(c) ? "" : " off") }, img(c.img), h("span", { text: choiceName(c) }), toggle(isVisible(c), choiceName(c) + " available", (on) => flip(ci, on), { small: true }))))
+    ? h("div", { class: "vcards" }, g.choices.map((c, ci) => h("div", { class: "vcard" + (isVisible(c) ? "" : " off") }, c && c.img ? img(c.img) : h("div", { class: "noimg", text: "No picture yet" }), h("span", { text: choiceName(c) }), toggle(isVisible(c), choiceName(c) + " available", (on) => flip(ci, on), { small: true }))))
     : h("div", { class: "vchips" }, g.choices.map((c, ci) => h("div", { class: "vchip" + (isVisible(c) ? "" : " off") }, h("span", { text: choiceName(c) }), toggle(isVisible(c), choiceName(c) + " available", (on) => flip(ci, on), { small: true }))));
   return h("div", { class: "card" },
     h("div", { class: "card-h" }, h("b", { text: g.label }), h("span", { class: "muted", text: onCount + " of " + g.choices.length + " available" }),
