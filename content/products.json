@@ -1349,7 +1349,7 @@
       "video": "",
       "id": "apparel-hoodie",
       "description": "Custom hoodie printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "status": "active",
+      "status": "hidden",
       "category": "Apparel",
       "pricePlan": {
         "stage": "growth",
@@ -1371,7 +1371,8 @@
           "Size / 2XL": 53.99,
           "Size / 3XL": 55.99
         }
-      }
+      },
+      "updatedAt": "2026-09-27T14:20:38.787Z"
     },
     {
       "price": 44.98,
@@ -1564,7 +1565,7 @@
       "video": "",
       "id": "apparel-tote-bag",
       "description": "Custom tote bag printed with your design, photo, or text. A perfect personalized gift for family, teams, events & small businesses.",
-      "status": "active",
+      "status": "hidden",
       "category": "Apparel",
       "pricePlan": {
         "stage": "growth",
@@ -1574,7 +1575,8 @@
         "premium": {
           "Base price": 22.99
         }
-      }
+      },
+      "updatedAt": "2026-09-27T14:20:56.754Z"
     },
     {
       "price": 26.99,
@@ -1677,7 +1679,7 @@
       "video": "",
       "id": "gift-fridge-magnet",
       "description": "Personalized fridge magnet made from your photo, name, or design — a thoughtful custom keepsake and the perfect little gift for any occasion or holiday.",
-      "status": "active",
+      "status": "hidden",
       "category": "Gifts",
       "pricePlan": {
         "stage": "growth",
@@ -1687,7 +1689,8 @@
         "premium": {
           "Base price": 10.99
         }
-      }
+      },
+      "updatedAt": "2026-09-27T14:20:56.754Z"
     },
     {
       "price": 8.99,
