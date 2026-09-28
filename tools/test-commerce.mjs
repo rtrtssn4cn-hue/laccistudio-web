@@ -393,7 +393,7 @@ await test("31. Coaster shapes switched off (Heart, Hexagon) are kept in the dat
   eq(pricing.fromPriceCents(P("ceramic-coasters")), C1, "switched-off shapes don't change the from-price");
 });
 
-await test("32. Coaster ladder: 1 $9.99 · 2 $15.99 · 4 $21.99 · 6 $30.99 · 8 $39.99 (bigger sets a little cheaper each); sets of 10 and 12 kept but off", async () => {
+await test("32. Coaster ladder: 1 $7.99 · 2 $13.99 · 4 $26.99 · 6 $36.99 · 8 $39.99 (bigger sets cheaper per coaster); sets of 10 and 12 kept but off", async () => {
   const q = P("ceramic-coasters").optionGroups.find((g) => g.label === "Quantity");
   eq(pricing.visibleGroups(P("ceramic-coasters")).find((g) => g.label === "Quantity").choices.map((c) => c.name).join(","), "Single,Set of 2,Set of 4,Set of 6,Set of 8", "customers see 1, 2, 4, 6, 8");
   const { o } = await chain([
@@ -402,15 +402,15 @@ await test("32. Coaster ladder: 1 $9.99 · 2 $15.99 · 4 $21.99 · 6 $30.99 · 8
     line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Round" }),
     line("ceramic-coasters", { Quantity: "Set of 6", Material: "Ceramic", Shape: "Round" }),
     line("ceramic-coasters", { Quantity: "Set of 8", Material: "Ceramic", Shape: "Round" }),
-  ], [999, 1599, 2199, 3099, 3999]);
-  eq(o.subtotal_cents, 999 + 1599 + 2199 + 3099 + 3999, "order subtotal matches the ladder");
+  ], [799, 1399, 2699, 3699, 3999]);
+  eq(o.subtotal_cents, 799 + 1399 + 2699 + 3699 + 3999, "order subtotal matches the ladder");
   const two = await checkout([line("ceramic-coasters", { Quantity: "Set of 2", Material: "Ceramic", Shape: "Round" })]);
   eq(two.status, 200, "set of 2 sells on its own");
   for (const n of ["Set of 10", "Set of 12"]) {
     const c = q.choices.find((x) => x.name === n); ok(c && c.hidden === true && c.price > 0, n + " kept with its price, switched off");
     eq((await checkout([line("ceramic-coasters", { Quantity: n, Material: "Ceramic", Shape: "Round" })])).status, 400, "checkout refuses " + n);
   }
-  eq(pricing.fromPriceCents(P("ceramic-coasters")), 999, "shop card shows from $9.99");
+  eq(pricing.fromPriceCents(P("ceramic-coasters")), 799, "shop card shows from $7.99");
   for (let i = 1; i < 5; i++) ok([C1, C2 / 2, C4 / 4, C6 / 6, C8 / 8][i] < [C1, C2 / 2, C4 / 4, C6 / 6, C8 / 8][i - 1], "bigger sets cost less per coaster");
 });
 
