@@ -393,7 +393,7 @@ await test("31. Coaster shapes switched off (Heart, Hexagon) are kept in the dat
   eq(pricing.fromPriceCents(P("ceramic-coasters")), C1, "switched-off shapes don't change the from-price");
 });
 
-await test("32. Coaster ladder: 1 $7.99 · 2 $13.99 · 4 $26.99 · 6 $36.99 · 8 $39.99 (bigger sets cheaper per coaster); sets of 10 and 12 kept but off", async () => {
+await test("32. Coaster ladder: 1 $7.99 · 2 $13.99 · 4 $26.99 · 6 $36.99 · 8 $42.99 (bigger sets cheaper per coaster); sets of 10 and 12 kept but off", async () => {
   const q = P("ceramic-coasters").optionGroups.find((g) => g.label === "Quantity");
   eq(pricing.visibleGroups(P("ceramic-coasters")).find((g) => g.label === "Quantity").choices.map((c) => c.name).join(","), "Single,Set of 2,Set of 4,Set of 6,Set of 8", "customers see 1, 2, 4, 6, 8");
   const { o } = await chain([
@@ -403,7 +403,7 @@ await test("32. Coaster ladder: 1 $7.99 · 2 $13.99 · 4 $26.99 · 6 $36.99 · 8
     line("ceramic-coasters", { Quantity: "Set of 6", Material: "Ceramic", Shape: "Round" }),
   ], [799, 1399, 2699, 3699]);
   eq(o.subtotal_cents, 799 + 1399 + 2699 + 3699, "order subtotal matches the ladder"); // 13 coasters; the 8-set on its own (20-item limit)
-  await chain([line("ceramic-coasters", { Quantity: "Set of 8", Material: "Ceramic", Shape: "Round" })], [3999]);
+  await chain([line("ceramic-coasters", { Quantity: "Set of 8", Material: "Ceramic", Shape: "Round" })], [4299]);
   const two = await checkout([line("ceramic-coasters", { Quantity: "Set of 2", Material: "Ceramic", Shape: "Round" })]);
   eq(two.status, 200, "set of 2 sells on its own");
   for (const n of ["Set of 10", "Set of 12"]) {
