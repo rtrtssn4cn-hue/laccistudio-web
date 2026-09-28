@@ -304,7 +304,7 @@ async function handleRequestPay(request, env) {
   if (o.status === "pending" && o.session_id) {
     try {
       const s = await stripe(env, "GET", `checkout/sessions/${o.session_id}`, {});
-      if (s.payment_status === "paid") { await markPaid(env, s); return json({ error: "This order is already paid. Thank you!" }, 409); }
+      if (s.payment_status === "paid" || (s.payment_status === "no_payment_required" && s.status === "complete")) { await markPaid(env, s); return json({ error: "This order is already paid. Thank you!" }, 409); }
       if (s.status === "open" && s.url) return json({ url: s.url });
     } catch {
       // unknown state of the open payment page: don't open a second one that could be paid as well
@@ -322,7 +322,8 @@ async function handleRequestPay(request, env) {
 
 // ---------------------------------------------------------------- payment confirmation
 async function markPaid(env, session) {
-  if (!session || session.payment_status !== "paid") return 0;
+  // "no_payment_required": the whole order was covered by a 100% discount code, so nothing was charged.
+  if (!session || !(session.payment_status === "paid" || (session.payment_status === "no_payment_required" && session.status === "complete"))) return 0;
   const cd = session.customer_details || {};
   const ship = session.shipping_details || (session.collected_information && session.collected_information.shipping_details) || null;
   const td = session.total_details || {};

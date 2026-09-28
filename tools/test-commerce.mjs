@@ -575,6 +575,20 @@ await test("39. Free local delivery is offered only for a ZIP in the delivery ar
   ok(/LOCAL DELIVERY OUTSIDE AREA/.test((await order(s.id)).notes || ""), "address outside the area after choosing local delivery is flagged");
 });
 
+await test("40. A fully discounted order (100% code, free local delivery: $0, nothing charged) is recorded as paid; an unfinished one is not", async () => {
+  const c1 = line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" });
+  eq((await checkout([c1])).status, 200, "checkout opens");
+  const s = stripeState.created.at(-1);
+  Object.assign(s, { payment_status: "no_payment_required", status: "open" });
+  await call("/api/order-status?session_id=" + s.id);
+  eq((await order(s.id)).status, "pending", "not finished yet: still pending");
+  const done = pay(s.id, { shipping: 0, discount: s.amount_subtotal });
+  Object.assign(done, { payment_status: "no_payment_required", amount_total: 0 });
+  eq((await webhook({ id: "evt_free_1", type: "checkout.session.completed", data: { object: done } })).status, 200, "webhook");
+  const o = await order(s.id);
+  eq(o.status, "paid", "recorded as paid"); eq(o.total_cents, 0, "total $0"); eq(o.discount_cents, s.amount_subtotal, "discount recorded");
+});
+
 for (const [r, n] of results) console.log(`${r}  ${n}`);
 console.log(`\n${pass} passed, ${fail} failed; simulated Stripe calls: ${stripeState.calls.length}`);
 process.exit(fail ? 1 : 0);

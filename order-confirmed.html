@@ -97,6 +97,7 @@
         "<tr><td>Tax</td><td style='text-align:right'>" + money(d.tax) + "</td></tr>" +
         "<tr><td><strong>Total</strong></td><td style='text-align:right'><strong>" + money(d.total) + "</strong></td></tr></table>" +
         "<p style='margin-top:1rem'>If you asked for a proof, we'll email it before we print. Questions? <a href='mailto:info@laccistudio.com'>info@laccistudio.com</a></p>";
+      thankYou();
       return;
     }
     if (d.status === "pending" && tries < 10) { setTimeout(() => check(tries + 1), 2000); return; }
@@ -105,6 +106,17 @@
     card.innerHTML = d.status === "pending"
       ? "<p>This can take a minute. We'll email your receipt as soon as it clears. Order reference: " + esc(d.orderNumber) + "</p>"
       : "<p>Your cart is still saved. <a href='shop.html'>Return to the shop</a> to try again.</p>";
+  }
+  // Thank-you code for the next order (content/settings.json "thankYouCode"; the code itself is set up in Stripe).
+  async function thankYou() {
+    const s = await fetch("/content/settings.json").then((r) => r.json()).catch(() => ({}));
+    const code = String(s.thankYouCode || "").trim();
+    if (!/^[A-Z0-9]{3,40}$/i.test(code)) return;
+    const box = document.createElement("div");
+    box.className = "oc-thanks";
+    box.innerHTML = "<p><strong>A thank-you from us:</strong> 10% off your next order with code</p><p class='oc-code'>" + esc(code) + "</p><button type='button' class='btn btn-outline' id='oc-copy'>Copy code</button>";
+    card.appendChild(box);
+    document.querySelector("#oc-copy").onclick = (e) => { (navigator.clipboard ? navigator.clipboard.writeText(code) : Promise.reject()).then(() => { e.target.textContent = "Copied"; }, () => {}); };
   }
   check(0);
 </script>

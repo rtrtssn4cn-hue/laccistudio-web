@@ -163,6 +163,7 @@ collections:
           - { name: "email", label: "Business email", widget: "string" }
           - { name: "phone", label: "Phone (leave blank to hide)", widget: "string", required: false }
           - { name: "instagram", label: "Instagram link (blank to hide)", widget: "string", required: false }
+          - { name: "thankYouCode", label: "Thank-you code shown after an order (10% off next order; must also exist in Stripe). Blank to hide", widget: "string", required: false }
           - { name: "facebook", label: "Facebook link (blank to hide)", widget: "string", required: false }
           - { name: "etsy", label: "Etsy link (blank to hide)", widget: "string", required: false }
           - { name: "tiktok", label: "TikTok (blank to hide)", widget: "string", required: false, hint: "Handle or full link \u2014 e.g. @laccistudio" }
