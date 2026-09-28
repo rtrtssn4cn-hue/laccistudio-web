@@ -481,7 +481,7 @@ function renderCtx() {
   const order = (ls.length > 1 && !l.clip ? btn("forward", "Forward", "⬆", i === ls.length - 1 ? "disabled" : "") + btn("backward", "Back", "⬇", i === 0 ? "disabled" : "") : "");
   box.innerHTML = l.type === "image"
     ? btn("replace", "Replace", "⇄") + ((imgs[l.src] || {}).img && bgKind(l) !== "transparent" ? btn("bg", S.bgBusy ? "Removing…" : "Remove bg", "◩", S.bgBusy ? "disabled" : (bgKind(l) === "plain" && l.removeWhite !== false ? 'aria-pressed="true"' : "")) : "") + ((imgs[l.src] || {}).img ? btn("touchup", "Touch up", "🖌") : "") + btn("crop", "Crop", "⌗") + btn("flip", "Flip", "⇋") + btn("fit", "Fit", "⤢") + btn("fill", "Fill", "⛶") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("reset", "Reset", "↺") + btn("delete", "Delete", "🗑", 'class="lz-danger"')
-    : btn("edittext", "Edit", "✎") + btn("t-font", "Font", "Aa", S.tool === "t-font" ? 'aria-pressed="true"' : "") + btn("t-size", "Size", "↕", S.tool === "t-size" ? 'aria-pressed="true"' : "") + `<span class="lz-fmt" role="group" aria-label="Text style">${ib("t-color", "Text colour", `<b class="lz-colA">A</b><i class="lz-colbar" style="background:${esc(l.color)}"></i>`, S.tool === "t-color")}${ib("bold", "Bold", "<b>B</b>", l.bold)}${ib("italic", "Italic", '<i style="font-family:Georgia,serif">I</i>', l.italic)}${ib("underline", "Underline", "<u>U</u>", l.underline)}${ib("strike", "Strikethrough", "<s>S</s>", l.strike)}${ib("caps", l.caps === "upper" ? "Uppercase (tap for lowercase)" : l.caps === "lower" ? "Lowercase (tap for as typed)" : "As typed (tap for uppercase)", l.caps === "upper" ? "AA" : l.caps === "lower" ? "aa" : "aA", !!l.caps)}</span>` + btn("align", "Align", l.align === "left" ? "⇤" : l.align === "right" ? "⇥" : "≡") + btn("t-spacing", "Spacing", "↔", S.tool === "t-spacing" ? 'aria-pressed="true"' : "") +
+    : btn("t-font", "Font", "Aa", S.tool === "t-font" ? 'aria-pressed="true"' : "") + btn("t-size", "Size", "↕", S.tool === "t-size" ? 'aria-pressed="true"' : "") + `<span class="lz-fmt" role="group" aria-label="Text style">${ib("t-color", "Text colour", `<b class="lz-colA">A</b><i class="lz-colbar" style="background:${esc(l.color)}"></i>`, S.tool === "t-color")}${ib("bold", "Bold", "<b>B</b>", l.bold)}${ib("italic", "Italic", '<i style="font-family:Georgia,serif">I</i>', l.italic)}${ib("underline", "Underline", "<u>U</u>", l.underline)}${ib("strike", "Strikethrough", "<s>S</s>", l.strike)}${ib("caps", l.caps === "upper" ? "Uppercase (tap for lowercase)" : l.caps === "lower" ? "Lowercase (tap for as typed)" : "As typed (tap for uppercase)", l.caps === "upper" ? "AA" : l.caps === "lower" ? "aa" : "aA", !!l.caps)}</span>` + btn("align", "Align", l.align === "left" ? "⇤" : l.align === "right" ? "⇥" : "≡") + btn("t-spacing", "Spacing", "↔", S.tool === "t-spacing" ? 'aria-pressed="true"' : "") +
       btn("t-curve", "Curve", "◠", S.tool === "t-curve" ? 'aria-pressed="true"' : "") + btn("vertical", l.vertical ? "Across" : "Down", l.vertical ? "⇥" : "⇩") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("delete", "Delete", "🗑", 'class="lz-danger"');
   renderPop();
 }
@@ -937,6 +937,7 @@ function renderPanel() {
   const tab = S.tab === "position" && !isMobile() ? "design" : S.tab;
   const titles = { design: "Add", text: "Text", product: "Product", review: "Review", position: "Position" };
   root.querySelector("#lz-sheet-title").textContent = titles[tab] || "";
+  parkTextTools(); // keep the toolbar safe while the panel is redrawn
   box.innerHTML = { design: designPanel, text: textPanel, product: productPanel, review: reviewPanel, position: positionPanel }[tab]();
   bindPanel(box);
   placeTextTools();
@@ -947,8 +948,11 @@ function placeTextTools() {
   const ctx = root.querySelector("#lz-ctx"), pop = root.querySelector("#lz-pop"), slot = root.querySelector("#lz-textslot");
   const textSel = multiOn() ? tgt().length > 0 : !!(selected() && selected().type === "text");
   if (slot && textSel && !isMobile()) { slot.append(ctx, pop); ctx.classList.add("in-panel"); return; }
-  const stage = root.querySelector(".lz-stage"), warn = root.querySelector("#lz-warn");
-  if (ctx.parentNode !== stage) { stage.insertBefore(ctx, warn); stage.insertBefore(pop, warn); ctx.classList.remove("in-panel"); }
+  parkTextTools();
+}
+function parkTextTools() {
+  const ctx = root.querySelector("#lz-ctx"), pop = root.querySelector("#lz-pop"), stage = root.querySelector(".lz-stage"), warn = root.querySelector("#lz-warn");
+  if (ctx && ctx.parentNode !== stage) { stage.insertBefore(ctx, warn); stage.insertBefore(pop, warn); ctx.classList.remove("in-panel"); }
 }
 function layerLabel(l) { return l.type === "image" ? "🖼 " + esc((imgs[l.src] || {}).name || l.name || "Your upload") + statusOf(l) + qualityBadge(l) : "T “" + esc(l.text.trim() || "Your text") + "”" + `<small class="lz-sz">${sizeLabel(l)}</small>`; }
 function designPanel() {
