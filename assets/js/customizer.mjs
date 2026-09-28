@@ -455,6 +455,8 @@ function renderPrice() {
 const uploadingAny = () => Object.values(imgs).some((i) => i.uploading);
 
 // ---------------------------------------------------------------- contextual toolbar
+// Icon-only toolbar button (label for screen readers and on hover).
+const ib = (act, label, html, pressed) => `<button type="button" class="lz-ib" data-act="${act}" aria-label="${esc(label)}" title="${esc(label)}"${pressed ? ' aria-pressed="true"' : ""}>${html}</button>`;
 const btn = (act, label, icon, extra = "") => `<button type="button" data-act="${act}" ${extra}><span aria-hidden="true">${icon}</span>${label}</button>`;
 function renderCtx() {
   const box = root.querySelector("#lz-ctx"), l = selected(), pop = root.querySelector("#lz-pop");
@@ -472,8 +474,7 @@ function renderCtx() {
   const order = (ls.length > 1 && !l.clip ? btn("forward", "Forward", "⬆", i === ls.length - 1 ? "disabled" : "") + btn("backward", "Back", "⬇", i === 0 ? "disabled" : "") : "");
   box.innerHTML = l.type === "image"
     ? btn("replace", "Replace", "⇄") + ((imgs[l.src] || {}).img && bgKind(l) !== "transparent" ? btn("bg", S.bgBusy ? "Removing…" : "Remove bg", "◩", S.bgBusy ? "disabled" : (bgKind(l) === "plain" && l.removeWhite !== false ? 'aria-pressed="true"' : "")) : "") + ((imgs[l.src] || {}).img ? btn("touchup", "Touch up", "🖌") : "") + btn("crop", "Crop", "⌗") + btn("flip", "Flip", "⇋") + btn("fit", "Fit", "⤢") + btn("fill", "Fill", "⛶") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("reset", "Reset", "↺") + btn("delete", "Delete", "🗑", 'class="lz-danger"')
-    : btn("edittext", "Edit", "✎") + btn("t-font", "Font", "Aa", S.tool === "t-font" ? 'aria-pressed="true"' : "") + btn("t-size", "Size", "↕", S.tool === "t-size" ? 'aria-pressed="true"' : "") + btn("t-color", "Color", "●", (S.tool === "t-color" ? 'aria-pressed="true" ' : "") + `style="--dot:${esc(l.color)}"`) +
-      btn("bold", "Bold", "B", l.bold ? 'aria-pressed="true"' : "") + btn("align", "Align", l.align === "left" ? "⇤" : l.align === "right" ? "⇥" : "≡") + btn("t-spacing", "Spacing", "↔", S.tool === "t-spacing" ? 'aria-pressed="true"' : "") +
+    : btn("edittext", "Edit", "✎") + btn("t-font", "Font", "Aa", S.tool === "t-font" ? 'aria-pressed="true"' : "") + btn("t-size", "Size", "↕", S.tool === "t-size" ? 'aria-pressed="true"' : "") + `<span class="lz-fmt" role="group" aria-label="Text style">${ib("t-color", "Text colour", `<b class="lz-colA">A</b><i class="lz-colbar" style="background:${esc(l.color)}"></i>`, S.tool === "t-color")}${ib("bold", "Bold", "<b>B</b>", l.bold)}${ib("italic", "Italic", '<i style="font-family:Georgia,serif">I</i>', l.italic)}${ib("underline", "Underline", "<u>U</u>", l.underline)}${ib("strike", "Strikethrough", "<s>S</s>", l.strike)}${ib("caps", l.caps === "upper" ? "Uppercase (tap for lowercase)" : l.caps === "lower" ? "Lowercase (tap for as typed)" : "As typed (tap for uppercase)", l.caps === "upper" ? "AA" : l.caps === "lower" ? "aa" : "aA", !!l.caps)}</span>` + btn("align", "Align", l.align === "left" ? "⇤" : l.align === "right" ? "⇥" : "≡") + btn("t-spacing", "Spacing", "↔", S.tool === "t-spacing" ? 'aria-pressed="true"' : "") +
       btn("t-curve", "Curve", "◠", S.tool === "t-curve" ? 'aria-pressed="true"' : "") + btn("vertical", l.vertical ? "Across" : "Down", l.vertical ? "⇥" : "⇩") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("delete", "Delete", "🗑", 'class="lz-danger"');
   renderPop();
 }
@@ -518,7 +519,7 @@ function renderPop() {
     const groups = personalization().fonts && personalization().fonts.length ? [{ label: "Fonts", fonts }] : R.FONT_GROUPS;
     const own = S.fontCat && groups.some((g) => g.label === S.fontCat) ? groups.filter((g) => g.label === S.fontCat) : groups;
     const cats = groups.length > 1 ? `<div class="lz-chips lz-fontcats">${["All", ...groups.map((g) => g.label)].map((c) => `<button type="button" data-fontcat="${esc(c)}" aria-pressed="${(S.fontCat || "All") === c}">${esc(c)}</button>`).join("")}</div>` : "";
-    pop.innerHTML = `<div class="lz-styles">${[["light", "Light"], ["regular", "Regular"], ["bold", "Bold"]].map(([k, t]) => `<button type="button" data-weight="${k}" aria-pressed="${(k === "bold" && l.bold) || (k === "light" && l.light && !l.bold) || (k === "regular" && !l.bold && !l.light)}">${t}</button>`).join("")}<button type="button" data-italic="1" aria-pressed="${!!l.italic}"><i>Italic</i></button></div>
+    pop.innerHTML = `
       ${cats}<div class="lz-fontdd"><div class="lz-fontrow"><button type="button" class="lz-fontstep" data-fontstep="-1" aria-label="Previous font">▲</button><button type="button" class="lz-fontstep" data-fontstep="1" aria-label="Next font">▼</button><button type="button" class="lz-fontbtn" data-fontdd="1" aria-expanded="${!!S.fontOpen}" style="font-family:${esc(R.fontFamily(l.font))}">${esc((l.font || "Font").replace(/ \/.*/, ""))}<span aria-hidden="true">▾</span></button></div>
       ${S.fontOpen ? `<div class="lz-fontlist" role="listbox">${own.map((g) => `<div class="lz-fgroup"><span>${esc(g.label)}</span>${g.fonts.map((f) => `<button type="button" role="option" data-font="${esc(f)}" aria-selected="${l.font === f}" style="font-family:${esc(R.fontFamily(f))}">${esc(f.replace(/ \/.*/, ""))}</button>`).join("")}</div>`).join("")}</div>` : ""}</div>`;
   }
@@ -573,6 +574,10 @@ function tool(act, el) {
     else if (info.img && !S.bgBusy) { cutOutSubject(l, info); return; }  // detailed background: AI cut-out
   }
   if (act === "bold") { l.bold = !l.bold; if (l.bold) l.light = false; afterFont(l); }
+  if (act === "italic") { l.italic = !l.italic; afterFont(l); }
+  if (act === "underline") l.underline = !l.underline;
+  if (act === "strike") l.strike = !l.strike;
+  if (act === "caps") { l.caps = l.caps === "upper" ? "lower" : l.caps === "lower" ? "" : "upper"; if (l.fromDesign) fitText(l); }
   if (act === "align") l.align = l.align === "left" ? "center" : l.align === "right" ? "left" : l.align === "center" || !l.align ? "right" : "center";
   if (act === "vertical") l.vertical = !l.vertical;
   if (act === "bigger") l[k] = round(clamp(l[k] * 1.1, 0.03, 3));
@@ -945,7 +950,7 @@ function vinylNote() {
 function fitText(t) {
   if (!t.maxW || !t.baseSize) return;
   const ab = R.areaBox(area(), 1000, 1000), c = fitText.ctx || (fitText.ctx = document.createElement("canvas").getContext("2d"));
-  const shown = /Monogram/.test(t.font || "") ? t.text.toUpperCase() : t.text;
+  const shown = /Monogram/.test(t.font || "") || t.caps === "upper" ? t.text.toUpperCase() : t.caps === "lower" ? t.text.toLowerCase() : t.text;
   c.font = R.fontString(t, 100);
   const wFrac = (c.measureText(shown).width * (t.baseSize * ab.h / 100)) / ab.w;
   t.size = round(wFrac > t.maxW ? t.baseSize * t.maxW / wFrac : t.baseSize);
@@ -1345,7 +1350,7 @@ function recordLayer(l) {
     if (l.design) o.design = l.design; if (l.locked) o.locked = true; if (l.clip) o.clip = l.clip; if (l.spot) o.spot = l.spot;
     return o;
   }
-  return { type: "text", text: l.text.trim(), font: l.font, color: l.color, size: l.size, x: l.x, y: l.y, rotation: l.rotation, spacing: l.spacing || 0, curve: l.curve || 0, bold: !!l.bold, italic: !!l.italic, light: !!l.light, vertical: !!l.vertical, align: l.align || "center" };
+  return { type: "text", text: l.text.trim(), font: l.font, color: l.color, size: l.size, x: l.x, y: l.y, rotation: l.rotation, spacing: l.spacing || 0, curve: l.curve || 0, bold: !!l.bold, italic: !!l.italic, light: !!l.light, underline: !!l.underline, strike: !!l.strike, caps: l.caps || "", vertical: !!l.vertical, align: l.align || "center" };
 }
 function recordAreas(d, ar) {
   const out = {};

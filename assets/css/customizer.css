@@ -246,3 +246,10 @@ html.lz-lock, html.lz-lock body { overflow: hidden; }
 .lz-fontstep { border: 1px solid var(--lz-line); background: #fff; border-radius: 10px; width: 40px; font-size: .8rem; }
 .lz-fontcats { flex-wrap: nowrap; overflow-x: auto; margin-bottom: 8px; padding-bottom: 2px; }
 .lz-fontcats button { flex: none; }
+
+/* Canva-style text style buttons */
+.lz-fmt { display: flex; align-items: center; gap: 2px; padding: 0 4px; border-left: 1px solid var(--lz-line); border-right: 1px solid var(--lz-line); margin: 0 4px; flex: none; }
+.lz-ctx .lz-ib { min-width: 40px; height: 44px; padding: 0 8px; font-size: 1.25rem; font-weight: 500; justify-content: center; flex-direction: column; gap: 0; }
+.lz-ib b { font-weight: 800; }
+.lz-colA { font-weight: 600 !important; line-height: 1; }
+.lz-colbar { display: block; width: 22px; height: 5px; border-radius: 3px; margin-top: 2px; box-shadow: 0 0 0 1px rgba(0,0,0,.15); }

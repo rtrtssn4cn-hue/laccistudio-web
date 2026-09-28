@@ -219,7 +219,10 @@ let scratch = null;
 function measureCtx() { if (!scratch) scratch = document.createElement("canvas").getContext("2d"); return scratch; }
 // Weight: Light 300, Regular, Bold 700; italic when chosen.
 export function fontString(layer, px) { return `${layer.italic ? "italic " : ""}${layer.bold ? 700 : layer.light ? 300 : 500} ${px}px ${fontFamily(layer.font)}`; }
-const displayText = (layer) => (/Monogram/.test(layer.font || "") ? String(layer.text || "").toUpperCase() : String(layer.text || ""));
+const displayText = (layer) => {
+  const t = String(layer.text || "");
+  return /Monogram/.test(layer.font || "") || layer.caps === "upper" ? t.toUpperCase() : layer.caps === "lower" ? t.toLowerCase() : t;
+};
 
 // Glyph placements for a text layer, relative to its centre, in px at font size px.
 export function layoutText(layer, px, ctx) {
@@ -313,6 +316,17 @@ function drawLayer(ctx, layer, area, W, H, imgs) {
     const px = layer.size * areaBox(area, W, H).h, L = layoutText(layer, px, ctx);
     ctx.font = fontString(layer, px); ctx.fillStyle = layer.color || "#141414"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
     for (const g of L.glyphs) { ctx.save(); ctx.translate(g.x, g.y); ctx.rotate(g.r); ctx.fillText(g.ch, 0, 0); ctx.restore(); }
+    if (layer.underline || layer.strike) { // a short line under / through each letter, so it follows curved text too
+      const th = Math.max(1, px * 0.055), gap = px * (layer.spacing || 0);
+      for (const g of L.glyphs) {
+        if (!g.ch.trim() && !layer.underline) continue;
+        const w = ctx.measureText(g.ch).width + gap + 0.6;
+        ctx.save(); ctx.translate(g.x, g.y); ctx.rotate(g.r);
+        if (layer.underline) ctx.fillRect(-w / 2, px * 0.42, w, th);
+        if (layer.strike && g.ch.trim()) ctx.fillRect(-w / 2, px * 0.04 - th / 2, w, th);
+        ctx.restore();
+      }
+    }
   } else {
     const info = imgs && imgs[layer.src];
     const src = info && (layer.removeWhite === false ? info.img || info.display : info.display || info.img);

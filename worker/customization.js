@@ -46,7 +46,7 @@ function cleanLayer(l, cleanUrl) {
     const size = num(l.size, 0.01, 1.5), spacing = num(l.spacing ?? 0, 0, 1), curve = num(l.curve ?? 0, -100, 100), color = hex(l.color);
     if (size === null || spacing === null || curve === null || !color) return { error: "A text layer has invalid styling." };
     const align = ["left", "center", "right"].includes(l.align) ? l.align : "center";
-    return { layer: { type: "text", text, font: str(l.font, 60), color, size, x, y, rotation, spacing, curve, bold: l.bold === true, italic: l.italic === true, light: l.light === true, vertical: l.vertical === true, align } };
+    return { layer: { type: "text", text, font: str(l.font, 60), color, size, x, y, rotation, spacing, curve, bold: l.bold === true, italic: l.italic === true, light: l.light === true, underline: l.underline === true, strike: l.strike === true, caps: ["upper", "lower"].includes(l.caps) ? l.caps : "", vertical: l.vertical === true, align } };
   }
   return { error: "A design layer has an unknown type." };
 }
