@@ -244,3 +244,5 @@ html.lz-lock, html.lz-lock body { overflow: hidden; }
 .lz-fontrow { display: flex; gap: 6px; }
 .lz-fontrow .lz-fontbtn { flex: 1; }
 .lz-fontstep { border: 1px solid var(--lz-line); background: #fff; border-radius: 10px; width: 40px; font-size: .8rem; }
+.lz-fontcats { flex-wrap: nowrap; overflow-x: auto; margin-bottom: 8px; padding-bottom: 2px; }
+.lz-fontcats button { flex: none; }

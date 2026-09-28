@@ -483,7 +483,8 @@ const sizeLabel = (l) => { const i = textInches(l); return i ? `${i.toFixed(2)} 
 // Fonts: every tap or arrow step changes the text at once; the list stays open while trying fonts.
 function fontList() {
   const own = personalization().fonts && personalization().fonts.length ? personalization().fonts : null;
-  return own || [...new Set(R.FONT_GROUPS.flatMap((g) => g.fonts))]; // each font once, in list order
+  const groups = S.fontCat ? R.FONT_GROUPS.filter((g) => g.label === S.fontCat) : R.FONT_GROUPS;
+  return own || [...new Set(groups.flatMap((g) => g.fonts))]; // each font once, in list order; only the chosen category
 }
 function setFont(l, f) {
   const pop = root.querySelector("#lz-pop"), keep = pop.querySelector(".lz-fontlist"), top = keep ? keep.scrollTop : 0;
@@ -514,9 +515,11 @@ function renderPop() {
   pop.hidden = false;
   const fonts = (personalization().fonts && personalization().fonts.length ? personalization().fonts : R.FONT_NAMES);
   if (S.tool === "t-font") {
-    const own = personalization().fonts && personalization().fonts.length ? [{ label: "Fonts", fonts }] : R.FONT_GROUPS;
+    const groups = personalization().fonts && personalization().fonts.length ? [{ label: "Fonts", fonts }] : R.FONT_GROUPS;
+    const own = S.fontCat && groups.some((g) => g.label === S.fontCat) ? groups.filter((g) => g.label === S.fontCat) : groups;
+    const cats = groups.length > 1 ? `<div class="lz-chips lz-fontcats">${["All", ...groups.map((g) => g.label)].map((c) => `<button type="button" data-fontcat="${esc(c)}" aria-pressed="${(S.fontCat || "All") === c}">${esc(c)}</button>`).join("")}</div>` : "";
     pop.innerHTML = `<div class="lz-styles">${[["light", "Light"], ["regular", "Regular"], ["bold", "Bold"]].map(([k, t]) => `<button type="button" data-weight="${k}" aria-pressed="${(k === "bold" && l.bold) || (k === "light" && l.light && !l.bold) || (k === "regular" && !l.bold && !l.light)}">${t}</button>`).join("")}<button type="button" data-italic="1" aria-pressed="${!!l.italic}"><i>Italic</i></button></div>
-      <div class="lz-fontdd"><div class="lz-fontrow"><button type="button" class="lz-fontstep" data-fontstep="-1" aria-label="Previous font">▲</button><button type="button" class="lz-fontstep" data-fontstep="1" aria-label="Next font">▼</button><button type="button" class="lz-fontbtn" data-fontdd="1" aria-expanded="${!!S.fontOpen}" style="font-family:${esc(R.fontFamily(l.font))}">${esc((l.font || "Font").replace(/ \/.*/, ""))}<span aria-hidden="true">▾</span></button></div>
+      ${cats}<div class="lz-fontdd"><div class="lz-fontrow"><button type="button" class="lz-fontstep" data-fontstep="-1" aria-label="Previous font">▲</button><button type="button" class="lz-fontstep" data-fontstep="1" aria-label="Next font">▼</button><button type="button" class="lz-fontbtn" data-fontdd="1" aria-expanded="${!!S.fontOpen}" style="font-family:${esc(R.fontFamily(l.font))}">${esc((l.font || "Font").replace(/ \/.*/, ""))}<span aria-hidden="true">▾</span></button></div>
       ${S.fontOpen ? `<div class="lz-fontlist" role="listbox">${own.map((g) => `<div class="lz-fgroup"><span>${esc(g.label)}</span>${g.fonts.map((f) => `<button type="button" role="option" data-font="${esc(f)}" aria-selected="${l.font === f}" style="font-family:${esc(R.fontFamily(f))}">${esc(f.replace(/ \/.*/, ""))}</button>`).join("")}</div>`).join("")}</div>` : ""}</div>`;
   }
   if (S.tool === "t-color") pop.innerHTML = `<div class="lz-swatches">${R.TEXT_SWATCHES.map((s) => `<button type="button" data-color="${s.hex}" aria-label="${s.name}" title="${s.name}" aria-pressed="${l.color.toLowerCase() === s.hex.toLowerCase()}" style="background:${s.hex}"></button>`).join("")}</div>
@@ -531,6 +534,7 @@ function renderPop() {
     const t = e.target.closest("button"); if (!t) return;
     if (t.dataset.fontdd) { S.fontOpen = !S.fontOpen; renderPop(); showChosenFont(pop); return; }
     if (t.dataset.fontstep) { stepFont(+t.dataset.fontstep); return; }
+    if (t.dataset.fontcat) { S.fontCat = t.dataset.fontcat === "All" ? "" : t.dataset.fontcat; S.fontOpen = true; renderPop(); showChosenFont(pop); return; } // the list opens on that category
     if (t.dataset.font) { setFont(l, t.dataset.font); return; } // the list stays open to try the next one
     if (t.dataset.weight) { l.bold = t.dataset.weight === "bold"; l.light = t.dataset.weight === "light"; afterFont(l); commit(); renderPop(); renderCtx(); draw(); }
     if (t.dataset.italic) { l.italic = !l.italic; afterFont(l); commit(); renderPop(); draw(); }
