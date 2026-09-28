@@ -476,6 +476,9 @@ function renderCtx() {
       btn("t-curve", "Curve", "◠", S.tool === "t-curve" ? 'aria-pressed="true"' : "") + btn("vertical", l.vertical ? "Across" : "Down", l.vertical ? "⇥" : "⇩") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("delete", "Delete", "🗑", 'class="lz-danger"');
   renderPop();
 }
+// Printed text size: the letter size (font size) in inches on the product, and the same in points.
+const textInches = (l) => l.size * ((area().print || {}).heightIn || 0);
+const sizeLabel = (l) => { const i = textInches(l); return i ? `${i.toFixed(2)} in` : ""; };
 function renderPop() {
   const pop = root.querySelector("#lz-pop"), l = selected();
   if (!l || l.type !== "text" || !S.tool) { pop.hidden = true; return; }
@@ -484,7 +487,8 @@ function renderPop() {
   if (S.tool === "t-font") pop.innerHTML = `<div class="lz-chips">${fonts.map((f) => `<button type="button" data-font="${esc(f)}" aria-pressed="${l.font === f}" style="font-family:${esc(R.fontFamily(f))}">${esc(f.replace(/ \/.*/, ""))}</button>`).join("")}</div>`;
   if (S.tool === "t-color") pop.innerHTML = `<div class="lz-swatches">${R.TEXT_SWATCHES.map((s) => `<button type="button" data-color="${s.hex}" aria-label="${s.name}" title="${s.name}" aria-pressed="${l.color.toLowerCase() === s.hex.toLowerCase()}" style="background:${s.hex}"></button>`).join("")}</div>
     <details class="lz-adv"><summary>Exact colour (HEX)</summary><input type="text" id="lz-hex" maxlength="7" value="${esc(l.color)}" spellcheck="false" autocapitalize="characters" placeholder="#D79D41"></details>`;
-  if (S.tool === "t-size") pop.innerHTML = `<label class="lz-range"><span>A</span><input type="range" min="3" max="60" value="${Math.round(l.size * 100)}" data-range="size" aria-label="Text size"><span style="font-size:1.3em">A</span></label>`;
+  if (S.tool === "t-size") pop.innerHTML = `<label class="lz-range"><span>A</span><input type="range" min="3" max="60" value="${Math.round(l.size * 100)}" data-range="size" aria-label="Text size"><span style="font-size:1.3em">A</span></label>
+    <label class="lz-sizebox"><span>Size</span><input type="number" id="lz-size-in" min="0.1" max="12" step="0.05" value="${textInches(l).toFixed(2)}" inputmode="decimal"> <span>in</span> <small id="lz-size-pt">${Math.round(textInches(l) * 72)} pt</small></label>`;
   if (S.tool === "t-spacing") pop.innerHTML = `<label class="lz-range"><span>Tight</span><input type="range" min="0" max="50" value="${Math.round((l.spacing || 0) * 100)}" data-range="spacing" aria-label="Letter spacing"><span>Wide</span></label>`;
   if (S.tool === "t-curve") pop.innerHTML = `<label class="lz-range"><span>◡</span><input type="range" min="-100" max="100" step="5" value="${l.curve || 0}" data-range="curve" aria-label="Curve: arch down to arch up"><span>◠</span></label>${l.text.includes("\n") ? `<p class="lz-note">Curves apply to one line of text.</p>` : ""}`;
   pop.onclick = (e) => {
@@ -494,13 +498,14 @@ function renderPop() {
   };
   pop.oninput = (e) => {
     const t = e.target;
-    if (t.dataset.range === "size") l.size = Number(t.value) / 100;
+    if (t.dataset.range === "size") { l.size = Number(t.value) / 100; const b = pop.querySelector("#lz-size-in"); if (b) b.value = textInches(l).toFixed(2); const p = pop.querySelector("#lz-size-pt"); if (p) p.textContent = Math.round(textInches(l) * 72) + " pt"; }
+    if (t.id === "lz-size-in") { const h = (area().print || {}).heightIn, v = Number(t.value); if (h && v > 0) { l.size = round(clamp(v / h, 0.01, 1.5)); if (l.fromDesign) { l.baseSize = l.size; l.maxW = 0; } const r = pop.querySelector("[data-range=size]"); if (r) r.value = Math.round(l.size * 100); const p = pop.querySelector("#lz-size-pt"); if (p) p.textContent = Math.round(v * 72) + " pt"; } }
     if (t.dataset.range === "spacing") l.spacing = Number(t.value) / 100;
     if (t.dataset.range === "curve") l.curve = Number(t.value);
     if (t.id === "lz-hex") { const v = t.value.trim(); if (/^#?[0-9a-f]{6}$/i.test(v)) l.color = (v[0] === "#" ? v : "#" + v).toUpperCase(); }
     draw();
   };
-  pop.onchange = () => { commit(); renderCtx(); };
+  pop.onchange = () => { commit(); renderCtx(); renderPanel(); }; // the lists show the new size
 }
 
 function tool(act, el) {
@@ -842,7 +847,7 @@ function renderPanel() {
   bindPanel(box);
 }
 
-function layerLabel(l) { return l.type === "image" ? "🖼 " + esc((imgs[l.src] || {}).name || l.name || "Your upload") + statusOf(l) + qualityBadge(l) : "T “" + esc(l.text.trim() || "Your text") + "”"; }
+function layerLabel(l) { return l.type === "image" ? "🖼 " + esc((imgs[l.src] || {}).name || l.name || "Your upload") + statusOf(l) + qualityBadge(l) : "T “" + esc(l.text.trim() || "Your text") + "”" + `<small class="lz-sz">${sizeLabel(l)}</small>`; }
 function designPanel() {
   const ls = layers(), n = setSize(S.options), z = personalization();
   const list = ls.map((l, i) => ({ l, i })).reverse().map(({ l, i }) => `<li class="${i === S.sel ? "on" : ""}"><button type="button" data-select="${i}">${layerLabel(l)}</button>
@@ -924,7 +929,7 @@ function ideasBlock() {
 function textPanel() {
   const l = selected();
   const texts = layers().map((x, i) => [x, i]).filter(([x]) => x.type === "text");
-  const list = texts.length ? `<ul class="lz-layers">${texts.map(([x, i]) => `<li class="${i === S.sel ? "on" : ""}"><button type="button" data-select="${i}">T “${esc(x.text.trim() || (x.fromDesign ? "empty line" : "Your text"))}”</button></li>`).join("")}</ul>` : "";
+  const list = texts.length ? `<ul class="lz-layers">${texts.map(([x, i]) => `<li class="${i === S.sel ? "on" : ""}"><button type="button" data-select="${i}">T “${esc(x.text.trim() || (x.fromDesign ? "empty line" : "Your text"))}”<small class="lz-sz">${sizeLabel(x)}</small></button></li>`).join("")}</ul>` : "";
   if (!l || l.type !== "text") {
     return `${ideasBlock()}<button type="button" class="btn btn-gold lz-wide" data-do="addtext">＋ Add text</button>${list || `<p class="lz-note">Add a name, date, message or monogram. Select text on the product to change its font, size, colour, spacing or curve.</p>`}`;
   }

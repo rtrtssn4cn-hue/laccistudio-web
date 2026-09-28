@@ -219,3 +219,9 @@ html.lz-lock, html.lz-lock body { overflow: hidden; }
 .lz-ideas { display: flex; flex-wrap: wrap; gap: 6px; }
 .lz-ideas button { border: 1px solid var(--lz-line); background: #fff; border-radius: 99px; padding: 6px 12px; font-size: .78rem; }
 .lz-ideas button:hover { border-color: var(--lz-gold); }
+
+/* printed text size */
+.lz-sz { margin-left: 8px; font-size: .72rem; color: var(--lz-muted); font-weight: 500; }
+.lz-sizebox { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: .8rem; }
+.lz-sizebox input { width: 72px; padding: 6px 8px; border: 1px solid var(--lz-line); border-radius: 8px; font: inherit; }
+.lz-sizebox small { color: var(--lz-muted); }
