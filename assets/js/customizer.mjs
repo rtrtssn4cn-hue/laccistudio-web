@@ -395,7 +395,7 @@ function draw() {
     if (!ctx || !W || !S) return;
     const a = area();
     followDesigns();
-    R.drawComposite(ctx, a, layers().map(withPlaceholder), W, W, imgs, { mockup: mockupImage(a), editing: true, selected: S.sel, selectedAll: !!S.all });
+    R.drawComposite(ctx, a, layers().map(withPlaceholder), W, W, imgs, { mockup: mockupImage(a), editing: true, selected: S.sel, selectedAll: !!S.all, selectedMany: multiOn() ? S.multi : null, guides: S.guides });
     const out = layers().some((l) => filled(l) && R.isOutside(l, a, W, W, imgs));
     root.querySelector("#lz-warn").hidden = !out;
   });
@@ -460,7 +460,7 @@ const ib = (act, label, html, pressed) => `<button type="button" class="lz-ib" d
 const btn = (act, label, icon, extra = "") => `<button type="button" data-act="${act}" ${extra}><span aria-hidden="true">${icon}</span>${label}</button>`;
 function renderCtx() {
   const box = root.querySelector("#lz-ctx"), l = selected(), pop = root.querySelector("#lz-pop");
-  if (!l) {
+  if (!l && !multiOn()) {
     box.innerHTML = personalization().upload || personalization().text
       ? (canPickDesigns() ? btn("designs", "Lacci designs", "✦") : "") + (personalization().upload ? btn("upload", photoSpotOpen() ? "Add your photo" : "Upload", "⬆") : "") + (personalization().text ? btn("addtext", "Add text", "T") : "") + (layers().some((x) => filled(x) && !x.locked) ? btn("selectlast", "Edit design", "✎") : "")
       : "";
@@ -469,18 +469,52 @@ function renderCtx() {
     return;
   }
   box.classList.toggle("idle", false);
+  if (multiOn()) {
+    const ts = tgt(), f = ts[0];
+    box.innerHTML = `<span class="lz-multi">${S.multi.length} selected</span>` + (f ? `<span class="lz-fmt" role="group" aria-label="Text style">${ib("t-color", "Text colour", `<b class="lz-colA">A</b><i class="lz-colbar" style="background:${esc(f.color)}"></i>`, S.tool === "t-color")}${ib("bold", "Bold", "<b>B</b>", f.bold)}${ib("italic", "Italic", '<i style="font-family:Georgia,serif">I</i>', f.italic)}${ib("underline", "Underline", "<u>U</u>", f.underline)}${ib("strike", "Strikethrough", "<s>S</s>", f.strike)}${ib("caps", "Capitals", "aA", !!f.caps)}</span>`
+      + btn("t-font", "Font", "Aa", S.tool === "t-font" ? 'aria-pressed="true"' : "") + btn("t-size", "Size", "↕", S.tool === "t-size" ? 'aria-pressed="true"' : "") + btn("t-spacing", "Spacing", "↔", S.tool === "t-spacing" ? 'aria-pressed="true"' : "") + btn("t-curve", "Curve", "◠", S.tool === "t-curve" ? 'aria-pressed="true"' : "") : "")
+      + btn("center", "Center", "✛") + btn("delete", "Delete", "🗑", 'class="lz-danger"') + btn("deselect", "Done", "✓");
+    renderPop(); return;
+  }
   if (l.locked) { box.innerHTML = btn("upload", photoSpotOpen() ? "Add your photo" : "Change photo", "⬆") + btn("delete", "Remove design", "🗑", 'class="lz-danger"'); pop.hidden = true; return; }
   const ls = layers(), i = S.sel;
-  const order = (ls.length > 1 && !l.clip ? btn("forward", "Forward", "⬆", i === ls.length - 1 ? "disabled" : "") + btn("backward", "Back", "⬇", i === 0 ? "disabled" : "") : "");
+  const order = (ls.length > 1 && !l.clip ? btn("forward", "Bring front", "⬆", (i === ls.length - 1 ? "disabled " : "") + 'title="Put this in front of items it overlaps"') + btn("backward", "Send back", "⬇", (i === 0 ? "disabled " : "") + 'title="Put this behind items it overlaps"') : "");
   box.innerHTML = l.type === "image"
     ? btn("replace", "Replace", "⇄") + ((imgs[l.src] || {}).img && bgKind(l) !== "transparent" ? btn("bg", S.bgBusy ? "Removing…" : "Remove bg", "◩", S.bgBusy ? "disabled" : (bgKind(l) === "plain" && l.removeWhite !== false ? 'aria-pressed="true"' : "")) : "") + ((imgs[l.src] || {}).img ? btn("touchup", "Touch up", "🖌") : "") + btn("crop", "Crop", "⌗") + btn("flip", "Flip", "⇋") + btn("fit", "Fit", "⤢") + btn("fill", "Fill", "⛶") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("reset", "Reset", "↺") + btn("delete", "Delete", "🗑", 'class="lz-danger"')
-    : btn("edittext", "Edit", "✎") + btn("t-font", "Font", "Aa", S.tool === "t-font" ? 'aria-pressed="true"' : "") + btn("t-size", "Size", "↕", S.tool === "t-size" ? 'aria-pressed="true"' : "") + `<span class="lz-fmt" role="group" aria-label="Text style">${ib("t-color", "Text colour", `<b class="lz-colA">A</b><i class="lz-colbar" style="background:${esc(l.color)}"></i>`, S.tool === "t-color")}${ib("bold", "Bold", "<b>B</b>", l.bold)}${ib("italic", "Italic", '<i style="font-family:Georgia,serif">I</i>', l.italic)}${ib("underline", "Underline", "<u>U</u>", l.underline)}${ib("strike", "Strikethrough", "<s>S</s>", l.strike)}${ib("caps", l.caps === "upper" ? "Uppercase (tap for lowercase)" : l.caps === "lower" ? "Lowercase (tap for as typed)" : "As typed (tap for uppercase)", l.caps === "upper" ? "AA" : l.caps === "lower" ? "aa" : "aA", !!l.caps)}</span>` + btn("align", "Align", l.align === "left" ? "⇤" : l.align === "right" ? "⇥" : "≡") + btn("t-spacing", "Spacing", "↔", S.tool === "t-spacing" ? 'aria-pressed="true"' : "") +
-      btn("t-curve", "Curve", "◠", S.tool === "t-curve" ? 'aria-pressed="true"' : "") + btn("vertical", l.vertical ? "Across" : "Down", l.vertical ? "⇥" : "⇩") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("delete", "Delete", "🗑", 'class="lz-danger"');
+    : btn("t-font", "Font", "Aa", S.tool === "t-font" ? 'aria-pressed="true"' : "") + btn("t-size", "Size", "↕", S.tool === "t-size" ? 'aria-pressed="true"' : "") + `<span class="lz-fmt" role="group" aria-label="Text style">${ib("t-color", "Text colour", `<b class="lz-colA">A</b><i class="lz-colbar" style="background:${esc(l.color)}"></i>`, S.tool === "t-color")}${ib("bold", "Bold", "<b>B</b>", l.bold)}${ib("italic", "Italic", '<i style="font-family:Georgia,serif">I</i>', l.italic)}${ib("underline", "Underline", "<u>U</u>", l.underline)}${ib("strike", "Strikethrough", "<s>S</s>", l.strike)}${ib("caps", l.caps === "upper" ? "Uppercase (tap for lowercase)" : l.caps === "lower" ? "Lowercase (tap for as typed)" : "As typed (tap for uppercase)", l.caps === "upper" ? "AA" : l.caps === "lower" ? "aa" : "aA", !!l.caps)}</span>` + btn("t-align", "Align", "⊞", S.tool === "t-align" ? 'aria-pressed="true"' : "") + btn("t-spacing", "Spacing", "↔", S.tool === "t-spacing" ? 'aria-pressed="true"' : "") +
+      btn("t-curve", "Curve", "◠", S.tool === "t-curve" ? 'aria-pressed="true"' : "") + btn("vertical", l.vertical ? "Horizontal" : "Vertical", l.vertical ? "⇥" : "⇩", `title="${l.vertical ? "Letters side by side" : "Stack the letters top to bottom"}"`) + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("delete", "Delete", "🗑", 'class="lz-danger"');
   renderPop();
 }
 // Printed text size: the letter size (font size) in inches on the product, and the same in points.
 const textInches = (l) => l.size * ((area().print || {}).heightIn || 0);
 const sizeLabel = (l) => { const i = textInches(l); return i ? `${i.toFixed(2)} in` : ""; };
+const SNAP = 0.012; // how close to the centre (share of the print area) before snapping to it
+// Moves text to an edge (or the middle) of the print area, like "align to page".
+function alignToProduct(list, where) {
+  const a = area(), ab = R.areaBox(a, 1000, 1000);
+  for (const t of list) {
+    const bx = R.layerBox(t, a, 1000, 1000, imgs), w = bx.w / ab.w, h = bx.h / ab.h, m = 0.03; // small margin keeps it inside the print area
+    if (where === "left") t.x = round(w / 2 + m); if (where === "right") t.x = round(1 - w / 2 - m); if (where === "hcenter") t.x = 0.5;
+    if (where === "top") t.y = round(h / 2 + m); if (where === "bottom") t.y = round(1 - h / 2 - m); if (where === "vcenter") t.y = 0.5;
+  }
+}
+// After resizing on the product (drag, pinch, scroll, keys) the sizes shown in the lists and the Size box follow.
+function refreshMeasures() { if (!root || !S) return; renderPanel(); if (S.tool) renderPop(); }
+
+// ---------------------------------------------------------------- several items at once (Shift+click)
+const multiOn = () => !!(S.multi && S.multi.length > 1);
+function picked() { const ls = layers(); return multiOn() ? S.multi.map((i) => ls[i]).filter(Boolean) : (selected() ? [selected()] : []); }
+// Text lines that style changes apply to: every selected line, or the one selected.
+function tgt() { return picked().filter((x) => x.type === "text"); }
+// Items that move: a design's wording already follows its design, so it isn't moved twice.
+function movers() { const p = picked(); return p.filter((x) => !(x.type === "text" && x.fromDesign && p.some((d) => d.design && d.design.id === x.fromDesign))); }
+function toggleMulti(i) {
+  const base = S.multi ? [...S.multi] : (S.sel >= 0 ? [S.sel] : []);
+  const at = base.indexOf(i); if (at >= 0) base.splice(at, 1); else base.push(i);
+  if (base.length > 1) { S.multi = base.sort((a, b) => a - b); S.sel = -1; } else { S.multi = null; S.sel = base.length ? base[0] : -1; }
+  S.tool = ""; render();
+}
+function moveAll(dx, dy) { for (const x of movers()) { x.x = round(clamp(x.x + dx, -0.5, 1.5)); x.y = round(clamp(x.y + dy, -0.5, 1.5)); } }
 // Fonts: every tap or arrow step changes the text at once; the list stays open while trying fonts.
 function fontList() {
   const own = personalization().fonts && personalization().fonts.length ? personalization().fonts : null;
@@ -489,12 +523,12 @@ function fontList() {
 }
 function setFont(l, f) {
   const pop = root.querySelector("#lz-pop"), keep = pop.querySelector(".lz-fontlist"), top = keep ? keep.scrollTop : 0;
-  l.font = f; afterFont(l); commit(); renderPop(); draw();
+  for (const t of tgt()) { t.font = f; afterFont(t); } commit(); renderPop(); draw();
   const list = pop.querySelector(".lz-fontlist"); if (list) list.scrollTop = top;
   showChosenFont(pop);
 }
 function stepFont(dir) {
-  const l = selected(); if (!l || l.type !== "text") return;
+  const l = tgt()[0]; if (!l) return;
   const all = fontList(), i = all.indexOf(l.font);
   setFont(l, all[((i < 0 ? (dir > 0 ? -1 : 0) : i) + dir + all.length) % all.length]);
 }
@@ -511,8 +545,8 @@ function afterFont(l) {
   if (document.fonts) document.fonts.load(R.fontString(l, 40)).then(again).catch(() => {}); again();
 }
 function renderPop() {
-  const pop = root.querySelector("#lz-pop"), l = selected();
-  if (!l || l.type !== "text" || !S.tool) { pop.hidden = true; return; }
+  const pop = root.querySelector("#lz-pop"), all = tgt(), l = all[0];
+  if (!l || !S.tool) { pop.hidden = true; return; }
   pop.hidden = false;
   const fonts = (personalization().fonts && personalization().fonts.length ? personalization().fonts : R.FONT_NAMES);
   if (S.tool === "t-font") {
@@ -527,6 +561,9 @@ function renderPop() {
     <details class="lz-adv"><summary>Exact colour (HEX)</summary><input type="text" id="lz-hex" maxlength="7" value="${esc(l.color)}" spellcheck="false" autocapitalize="characters" placeholder="#D79D41"></details>`;
   if (S.tool === "t-size") pop.innerHTML = `<label class="lz-range"><span>A</span><input type="range" min="3" max="60" value="${Math.round(l.size * 100)}" data-range="size" aria-label="Text size"><span style="font-size:1.3em">A</span></label>
     <label class="lz-sizebox"><span>Size</span><input type="number" id="lz-size-in" min="0.1" max="12" step="0.05" value="${textInches(l).toFixed(2)}" inputmode="decimal"> <span>in</span> <small id="lz-size-pt">${Math.round(textInches(l) * 72)} pt</small></label>`;
+  if (S.tool === "t-align") pop.innerHTML = `<div class="lz-alignbox"><span>On the product</span><div class="lz-chips">${[["left", "⇤ Left"], ["hcenter", "↔ Center"], ["right", "Right ⇥"], ["top", "⤒ Top"], ["vcenter", "↕ Middle"], ["bottom", "⤓ Bottom"]].map(([k, t]) => `<button type="button" data-pos="${k}">${t}</button>`).join("")}</div>
+    <span>Text lines</span><div class="lz-chips">${[["left", "⇤ Left"], ["center", "≡ Center"], ["right", "Right ⇥"]].map(([k, t]) => `<button type="button" data-talign="${k}" aria-pressed="${(l.align || "center") === k}">${t}</button>`).join("")}</div>
+    ${l.text.includes("\n") ? "" : `<p class="lz-note">Text lines apply when the text has more than one line.</p>`}</div>`;
   if (S.tool === "t-spacing") pop.innerHTML = `<label class="lz-range"><span>Tight</span><input type="range" min="0" max="50" value="${Math.round((l.spacing || 0) * 100)}" data-range="spacing" aria-label="Letter spacing"><span>Wide</span></label>
     <label class="lz-sizebox"><span>Spacing</span><input type="number" data-num="spacing" min="0" max="50" step="1" value="${Math.round((l.spacing || 0) * 100)}" inputmode="numeric"> <small>0 = normal, 50 = widest</small></label>`;
   if (S.tool === "t-curve") pop.innerHTML = `<label class="lz-range"><span>◡</span><input type="range" min="-100" max="100" step="5" value="${l.curve || 0}" data-range="curve" aria-label="Curve: arch down to arch up"><span>◠</span></label>
@@ -535,19 +572,21 @@ function renderPop() {
     const t = e.target.closest("button"); if (!t) return;
     if (t.dataset.fontdd) { S.fontOpen = !S.fontOpen; renderPop(); showChosenFont(pop); return; }
     if (t.dataset.fontstep) { stepFont(+t.dataset.fontstep); return; }
+    if (t.dataset.talign) { for (const x of all) x.align = t.dataset.talign; commit(); renderPop(); draw(); return; }
+    if (t.dataset.pos) { alignToProduct(all, t.dataset.pos); commit(); draw(); return; }
     if (t.dataset.fontcat) { S.fontCat = t.dataset.fontcat === "All" ? "" : t.dataset.fontcat; S.fontOpen = true; renderPop(); showChosenFont(pop); return; } // the list opens on that category
     if (t.dataset.font) { setFont(l, t.dataset.font); return; } // the list stays open to try the next one
     if (t.dataset.weight) { l.bold = t.dataset.weight === "bold"; l.light = t.dataset.weight === "light"; afterFont(l); commit(); renderPop(); renderCtx(); draw(); }
     if (t.dataset.italic) { l.italic = !l.italic; afterFont(l); commit(); renderPop(); draw(); }
-    if (t.dataset.color) { l.color = t.dataset.color; commit(); renderCtx(); draw(); }
+    if (t.dataset.color) { for (const x of all) x.color = t.dataset.color; commit(); renderCtx(); draw(); }
   };
   pop.oninput = (e) => {
     const t = e.target;
-    if (t.dataset.range === "size") { l.size = Number(t.value) / 100; const b = pop.querySelector("#lz-size-in"); if (b) b.value = textInches(l).toFixed(2); const p = pop.querySelector("#lz-size-pt"); if (p) p.textContent = Math.round(textInches(l) * 72) + " pt"; }
-    if (t.id === "lz-size-in") { const h = (area().print || {}).heightIn, v = Number(t.value); if (h && v > 0) { l.size = round(clamp(v / h, 0.01, 1.5)); if (l.fromDesign) { l.baseSize = l.size; l.maxW = 0; } const r = pop.querySelector("[data-range=size]"); if (r) r.value = Math.round(l.size * 100); const p = pop.querySelector("#lz-size-pt"); if (p) p.textContent = Math.round(v * 72) + " pt"; } }
-    if (t.dataset.range === "spacing" || t.dataset.num === "spacing") { l.spacing = clamp(Number(t.value) || 0, 0, 50) / 100; syncMeasure(pop, "spacing", Math.round(l.spacing * 100)); }
-    if (t.dataset.range === "curve" || t.dataset.num === "curve") { l.curve = clamp(Math.round(Number(t.value) || 0), -100, 100); syncMeasure(pop, "curve", l.curve); const s = pop.querySelector("#lz-curve-say"); if (s) s.textContent = curveSay(l.curve); }
-    if (t.id === "lz-hex") { const v = t.value.trim(); if (/^#?[0-9a-f]{6}$/i.test(v)) l.color = (v[0] === "#" ? v : "#" + v).toUpperCase(); }
+    if (t.dataset.range === "size") { for (const x of all) x.size = Number(t.value) / 100; const b = pop.querySelector("#lz-size-in"); if (b) b.value = textInches(l).toFixed(2); const p = pop.querySelector("#lz-size-pt"); if (p) p.textContent = Math.round(textInches(l) * 72) + " pt"; }
+    if (t.id === "lz-size-in") { const h = (area().print || {}).heightIn, v = Number(t.value); if (h && v > 0) { for (const x of all) { x.size = round(clamp(v / h, 0.01, 1.5)); if (x.fromDesign) { x.baseSize = x.size; x.maxW = 0; } } const r = pop.querySelector("[data-range=size]"); if (r) r.value = Math.round(l.size * 100); const p = pop.querySelector("#lz-size-pt"); if (p) p.textContent = Math.round(v * 72) + " pt"; } }
+    if (t.dataset.range === "spacing" || t.dataset.num === "spacing") { for (const x of all) x.spacing = clamp(Number(t.value) || 0, 0, 50) / 100; syncMeasure(pop, "spacing", Math.round(l.spacing * 100)); }
+    if (t.dataset.range === "curve" || t.dataset.num === "curve") { for (const x of all) x.curve = clamp(Math.round(Number(t.value) || 0), -100, 100); syncMeasure(pop, "curve", l.curve); const s = pop.querySelector("#lz-curve-say"); if (s) s.textContent = curveSay(l.curve); }
+    if (t.id === "lz-hex") { const v = t.value.trim(); if (/^#?[0-9a-f]{6}$/i.test(v)) for (const x of all) x.color = (v[0] === "#" ? v : "#" + v).toUpperCase(); }
     draw();
   };
   pop.onchange = () => { commit(); renderCtx(); renderPanel(); }; // the lists show the new size
@@ -555,6 +594,26 @@ function renderPop() {
 
 function tool(act, el) {
   S.all = false;
+  if (multiOn() && !["upload", "addtext", "designs"].includes(act)) {
+    const ts = tgt(), f = ts[0], ls = layers();
+    if (act.startsWith("t-")) { S.tool = S.tool === act ? "" : act; renderCtx(); return; }
+    if (act === "deselect") { S.multi = null; S.tool = ""; render(); return; }
+    if (act === "center") { const m = movers(); if (m.length) { const cx = m.reduce((s, x) => s + x.x, 0) / m.length, cy = m.reduce((s, x) => s + x.y, 0) / m.length; moveAll(0.5 - cx, 0.5 - cy); } }
+    if (act === "delete") {
+      const gone = new Set(picked()), ids = [...gone].filter((x) => x.design).map((x) => x.design.id);
+      for (let j = ls.length - 1; j >= 0; j--) if (gone.has(ls[j]) || (ls[j].fromDesign && ids.includes(ls[j].fromDesign))) ls.splice(j, 1);
+      S.multi = null; S.sel = -1;
+    }
+    if (f) {
+      const on = (k) => !f[k];
+      if (act === "bold") { const v = on("bold"); ts.forEach((x) => { x.bold = v; if (v) x.light = false; afterFont(x); }); }
+      if (act === "italic") { const v = on("italic"); ts.forEach((x) => { x.italic = v; afterFont(x); }); }
+      if (act === "underline") { const v = on("underline"); ts.forEach((x) => (x.underline = v)); }
+      if (act === "strike") { const v = on("strike"); ts.forEach((x) => (x.strike = v)); }
+      if (act === "caps") { const v = f.caps === "upper" ? "lower" : f.caps === "lower" ? "" : "upper"; ts.forEach((x) => { x.caps = v; if (x.fromDesign) fitText(x); }); }
+    }
+    commit(); render(); return;
+  }
   if (act === "upload") return pickFile();
   if (act === "designs") return openDesigns();
   if (act === "addtext") return addText();
@@ -892,10 +951,23 @@ function renderPanel() {
   const tab = S.tab === "position" && !isMobile() ? "design" : S.tab;
   const titles = { design: "Add", text: "Text", product: "Product", review: "Review", position: "Position" };
   root.querySelector("#lz-sheet-title").textContent = titles[tab] || "";
+  parkTextTools(); // keep the toolbar safe while the panel is redrawn
   box.innerHTML = { design: designPanel, text: textPanel, product: productPanel, review: reviewPanel, position: positionPanel }[tab]();
   bindPanel(box);
+  placeTextTools();
 }
 
+// On a computer the text tools sit in the right-hand panel under the text box; on a phone, under the product.
+function placeTextTools() {
+  const ctx = root.querySelector("#lz-ctx"), pop = root.querySelector("#lz-pop"), slot = root.querySelector("#lz-textslot");
+  const textSel = multiOn() ? tgt().length > 0 : !!(selected() && selected().type === "text");
+  if (slot && textSel && !isMobile()) { slot.append(ctx, pop); ctx.classList.add("in-panel"); return; }
+  parkTextTools();
+}
+function parkTextTools() {
+  const ctx = root.querySelector("#lz-ctx"), pop = root.querySelector("#lz-pop"), stage = root.querySelector(".lz-stage"), warn = root.querySelector("#lz-warn");
+  if (ctx && ctx.parentNode !== stage) { stage.insertBefore(ctx, warn); stage.insertBefore(pop, warn); ctx.classList.remove("in-panel"); }
+}
 function layerLabel(l) { return l.type === "image" ? "🖼 " + esc((imgs[l.src] || {}).name || l.name || "Your upload") + statusOf(l) + qualityBadge(l) : "T “" + esc(l.text.trim() || "Your text") + "”" + `<small class="lz-sz">${sizeLabel(l)}</small>`; }
 function designPanel() {
   const ls = layers(), n = setSize(S.options), z = personalization();
@@ -980,10 +1052,11 @@ function textPanel() {
   const texts = layers().map((x, i) => [x, i]).filter(([x]) => x.type === "text");
   const list = texts.length ? `<ul class="lz-layers">${texts.map(([x, i]) => `<li class="${i === S.sel ? "on" : ""}"><button type="button" data-select="${i}">T “${esc(x.text.trim() || (x.fromDesign ? "empty line" : "Your text"))}”<small class="lz-sz">${sizeLabel(x)}</small></button></li>`).join("")}</ul>` : "";
   if (!l || l.type !== "text") {
-    return `${ideasBlock()}<button type="button" class="btn btn-gold lz-wide" data-do="addtext">＋ Add text</button>${list || `<p class="lz-note">Add a name, date, message or monogram. Select text on the product to change its font, size, colour, spacing or curve.</p>`}`;
+    return `${ideasBlock()}<button type="button" class="btn btn-gold lz-wide" data-do="addtext">＋ Add text</button><div id="lz-textslot" class="lz-textslot"></div>${list || `<p class="lz-note">Add a name, date, message or monogram. Select text on the product to change its font, size, colour, spacing or curve.</p>`}`;
   }
   return `${l.fromDesign ? ideasBlock() : ""}<label class="lz-field"><span>Your text</span><textarea id="lz-text" rows="2" maxlength="200" placeholder="e.g. The Smith Family">${esc(unusedOptional(l) ? "" : l.text)}</textarea></label>
     ${l.optional ? `<p class="lz-note">Optional. Leave it empty and this line won't be printed.</p>` : ""}
+    <div id="lz-textslot" class="lz-textslot"></div>
     <p class="lz-note">Use the toolbar under the product for font, size, colour, bold, alignment, spacing and curve.</p>
     <div class="lz-row"><button type="button" class="btn btn-ghost-gold" data-do="addtext">＋ Add another text</button><button type="button" class="btn btn-ghost-gold" data-do="done">Done</button></div>${texts.length > 1 ? list : ""}`;
 }
@@ -1063,7 +1136,8 @@ function bindPanel(box) {
     else if (t.dataset.do === "upload") pickFile();
     else if (t.dataset.do === "addtext") addText();
     else if (t.dataset.do === "done") { S.sel = -1; S.sheet = false; render(); }
-    else if (t.dataset.select != null) { S.sel = +t.dataset.select; if (isMobile()) S.sheet = false; render(); canvas.focus({ preventScroll: true }); }
+    else if (t.dataset.select != null && e.shiftKey) toggleMulti(+t.dataset.select);
+    else if (t.dataset.select != null) { S.multi = null; S.sel = +t.dataset.select; if (isMobile()) S.sheet = false; render(); canvas.focus({ preventScroll: true }); }
     else if (t.dataset.del != null) { layers().splice(+t.dataset.del, 1); S.sel = -1; commit(); render(); }
     else if (t.dataset.up != null) { S.sel = +t.dataset.up; tool("forward"); }
     else if (t.dataset.down != null) { S.sel = +t.dataset.down; tool("backward"); }
@@ -1194,7 +1268,7 @@ function bindGestures() {
   const ang = (a, b) => Math.atan2(b.y - a.y, b.x - a.x);
   const snap = (l) => ({ x: l.x, y: l.y, w: l.w, size: l.size, rotation: l.rotation });
 
-  function startSingle(p, pointerType) {
+  function startSingle(p, pointerType, shift) {
     const ls = layers().map(withPlaceholder), a = area();
     const sel = ls[S.sel];
     const pad = pointerType === "touch" ? 24 : 12;
@@ -1206,11 +1280,15 @@ function bindGestures() {
     for (let i = ls.length - 1; i >= 0; i--) {
       if (ls[i].locked) continue; // a photo design's artwork stays put; taps reach the photo under it
       if (R.hitLayer(ls[i], a, W, W, imgs, p.x, p.y, pointerType === "touch" ? 8 : 2)) {
-        if (S.sel !== i) { S.sel = i; S.tool = ""; render(); }
+        if (shift) { toggleMulti(i); return (g = multiOn() ? { kind: "multimove", p0: p, s: movers().map((x) => ({ x, px: x.x, py: x.y })) } : null); }
+        if (multiOn() && S.multi.includes(i)) return (g = { kind: "multimove", p0: p, s: movers().map((x) => ({ x, px: x.x, py: x.y })) }); // drag the group
+        if (S.multi) S.multi = null;
+        if (S.sel !== i) { S.sel = i; S.tool = ""; if (!isMobile() && ls[i].type === "text") S.tab = "text"; render(); } // computer: text tools show on the right
         return (g = { kind: "move", p0: p, s: snap(selected()) });
       }
     }
-    if (S.sel !== -1) { S.sel = -1; render(); }
+    if (shift) { g = null; return; } // shift-tap on empty space keeps the selection
+    if (S.sel !== -1 || S.multi) { S.sel = -1; S.multi = null; render(); }
     g = null;
   }
   const wrapEl = () => root.querySelector("#lz-canvaswrap");
@@ -1231,7 +1309,7 @@ function bindGestures() {
     scr.set(e.pointerId, { x: e.clientX, y: e.clientY });
     moved = false;
     if (pts.size === 1) {
-      if (layers().length) startSingle(pos(e), e.pointerType); else g = null;
+      if (layers().length) startSingle(pos(e), e.pointerType, e.shiftKey); else g = null;
       if (!g && zoom > 1) { const w = wrapEl(); g = { kind: "pan", x0: e.clientX, y0: e.clientY, sl: w.scrollLeft, st: w.scrollTop }; }
     } else if (pts.size === 2) {
       if (g && g.kind === "pan") g = null;
@@ -1254,12 +1332,22 @@ function bindGestures() {
     scr.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (g && g.kind === "pan") { const w = wrapEl(); w.scrollLeft = g.sl - (e.clientX - g.x0); w.scrollTop = g.st - (e.clientY - g.y0); return; }
     if (g && g.kind === "view") { if (scr.size >= 2) { const m = rawMid(); setZoom(g.z0 * rawDist() / Math.max(1, g.d0), m.x, m.y); } return; }
+    if (g && g.kind === "multimove") {
+      const b = box(), p = pos(e); moved = true;
+      for (const s of g.s) { s.x.x = round(clamp(s.px + (p.x - g.p0.x) / b.w, -0.5, 1.5)); s.x.y = round(clamp(s.py + (p.y - g.p0.y) / b.h, -0.5, 1.5)); }
+      const cx = g.s.reduce((t, s) => t + s.x.x, 0) / g.s.length, cy = g.s.reduce((t, s) => t + s.x.y, 0) / g.s.length; // the group's centre snaps too
+      S.guides = { v: Math.abs(cx - 0.5) < SNAP, h: Math.abs(cy - 0.5) < SNAP };
+      if (S.guides.v || S.guides.h) moveAll(S.guides.v ? 0.5 - cx : 0, S.guides.h ? 0.5 - cy : 0);
+      draw(); return;
+    }
     const l = selected(); if (!g || !l) return;
     moved = true;
     const b = box(), p = pos(e), k = l.type === "text" ? "size" : "w";
     if (g.kind === "move") {
       l.x = round(clamp(g.s.x + (p.x - g.p0.x) / b.w, -0.5, 1.5));
       l.y = round(clamp(g.s.y + (p.y - g.p0.y) / b.h, -0.5, 1.5));
+      S.guides = { v: Math.abs(l.x - 0.5) < SNAP, h: Math.abs(l.y - 0.5) < SNAP }; // centre guide lines, and a gentle snap to them
+      if (S.guides.v) l.x = 0.5; if (S.guides.h) l.y = 0.5;
     } else if (g.kind === "resize") {
       l[k] = round(clamp(g.s[k] * Math.hypot(p.x - g.c.cx, p.y - g.c.cy) / Math.max(1, g.d0), 0.03, 3));
     } else if (g.kind === "rotate") {
@@ -1279,7 +1367,7 @@ function bindGestures() {
     pts.delete(e.pointerId); scr.delete(e.pointerId);
     if (g && (g.kind === "pan" || g.kind === "view")) { if (!pts.size) g = null; return; }
     if (pts.size === 1 && selected()) { const p = [...pts.values()][0]; g = { kind: "move", p0: p, s: snap(selected()) }; }
-    else if (!pts.size) { g = null; if (moved) commit(); }
+    else if (!pts.size) { g = null; if (S.guides) { S.guides = null; draw(); } if (moved) { commit(); refreshMeasures(); } }
   };
   canvas.addEventListener("pointerup", end);
   canvas.addEventListener("pointercancel", end);
@@ -1293,7 +1381,7 @@ function bindGestures() {
     const k = l.type === "text" ? "size" : "w";
     if (e.shiftKey) l.rotation = snapRot(l.rotation + (e.deltaY > 0 ? 3 : -3));
     else l[k] = round(clamp(l[k] * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.002)), 0.03, 3));
-    draw(); commitSoon();
+    draw(); commitSoon(); clearTimeout(refreshMeasures.t); refreshMeasures.t = setTimeout(refreshMeasures, 300);
   }, { passive: false });
   if (!keysBound) { keysBound = true; document.addEventListener("keydown", onKey); }
 }
@@ -1309,11 +1397,17 @@ function onKey(e) {
     if (S.tool === "t-font" && S.fontOpen && (e.key === "Enter" || e.key === "Escape")) { e.preventDefault(); S.fontOpen = false; renderPop(); return; }
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "a") {
       if (!layers().length) return;
-      e.preventDefault(); S.all = true; S.sel = -1; render(); return;
+      e.preventDefault(); S.all = true; S.sel = -1; S.multi = layers().length > 1 ? layers().map((_, i) => i) : null; render(); return;
     }
     if (S.all) {
       if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); clearSide(); return; }
-      if (e.key === "Escape") { S.all = false; render(); return; }
+      if (e.key === "Escape") { S.all = false; S.multi = null; render(); return; }
+    }
+    if (multiOn()) {
+      if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); tool("delete"); return; }
+      if (e.key === "Escape") { S.multi = null; render(); return; }
+      const st = e.shiftKey ? 0.05 : 0.01, mv = { ArrowLeft: [-st, 0], ArrowRight: [st, 0], ArrowUp: [0, -st], ArrowDown: [0, st] }[e.key];
+      if (mv && S.tool !== "t-font") { e.preventDefault(); moveAll(mv[0], mv[1]); draw(); commit(); return; }
     }
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") { e.preventDefault(); return e.shiftKey ? redo() : undo(); }
     const l = selected();
@@ -1327,7 +1421,7 @@ function onKey(e) {
     };
     if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); return tool("delete"); }
     if (e.key === "Escape") { S.sel = -1; render(); return; }
-    if (acts[e.key]) { acts[e.key](); e.preventDefault(); e.stopPropagation(); draw(); commit(); } // one step per key press
+    if (acts[e.key]) { acts[e.key](); e.preventDefault(); e.stopPropagation(); draw(); commit(); refreshMeasures(); } // one step per key press
 }
 // Remove everything on this side (Clear all, or select all + Delete). Undo brings it back.
 function clearSide() {
@@ -1350,7 +1444,7 @@ function recordLayer(l) {
     if (l.design) o.design = l.design; if (l.locked) o.locked = true; if (l.clip) o.clip = l.clip; if (l.spot) o.spot = l.spot;
     return o;
   }
-  return { type: "text", text: l.text.trim(), font: l.font, color: l.color, size: l.size, x: l.x, y: l.y, rotation: l.rotation, spacing: l.spacing || 0, curve: l.curve || 0, bold: !!l.bold, italic: !!l.italic, light: !!l.light, underline: !!l.underline, strike: !!l.strike, caps: l.caps || "", vertical: !!l.vertical, align: l.align || "center" };
+  return { type: "text", text: l.text.trim(), font: l.font, color: l.color, size: l.size, x: l.x, y: l.y, rotation: l.rotation, spacing: l.spacing || 0, curve: l.curve || 0, bold: !!l.bold, italic: !!l.italic, light: !!l.light, underline: !!l.underline, strike: !!l.strike, caps: l.caps || "", sizeIn: round(textInches(l), 2), vertical: !!l.vertical, align: l.align || "center" };
 }
 function recordAreas(d, ar) {
   const out = {};

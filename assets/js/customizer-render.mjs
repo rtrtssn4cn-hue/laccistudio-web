@@ -362,8 +362,16 @@ export function drawComposite(ctx, area, layers, W, H, imgs, opts = {}) {
   ctx.save(); clipArea(ctx, area, b);
   layers.forEach((l) => drawLayer(ctx, l, area, W, H, imgs));
   ctx.restore();
+  if (opts.editing && opts.guides && (opts.guides.v || opts.guides.h)) { // centre guide lines while dragging
+    ctx.save(); ctx.strokeStyle = "#E0457B"; ctx.lineWidth = Math.max(1, W / 450); ctx.setLineDash([W * 0.012, W * 0.008]);
+    const cx = b.x + b.w / 2, cy = b.y + b.h / 2; ctx.beginPath();
+    if (opts.guides.v) { ctx.moveTo(cx, b.y); ctx.lineTo(cx, b.y + b.h); }
+    if (opts.guides.h) { ctx.moveTo(b.x, cy); ctx.lineTo(b.x + b.w, cy); }
+    ctx.stroke(); ctx.restore();
+  }
   if (opts.editing) { // no print-area outline: parts outside it show faded, and the window warns about them
     if (opts.selectedAll) layers.forEach((l) => drawSelection(ctx, l, area, W, H, imgs, false));
+    else if (opts.selectedMany) opts.selectedMany.forEach((i) => layers[i] && drawSelection(ctx, layers[i], area, W, H, imgs, false));
     const sel = layers[opts.selected];
     if (sel) drawSelection(ctx, sel, area, W, H, imgs, opts.handles !== false);
   }
