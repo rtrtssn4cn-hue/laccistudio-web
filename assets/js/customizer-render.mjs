@@ -42,6 +42,7 @@ const DEFAULT_AREAS = {
   // Centred on the coaster face in the photos (centre 46.5% across, 47.3% down; the shadow sits to the right)
   "ceramic-coasters": [A("main", "Coaster", { x: 0.085, y: 0.093, w: 0.76, h: 0.76 }, { widthIn: 4, heightIn: 4 },
     { shape: "ellipse", shapeBy: { Shape: { Square: { shape: "rect", rect: { x: 0.084, y: 0.093, w: 0.76, h: 0.76 } } } } })],
+  "ceramic-coasters-square": [A("main", "Coaster", { x: 0.084, y: 0.093, w: 0.76, h: 0.76 }, { widthIn: 4, heightIn: 4 })],
   "custom-stickers": [A("main", "Sticker", { x: 0.15, y: 0.15, w: 0.7, h: 0.7 }, { widthIn: 3, heightIn: 3 },
     { base: "sticker", printFromOption: "Size" })],
 };
