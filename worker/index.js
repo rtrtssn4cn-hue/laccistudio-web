@@ -16,7 +16,7 @@
 // returns the correct prices instead of creating a payment.
 
 import { cleanCustomization, DESIGN_SRC } from "./customization.js";
-import { priceLine, coasterCount, money } from "../assets/js/pricing.mjs";
+import { priceLine, coasterCount, itemCount, MAX_ITEMS_PER_ORDER, money } from "../assets/js/pricing.mjs";
 import { stripe, isTestKey, verifyStripeSignature } from "./stripe.js";
 import { handleAdminContent } from "./admin-content.js";
 
@@ -123,9 +123,12 @@ async function validateCart(env, body) {
       options: priced.summary, color: priced.color ? priced.color.id : null, personalization, files,
       ...(cz.customization ? { customization: cz.customization } : {}),
       coasters: coasterCount(product, selections, qty),
+      items: itemCount(product, selections, qty),
       grams: (Number(product.weight) || 0) * qty,
     });
   }
+  const items = lines.reduce((s, l) => s + (l.items || 0), 0);
+  if (items > MAX_ITEMS_PER_ORDER) return { error: `Online orders are up to ${MAX_ITEMS_PER_ORDER} items. For more, please send us a request with the date you need them by and we'll confirm a time and price.`, status: 400, tooMany: true };
   if (mismatch) return { error: "Prices in your cart were out of date and have been updated. Please review your cart and check out again.", status: 409, fresh };
   return { lines, catalog };
 }

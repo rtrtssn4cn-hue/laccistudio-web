@@ -401,9 +401,9 @@ await test("32. Coaster ladder: 1 $7.99 · 2 $13.99 · 4 $26.99 · 6 $36.99 · 8
     line("ceramic-coasters", { Quantity: "Set of 2", Material: "Ceramic", Shape: "Round" }),
     line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Round" }),
     line("ceramic-coasters", { Quantity: "Set of 6", Material: "Ceramic", Shape: "Round" }),
-    line("ceramic-coasters", { Quantity: "Set of 8", Material: "Ceramic", Shape: "Round" }),
-  ], [799, 1399, 2699, 3699, 3999]);
-  eq(o.subtotal_cents, 799 + 1399 + 2699 + 3699 + 3999, "order subtotal matches the ladder");
+  ], [799, 1399, 2699, 3699]);
+  eq(o.subtotal_cents, 799 + 1399 + 2699 + 3699, "order subtotal matches the ladder"); // 13 coasters; the 8-set on its own (20-item limit)
+  await chain([line("ceramic-coasters", { Quantity: "Set of 8", Material: "Ceramic", Shape: "Round" })], [3999]);
   const two = await checkout([line("ceramic-coasters", { Quantity: "Set of 2", Material: "Ceramic", Shape: "Round" })]);
   eq(two.status, 200, "set of 2 sells on its own");
   for (const n of ["Set of 10", "Set of 12"]) {
@@ -492,6 +492,18 @@ await test("36. A cart line whose design uses a Lacci design picture is accepted
   eq(r.status, 200, "accepted " + JSON.stringify(r.body));
   eq(JSON.parse((await order(stripeState.created.at(-1).id)).lines_json)[0].files.design, D, "design picture kept on the order");
   eq((await checkout([{ ...base, files: { design: "/assets/img/other.png" } }])).status, 400, "other site paths still refused");
+});
+
+await test("37. Online orders are up to 20 items (coaster sets count their coasters); bigger orders are refused before payment", async () => {
+  const c8 = (qty) => line("ceramic-coasters", { Quantity: "Set of 8", Material: "Ceramic", Shape: "Round" }, { qty });
+  const mug = (qty) => line("sublimation-mug", { Size: "11 oz", Style: "Standard White" }, { qty });
+  const c4 = (qty) => line("ceramic-coasters-square", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Square" }, { qty });
+  const before = stripeState.created.length;
+  const big = await checkout([c8(3)]);
+  eq(big.status, 400, "3 sets of 8 (24 coasters) refused"); ok(/request/.test(big.body.error), "customer is pointed to a request");
+  eq((await checkout([c8(2), mug(5)])).status, 400, "16 coasters + 5 mugs (21 items) refused");
+  eq(stripeState.created.length, before, "no Stripe session for orders over the limit");
+  eq((await checkout([c8(2), c4(1)])).status, 200, "16 + 4 = 20 items goes through");
 });
 
 for (const [r, n] of results) console.log(`${r}  ${n}`);

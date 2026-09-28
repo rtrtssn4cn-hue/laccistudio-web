@@ -4,7 +4,7 @@
 // assets/js/pricing.mjs, the same code the server uses; the server recalculates every line before
 // creating the Stripe payment and never uses a price sent from here.
 
-import { priceLine, money } from "./pricing.mjs";
+import { priceLine, money, itemCount, MAX_ITEMS_PER_ORDER } from "./pricing.mjs";
 
 const KEY = "lacci_stripe_cart_v1";
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -14,6 +14,10 @@ let cart = load();
 
 const raw = () => window.LACCI_RAW || { products: [], colors: [] };
 const productOf = (id) => raw().products.find((p) => p.id === id);
+// Physical items in the cart (a coaster set counts its coasters), optionally leaving one line out.
+function cartItems(skip = -1) { return cart.reduce((s, l, i) => (i === skip ? s : s + itemCount(productOf(l.productId), { options: l.options }, l.qty)), 0); }
+let limitNote = "";
+const LIMIT_TEXT = `Online orders are up to ${MAX_ITEMS_PER_ORDER} items. Need more? <a href="contact.html?service=Custom%20or%20bulk%20order">Send us a request</a> with the date you need them by.`;
 function price(line) { return priceLine(productOf(line.productId), { options: line.options, color: line.color }, raw().colors); }
 // Lines from the visual customizer carry their own design id, so two different designs of the same
 // product never merge; re-adding the very same design only raises the quantity.
@@ -60,7 +64,7 @@ function render(message) {
     return;
   }
   let subtotal = 0, blocked = false;
-  box.innerHTML = cart.map((l, i) => {
+  box.innerHTML = (limitNote ? `<p class="cart-note cart-limit" role="alert">${limitNote}</p>` : "") + cart.map((l, i) => {
     const p = price(l);
     if (p.ok) subtotal += p.unitCents * l.qty; else blocked = true;
     const opts = p.ok ? p.summary.map((o) => `${esc(o.label)}: ${esc(o.value)}`).join("<br>") : "";
@@ -121,6 +125,8 @@ function review() {
 
 function setQty(i, q) {
   if (!cart[i]) return;
+  if (q > cart[i].qty && cartItems(i) + itemCount(productOf(cart[i].productId), { options: cart[i].options }, q) > MAX_ITEMS_PER_ORDER) { limitNote = LIMIT_TEXT; render(); return; }
+  limitNote = "";
   if (q <= 0) cart.splice(i, 1); else cart[i].qty = Math.min(q, 50);
   save(cart); render();
 }
