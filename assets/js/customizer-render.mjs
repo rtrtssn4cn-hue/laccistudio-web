@@ -29,8 +29,9 @@ const DEFAULT_AREAS = {
   "sublimation-mug": [A("main", "Front", { x: 0.13, y: 0.24, w: 0.44, h: 0.44 }, { widthIn: 3.5, heightIn: 3.5 },
     { printBy: { Size: { "15 oz": { widthIn: 3.8, heightIn: 3.8 } } } })],
   "apparel-t-shirt": [
-    A("front", "Front", { x: 0.33, y: 0.2, w: 0.34, h: 0.4 }, { widthIn: 12, heightIn: 14 }, { mockupSuffix: "-front" }),
-    A("back", "Back", { x: 0.33, y: 0.18, w: 0.34, h: 0.4 }, { widthIn: 12, heightIn: 14 }, { mockupSuffix: "-back" })],
+    // Whole front / back of the shirt body, collar to hem, so a design can go anywhere on it (chest, low, off-centre)
+    A("front", "Front", { x: 0.28, y: 0.19, w: 0.46, h: 0.69 }, { widthIn: 14, heightIn: 21 }, { mockupSuffix: "-front" }),
+    A("back", "Back", { x: 0.26, y: 0.15, w: 0.46, h: 0.73 }, { widthIn: 14, heightIn: 22 }, { mockupSuffix: "-back" })],
   "apparel-hoodie": [
     A("front", "Front", { x: 0.36, y: 0.3, w: 0.28, h: 0.25 }, { widthIn: 11, heightIn: 10 }, { mockupSuffix: "-front" }),
     A("back", "Back", { x: 0.33, y: 0.32, w: 0.34, h: 0.4 }, { widthIn: 12, heightIn: 14 }, { mockupSuffix: "-back" })],
@@ -128,7 +129,7 @@ export function removeWhite(img, maxSide = 2200) {
   const T1 = 34, T2 = 64; // same colour up to T1 (JPEG noise); T1–T2 is the soft edge
   let same = 0;
   for (const p of edge) if (diff(p) <= T1) same++;
-  if (same < edge.length * 0.6) { c.bgKind = "busy"; return c; }
+  if (same < edge.length * 0.85) { c.bgKind = "busy"; return c; } // most of the edge must be one colour; photos go to the AI cut-out
   const seen = new Uint8Array(w * h), stack = [];
   for (const p of edge) if (!seen[p] && diff(p) <= T1) { seen[p] = 1; stack.push(p); }
   while (stack.length) {
