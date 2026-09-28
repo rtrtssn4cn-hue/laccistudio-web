@@ -28,9 +28,8 @@
     },
     {
       "id": "local-delivery",
-      "enabled": false,
-      "disabledReason": "Hidden for the Stripe launch: hosted Checkout cannot limit it to Houston ZIP codes before payment.",
-      "name": "Local delivery — Houston area ZIP codes only (free)",
+      "note": "Offered at checkout only when the ZIP entered in the cart matches postalCodePattern; an order whose shipping address is outside the area is flagged in Orders.",
+      "name": "Local delivery — Houston area (free)",
       "maxDays": 5,
       "postalCodePattern": "^77([0-4][0-9]{2}|5(0[0-9]|1[0-8]|2[0-3]|3[0-9]|4[0-9]|7[0-9]|8[0-9]|9[0-9]))",
       "bands": [{ "maxGrams": null, "amount": 0 }]

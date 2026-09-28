@@ -33,6 +33,28 @@ function previewsOf(l) {
 }
 const customizer = () => import("./customizer.mjs?v=1");
 
+// Free local delivery: the customer enters a ZIP in the cart; when it's in the delivery area the
+// server adds the free option to the payment page. The ZIP is kept in this browser only.
+const ZIP_KEY = "lacci_local_zip";
+let localZip = ""; try { localZip = localStorage.getItem(ZIP_KEY) || ""; } catch {}
+let localArea = null;
+const loadArea = () => localArea || (localArea = fetch("/content/shipping.json").then((r) => r.json())
+  .then((s) => (s.methods || []).find((m) => m.postalCodePattern && m.enabled !== false) || null).catch(() => null));
+async function zipMessage() {
+  const out = document.querySelector("#sc-zipmsg"); if (!out) return;
+  if (!/^\d{5}$/.test(localZip)) { out.textContent = ""; out.className = "cart-zipmsg"; return; }
+  const m = await loadArea();
+  let ok = false; try { ok = !!m && new RegExp(m.postalCodePattern).test(localZip); } catch {}
+  out.textContent = ok ? "✓ Free local delivery will be offered at checkout." : "Sorry, that ZIP is outside our local delivery area. Shipping options will be shown.";
+  out.className = "cart-zipmsg " + (ok ? "ok" : "no");
+}
+const localBlock = () => `<div class="cart-local"><label for="sc-zip">Houston area? Enter your ZIP for free local delivery</label><input id="sc-zip" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="ZIP code" value="${esc(localZip)}"><p id="sc-zipmsg" class="cart-zipmsg" aria-live="polite"></p></div>`;
+function wireZip() {
+  const z = document.querySelector("#sc-zip"); if (!z) return;
+  z.oninput = () => { localZip = z.value.replace(/\D/g, "").slice(0, 5); if (z.value !== localZip) z.value = localZip; try { localStorage.setItem(ZIP_KEY, localZip); } catch {} zipMessage(); };
+  zipMessage();
+}
+
 function ensureDrawer() {
   if (document.querySelector("#sc-drawer")) return;
   const wrap = document.createElement("div");
@@ -88,7 +110,7 @@ function render(message) {
       ? `<p class="cart-note">${cartItems()} items. Shipping and any sales tax are added when you pay.</p>` +
         `<button class="btn btn-gold" id="sc-checkout" style="width:100%;justify-content:center"${blocked ? " disabled" : ""}>Send order request</button>` +
         `<p class="cart-note" style="text-align:center;margin-top:.5rem">No payment now</p>`
-      : `<p class="cart-note">Shipping and any sales tax are added at checkout. Promo codes can be entered there too.</p>` +
+      : localBlock() + `<p class="cart-note">Shipping and any sales tax are added at checkout. Promo codes can be entered there too.</p>` +
         `<button class="btn btn-gold" id="sc-checkout" style="width:100%;justify-content:center"${blocked ? " disabled" : ""}>Checkout</button>` +
         `<p class="cart-note" style="text-align:center;margin-top:.5rem">Secure payment by Stripe</p>`) +
     `<button class="cart-continue" id="sc-continue">Continue shopping</button>`;
@@ -98,6 +120,7 @@ function render(message) {
   box.querySelectorAll("[data-edit]").forEach((b) => (b.onclick = () => customizer().then((m) => m.edit(+b.dataset.edit))));
   box.querySelectorAll("[data-dup]").forEach((b) => (b.onclick = () => customizer().then((m) => m.edit(+b.dataset.dup, true))));
   document.querySelector("#sc-continue").onclick = close;
+  wireZip();
   document.querySelector("#sc-checkout").onclick = cart.some((l) => l.customization) ? review : isRequest() ? requestForm : checkout;
 }
 
@@ -122,11 +145,12 @@ function review() {
   foot.innerHTML = `<div class="cart-subtotal"><span>Subtotal</span><strong>${money(subtotal)}</strong></div>` +
     (isRequest() ? `<p class="cart-note">${REQUEST_TEXT}</p>` +
       `<button class="btn btn-gold" id="sc-pay" style="width:100%;justify-content:center">Continue to order request</button>`
-    : `<p class="cart-note">Shipping and any sales tax are added on the next page.</p>` +
+    : localBlock() + `<p class="cart-note">Shipping and any sales tax are added on the next page.</p>` +
       `<button class="btn btn-gold" id="sc-pay" style="width:100%;justify-content:center">Continue to secure checkout</button>`) +
     `<button class="cart-continue" id="sc-back">Back to cart</button>`;
   box.querySelectorAll("[data-edit]").forEach((b) => (b.onclick = () => customizer().then((m) => m.edit(+b.dataset.edit))));
   document.querySelector("#sc-pay").onclick = isRequest() ? requestForm : checkout;
+  wireZip();
   document.querySelector("#sc-back").onclick = () => render();
 }
 
@@ -201,7 +225,7 @@ async function checkout() {
   btn.disabled = true; btn.textContent = "Opening secure checkout…";
   const lines = cart.map(({ thumbs, ...l }) => ({ ...l, expectedUnitCents: price(l).unitCents }));
   try {
-    const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lines }) });
+    const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lines, localZip }) });
     const data = await res.json().catch(() => ({}));
     if (res.ok && data.url) { location.href = data.url; return; }
     if (res.status === 409) await reloadCatalog(); // prices changed since the page loaded: show the current ones
