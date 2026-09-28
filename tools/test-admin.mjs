@@ -58,7 +58,8 @@ await test("5. Archiving keeps the product and all its data", async () => {
   eq((await save(data, r.body.sha)).status, 200, "archive saved");
   const saved = JSON.parse(gh.files.draft["content/products.json"].text).products[0];
   eq(saved.status, "archived", "archived"); const { updatedAt, ...rest } = saved; ok(updatedAt, "save time stamped");
-  eq(JSON.stringify({ ...rest, status: JSON.parse(before).status }), JSON.stringify(JSON.parse(before)), "every other field kept");
+  const { updatedAt: _old, ...was } = JSON.parse(before); // an earlier Admin publish may have dated the product already
+  eq(JSON.stringify({ ...rest, status: was.status }), JSON.stringify(was), "every other field kept");
 });
 await test("6. A stale edit (someone else saved first) is refused, not overwritten", async () => {
   const r = await call("/api/admin/content/products");
