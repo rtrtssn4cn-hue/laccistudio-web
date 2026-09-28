@@ -129,7 +129,11 @@ await test("4. Artwork link from an unknown host is refused", async () => {
   eq(r.status, 400, "status");
 });
 await test("5. Mug 15 oz Color-Changing x3", async () => { await chain([line("sublimation-mug", { Size: "15 oz", Style: "Color-Changing Magic" }, { qty: 3 })], [1799]); });
-await test("6. Tumbler 30 oz Glitter", async () => { await chain([line("sublimation-tumbler", { Size: "30 oz", Finish: "Glitter" })], [2599]); });
+await test("6. Tumbler 40 oz Glossy; the size and finishes switched off in the Admin (30 oz, Glitter) are refused", async () => {
+  await chain([line("sublimation-tumbler", { Size: "40 oz", Finish: "Glossy" })], [2499]);
+  eq((await checkout([line("sublimation-tumbler", { Size: "30 oz", Finish: "Glossy" })])).status, 400, "30 oz refused");
+  eq((await checkout([line("sublimation-tumbler", { Size: "20 oz", Finish: "Glitter" })])).status, 400, "Glitter refused");
+});
 await test("7. White T-shirt, size L, front and back", async () => {
   await chain([line("apparel-t-shirt", { "Print location": "Front and back", Size: "L" }, { color: "white", files: { design: UC, backDesign: UC } })], [2399]);
 });
@@ -416,7 +420,7 @@ await test("32. Coaster ladder: 1 $7.99 · 2 $14.99 · 4 $24.99 · 6 $34.99 · 8
 
 await test("33. Aggressive Growth prices for every product on sale reach Stripe exactly; plans are never charged", async () => {
   const cases = [
-    ["sublimation-tumbler", { Size: "20 oz", Finish: "Glossy" }, null, 1899], ["sublimation-tumbler", { Size: "40 oz", Finish: "Matte" }, null, 2699],
+    ["sublimation-tumbler", { Size: "20 oz", Finish: "Glossy" }, null, 1899], ["sublimation-tumbler", { Size: "40 oz", Finish: "Glossy" }, null, 2499],
     ["sublimation-mug", { Size: "11 oz", Style: "Standard White" }, null, 1199], ["sublimation-mug", { Size: "15 oz", Style: "Standard White" }, null, 1399],
     ["apparel-t-shirt", { "Print location": "Front only", Size: "XL" }, "white", 1799], ["apparel-t-shirt", { "Print location": "Front only", Size: "3XL" }, "white", 2199],
     ["apparel-hoodie", { "Print location": "Front only", Size: "M" }, "white", 2499], ["apparel-hoodie", { "Print location": "Front only", Size: "3XL" }, "white", 2899],
