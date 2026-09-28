@@ -116,6 +116,11 @@ export function coasterCount(product, selections, qty) {
   return (m ? Number(m[1]) : 1) * qty;
 }
 
-const api = { cents, PRODUCT_STATUSES, productStatus, isProductOnSale, isVisible, choiceName, visibleGroups, choiceModCents, visibleColors, priceLine, fromPriceCents, money, coasterCount };
+// Largest order that can be paid online: 20 physical items (a set of 8 coasters counts as 8; a sticker
+// pack counts as one). Bigger orders are sent as a request with the date they're needed by.
+export const MAX_ITEMS_PER_ORDER = 20;
+export function itemCount(product, selections, qty) { const c = coasterCount(product, selections, qty); return c == null ? qty : c; }
+
+const api = { MAX_ITEMS_PER_ORDER, itemCount, cents, PRODUCT_STATUSES, productStatus, isProductOnSale, isVisible, choiceName, visibleGroups, choiceModCents, visibleColors, priceLine, fromPriceCents, money, coasterCount };
 if (typeof window !== "undefined") window.LacciPricing = api;
 export default api;

@@ -10,7 +10,7 @@
 // file show exactly what the customer made. The older form (cart.js openCustomize) stays available
 // with ?customizer=classic.
 
-import { priceLine, visibleGroups, choiceName, money } from "./pricing.mjs";
+import { priceLine, visibleGroups, choiceName, money, itemCount, MAX_ITEMS_PER_ORDER } from "./pricing.mjs";
 import R from "./customizer-render.mjs";
 
 const PROOF_YES = "Yes — send me a proof before production (recommended)";
@@ -803,6 +803,16 @@ async function cutOutSubject(l, info) {
   S.bgBusy = false; render();
 }
 
+// ---------------------------------------------------------------- order size limit
+// Items already in the cart (a line being edited doesn't count against itself).
+function cartItemsElsewhere() {
+  const lines = (window.LacciCheckout && window.LacciCheckout.lines()) || [];
+  return lines.reduce((s, l, i) => (i === S.editIndex ? s : s + itemCount(raw().products.find((p) => p.id === l.productId), { options: l.options }, l.qty)), 0);
+}
+const itemsFor = (qty) => itemCount(rawProduct(), { options: S.options }, qty);
+const fitsLimit = (qty) => cartItemsElsewhere() + itemsFor(qty) <= MAX_ITEMS_PER_ORDER;
+function limitError() { S.limitHit = true; renderPanel(); }
+
 // ---------------------------------------------------------------- touch up
 // Brush over the picture to bring back parts the background removal took away (Restore) or to
 // remove leftovers by hand (Erase). Removed areas show faintly so it is clear what can be restored.
@@ -1081,7 +1091,7 @@ function productPanel() {
         const name = choiceName(c), pr = priceLine(rp, { options: { ...S.options, [g.label]: name }, color: S.color }, raw().colors);
         const n = setSize({ Quantity: name });
         return `<button type="button" data-opt="${esc(g.label)}" data-v="${esc(name)}" aria-pressed="${S.options[g.label] === name}"><strong>${n}</strong><small>${n > 1 ? "coasters" : "coaster"}</small>${pr.ok ? `<em>${money(pr.unitCents)}</em>${n > 1 ? `<small>${money(Math.round(pr.unitCents / n))} each</small>` : ""}` : ""}</button>`;
-      }).join("")}<a class="lz-qbulk" href="contact.html"><strong>10+</strong><small>Bulk / custom order</small><em>Get a quote</em></a></div></div>`;
+      }).join("")}<a class="lz-qbulk" href="${quoteLink()}"><strong>21+</strong><small>Large order</small><em>Request a quote</em></a></div></div>`;
     }
     return `<div class="lz-field"><span>${esc(g.label)}</span><div class="lz-chips">${g.choices.map((c) => {
       const name = choiceName(c);
@@ -1095,7 +1105,8 @@ function productPanel() {
   const n = setSize(S.options);
   return `${html}${colors}
     ${singles.length ? `<p class="lz-info-line">${singles.map((g) => `<span><small>${esc(g.label)}</small> ${esc(choiceName(g.choices[0]))}</span>`).join("")}</p>` : ""}
-    <div class="lz-field"><span>${n > 1 ? "Number of sets" : "Quantity"}</span><div class="lz-stepper"><button type="button" data-qty="-1" aria-label="Fewer">−</button><output id="lz-qty">${S.qty}</output><button type="button" data-qty="1" aria-label="More">+</button></div></div>`;
+    <div class="lz-field"><span>${n > 1 ? "Number of sets" : "Quantity"}</span><div class="lz-stepper"><button type="button" data-qty="-1" aria-label="Fewer">−</button><output id="lz-qty">${S.qty}</output><button type="button" data-qty="1" aria-label="More">+</button></div></div>
+    <p class="lz-note${S.limitHit ? " lz-qnote" : ""}">Online orders are up to ${MAX_ITEMS_PER_ORDER} items${cartItemsElsewhere() ? ` (${cartItemsElsewhere()} already in your cart)` : ""}. Need more? <a href="${quoteLink()}">Send us a request</a> with the date you need them by.</p>`;
 }
 
 function reviewPanel() {
@@ -1144,7 +1155,11 @@ function bindPanel(box) {
     else if (t.dataset.pos) position(t.dataset.pos);
     else if (t.dataset.garment) { S.color = t.dataset.garment; commit(); render(); }
     else if (t.dataset.opt) setOption(t.dataset.opt, t.dataset.v);
-    else if (t.dataset.qty) { S.qty = clamp(S.qty + Number(t.dataset.qty), 1, 50); commit(); render(); }
+    else if (t.dataset.qty) {
+      const q = clamp(S.qty + Number(t.dataset.qty), 1, 50);
+      if (Number(t.dataset.qty) > 0 && !fitsLimit(q)) return limitError(); // up to 20 items per order
+      S.limitHit = false; S.qty = q; commit(); render();
+    }
     else if (t.closest("[data-bind=layout]")) setLayout(t.dataset.v);
   };
   box.oninput = (e) => {
@@ -1170,6 +1185,9 @@ function setOption(label, value) {
   const after = setSize({ ...S.options, [label]: value });
   if (S.layout === "each" && after < before && S.items.slice(after).some(hasContent) && !confirm(`Coasters ${after + 1}–${before} have designs. Remove them?`)) return;
   S.options[label] = value;
+  // a bigger set can push the order past 20 items: lower the number of sets to what fits
+  while (S.qty > 1 && !fitsLimit(S.qty)) S.qty--;
+  S.limitHit = !fitsLimit(S.qty);
   if (S.layout === "each") S.items = S.items.slice(0, Math.max(after, 1));
   if (after <= 1) { if (S.layout === "each") S.shared = S.items[0] || S.shared; S.layout = "same"; S.item = 0; }
   S.sel = -1;
@@ -1507,9 +1525,12 @@ function liveLayer(l) {
   return key ? { ...l, src: key } : l;
 }
 
+// Request form link with this product filled in.
+function quoteLink() { return `contact.html?service=Custom%20or%20bulk%20order&item=${encodeURIComponent(product().name)}&quantity=21%2B`; }
 async function addToCart() {
   const add = root.querySelector("#lz-add");
   if (uploadingAny()) return;
+  if (!fitsLimit(S.qty)) { limitError(); return error(`Online orders are up to ${MAX_ITEMS_PER_ORDER} items. Lower the quantity, or send us a request for a larger order.`); }
   const pr = priced(); if (!pr.ok) return error(pr.error);
   const used = new Set(Object.values(S.shared).concat(...S.items.map((d) => Object.values(d))).flat().filter((l) => l && l.type === "image").map((l) => l.src));
   if ([...used].some((k) => imgs[k] && imgs[k].failed)) return error("One of your files didn't upload. Delete it and upload it again.");
