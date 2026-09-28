@@ -478,17 +478,26 @@ function renderCtx() {
   }
   if (l.locked) { box.innerHTML = btn("upload", photoSpotOpen() ? "Add your photo" : "Change photo", "⬆") + btn("delete", "Remove design", "🗑", 'class="lz-danger"'); pop.hidden = true; return; }
   const ls = layers(), i = S.sel;
-  const order = (ls.length > 1 && !l.clip ? btn("forward", "Forward", "⬆", i === ls.length - 1 ? "disabled" : "") + btn("backward", "Back", "⬇", i === 0 ? "disabled" : "") : "");
+  const order = (ls.length > 1 && !l.clip ? btn("forward", "Bring front", "⬆", (i === ls.length - 1 ? "disabled " : "") + 'title="Put this in front of items it overlaps"') + btn("backward", "Send back", "⬇", (i === 0 ? "disabled " : "") + 'title="Put this behind items it overlaps"') : "");
   box.innerHTML = l.type === "image"
     ? btn("replace", "Replace", "⇄") + ((imgs[l.src] || {}).img && bgKind(l) !== "transparent" ? btn("bg", S.bgBusy ? "Removing…" : "Remove bg", "◩", S.bgBusy ? "disabled" : (bgKind(l) === "plain" && l.removeWhite !== false ? 'aria-pressed="true"' : "")) : "") + ((imgs[l.src] || {}).img ? btn("touchup", "Touch up", "🖌") : "") + btn("crop", "Crop", "⌗") + btn("flip", "Flip", "⇋") + btn("fit", "Fit", "⤢") + btn("fill", "Fill", "⛶") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("reset", "Reset", "↺") + btn("delete", "Delete", "🗑", 'class="lz-danger"')
-    : btn("t-font", "Font", "Aa", S.tool === "t-font" ? 'aria-pressed="true"' : "") + btn("t-size", "Size", "↕", S.tool === "t-size" ? 'aria-pressed="true"' : "") + `<span class="lz-fmt" role="group" aria-label="Text style">${ib("t-color", "Text colour", `<b class="lz-colA">A</b><i class="lz-colbar" style="background:${esc(l.color)}"></i>`, S.tool === "t-color")}${ib("bold", "Bold", "<b>B</b>", l.bold)}${ib("italic", "Italic", '<i style="font-family:Georgia,serif">I</i>', l.italic)}${ib("underline", "Underline", "<u>U</u>", l.underline)}${ib("strike", "Strikethrough", "<s>S</s>", l.strike)}${ib("caps", l.caps === "upper" ? "Uppercase (tap for lowercase)" : l.caps === "lower" ? "Lowercase (tap for as typed)" : "As typed (tap for uppercase)", l.caps === "upper" ? "AA" : l.caps === "lower" ? "aa" : "aA", !!l.caps)}</span>` + btn("align", "Align", l.align === "left" ? "⇤" : l.align === "right" ? "⇥" : "≡") + btn("t-spacing", "Spacing", "↔", S.tool === "t-spacing" ? 'aria-pressed="true"' : "") +
-      btn("t-curve", "Curve", "◠", S.tool === "t-curve" ? 'aria-pressed="true"' : "") + btn("vertical", l.vertical ? "Across" : "Down", l.vertical ? "⇥" : "⇩") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("delete", "Delete", "🗑", 'class="lz-danger"');
+    : btn("t-font", "Font", "Aa", S.tool === "t-font" ? 'aria-pressed="true"' : "") + btn("t-size", "Size", "↕", S.tool === "t-size" ? 'aria-pressed="true"' : "") + `<span class="lz-fmt" role="group" aria-label="Text style">${ib("t-color", "Text colour", `<b class="lz-colA">A</b><i class="lz-colbar" style="background:${esc(l.color)}"></i>`, S.tool === "t-color")}${ib("bold", "Bold", "<b>B</b>", l.bold)}${ib("italic", "Italic", '<i style="font-family:Georgia,serif">I</i>', l.italic)}${ib("underline", "Underline", "<u>U</u>", l.underline)}${ib("strike", "Strikethrough", "<s>S</s>", l.strike)}${ib("caps", l.caps === "upper" ? "Uppercase (tap for lowercase)" : l.caps === "lower" ? "Lowercase (tap for as typed)" : "As typed (tap for uppercase)", l.caps === "upper" ? "AA" : l.caps === "lower" ? "aa" : "aA", !!l.caps)}</span>` + btn("t-align", "Align", "⊞", S.tool === "t-align" ? 'aria-pressed="true"' : "") + btn("t-spacing", "Spacing", "↔", S.tool === "t-spacing" ? 'aria-pressed="true"' : "") +
+      btn("t-curve", "Curve", "◠", S.tool === "t-curve" ? 'aria-pressed="true"' : "") + btn("vertical", l.vertical ? "Horizontal" : "Vertical", l.vertical ? "⇥" : "⇩", `title="${l.vertical ? "Letters side by side" : "Stack the letters top to bottom"}"`) + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("delete", "Delete", "🗑", 'class="lz-danger"');
   renderPop();
 }
 // Printed text size: the letter size (font size) in inches on the product, and the same in points.
 const textInches = (l) => l.size * ((area().print || {}).heightIn || 0);
 const sizeLabel = (l) => { const i = textInches(l); return i ? `${i.toFixed(2)} in` : ""; };
 const SNAP = 0.012; // how close to the centre (share of the print area) before snapping to it
+// Moves text to an edge (or the middle) of the print area, like "align to page".
+function alignToProduct(list, where) {
+  const a = area(), ab = R.areaBox(a, 1000, 1000);
+  for (const t of list) {
+    const bx = R.layerBox(t, a, 1000, 1000, imgs), w = bx.w / ab.w, h = bx.h / ab.h, m = 0.03; // small margin keeps it inside the print area
+    if (where === "left") t.x = round(w / 2 + m); if (where === "right") t.x = round(1 - w / 2 - m); if (where === "hcenter") t.x = 0.5;
+    if (where === "top") t.y = round(h / 2 + m); if (where === "bottom") t.y = round(1 - h / 2 - m); if (where === "vcenter") t.y = 0.5;
+  }
+}
 // After resizing on the product (drag, pinch, scroll, keys) the sizes shown in the lists and the Size box follow.
 function refreshMeasures() { if (!root || !S) return; renderPanel(); if (S.tool) renderPop(); }
 
@@ -552,6 +561,9 @@ function renderPop() {
     <details class="lz-adv"><summary>Exact colour (HEX)</summary><input type="text" id="lz-hex" maxlength="7" value="${esc(l.color)}" spellcheck="false" autocapitalize="characters" placeholder="#D79D41"></details>`;
   if (S.tool === "t-size") pop.innerHTML = `<label class="lz-range"><span>A</span><input type="range" min="3" max="60" value="${Math.round(l.size * 100)}" data-range="size" aria-label="Text size"><span style="font-size:1.3em">A</span></label>
     <label class="lz-sizebox"><span>Size</span><input type="number" id="lz-size-in" min="0.1" max="12" step="0.05" value="${textInches(l).toFixed(2)}" inputmode="decimal"> <span>in</span> <small id="lz-size-pt">${Math.round(textInches(l) * 72)} pt</small></label>`;
+  if (S.tool === "t-align") pop.innerHTML = `<div class="lz-alignbox"><span>On the product</span><div class="lz-chips">${[["left", "⇤ Left"], ["hcenter", "↔ Center"], ["right", "Right ⇥"], ["top", "⤒ Top"], ["vcenter", "↕ Middle"], ["bottom", "⤓ Bottom"]].map(([k, t]) => `<button type="button" data-pos="${k}">${t}</button>`).join("")}</div>
+    <span>Text lines</span><div class="lz-chips">${[["left", "⇤ Left"], ["center", "≡ Center"], ["right", "Right ⇥"]].map(([k, t]) => `<button type="button" data-talign="${k}" aria-pressed="${(l.align || "center") === k}">${t}</button>`).join("")}</div>
+    ${l.text.includes("\n") ? "" : `<p class="lz-note">Text lines apply when the text has more than one line.</p>`}</div>`;
   if (S.tool === "t-spacing") pop.innerHTML = `<label class="lz-range"><span>Tight</span><input type="range" min="0" max="50" value="${Math.round((l.spacing || 0) * 100)}" data-range="spacing" aria-label="Letter spacing"><span>Wide</span></label>
     <label class="lz-sizebox"><span>Spacing</span><input type="number" data-num="spacing" min="0" max="50" step="1" value="${Math.round((l.spacing || 0) * 100)}" inputmode="numeric"> <small>0 = normal, 50 = widest</small></label>`;
   if (S.tool === "t-curve") pop.innerHTML = `<label class="lz-range"><span>◡</span><input type="range" min="-100" max="100" step="5" value="${l.curve || 0}" data-range="curve" aria-label="Curve: arch down to arch up"><span>◠</span></label>
@@ -560,6 +572,8 @@ function renderPop() {
     const t = e.target.closest("button"); if (!t) return;
     if (t.dataset.fontdd) { S.fontOpen = !S.fontOpen; renderPop(); showChosenFont(pop); return; }
     if (t.dataset.fontstep) { stepFont(+t.dataset.fontstep); return; }
+    if (t.dataset.talign) { for (const x of all) x.align = t.dataset.talign; commit(); renderPop(); draw(); return; }
+    if (t.dataset.pos) { alignToProduct(all, t.dataset.pos); commit(); draw(); return; }
     if (t.dataset.fontcat) { S.fontCat = t.dataset.fontcat === "All" ? "" : t.dataset.fontcat; S.fontOpen = true; renderPop(); showChosenFont(pop); return; } // the list opens on that category
     if (t.dataset.font) { setFont(l, t.dataset.font); return; } // the list stays open to try the next one
     if (t.dataset.weight) { l.bold = t.dataset.weight === "bold"; l.light = t.dataset.weight === "light"; afterFont(l); commit(); renderPop(); renderCtx(); draw(); }

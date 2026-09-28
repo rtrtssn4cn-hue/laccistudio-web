@@ -259,7 +259,10 @@ html.lz-lock, html.lz-lock body { overflow: hidden; }
 /* text tools in the right-hand panel (computer) */
 .lz-textslot:empty { display: none; }
 .lz-textslot { margin: 8px 0 12px; border: 1px solid var(--lz-line); border-radius: 12px; padding: 8px; background: #fff; }
-.lz-ctx.in-panel { flex-wrap: wrap; overflow: visible; justify-content: flex-start; gap: 2px; margin: 0; }
-.lz-ctx.in-panel button { min-width: 52px; }
-.lz-ctx.in-panel .lz-fmt { border: 0; padding: 0; margin: 0 0 4px; width: 100%; }
+.lz-ctx.in-panel { flex-wrap: wrap; overflow: visible; justify-content: flex-start; align-items: stretch; gap: 2px; margin: 0; }
+.lz-ctx.in-panel button { min-width: 0; padding: 6px 7px 5px; }
+.lz-ctx.in-panel .lz-fmt { display: contents; } /* style icons flow with the other buttons, no row of their own */
+.lz-ctx.in-panel .lz-ib { height: auto; min-width: 36px; padding: 6px 6px; }
 .lz-textslot .lz-pop { position: static; margin-top: 8px; max-height: none; box-shadow: none; }
+.lz-alignbox > span { display: block; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--lz-muted); margin: 4px 0; }
+.lz-alignbox .lz-chips { flex-wrap: wrap; }
