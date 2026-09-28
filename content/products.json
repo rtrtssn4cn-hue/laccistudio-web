@@ -2100,21 +2100,26 @@
               "name": "Ceramic"
             },
             {
-              "name": "Sandstone"
+              "name": "Sandstone",
+              "hidden": true
             },
             {
-              "name": "Cork-Backed"
+              "name": "Cork-Backed",
+              "hidden": true
             },
             {
-              "name": "Neoprene"
+              "name": "Neoprene",
+              "hidden": true
             },
             {
               "name": "Acrylic",
-              "add": 1
+              "add": 1,
+              "hidden": true
             },
             {
               "name": "Slate",
-              "add": 2
+              "add": 2,
+              "hidden": true
             }
           ]
         },
@@ -2215,21 +2220,26 @@
               "name": "Ceramic"
             },
             {
-              "name": "Sandstone"
+              "name": "Sandstone",
+              "hidden": true
             },
             {
-              "name": "Cork-Backed"
+              "name": "Cork-Backed",
+              "hidden": true
             },
             {
-              "name": "Neoprene"
+              "name": "Neoprene",
+              "hidden": true
             },
             {
               "name": "Acrylic",
-              "add": 1
+              "add": 1,
+              "hidden": true
             },
             {
               "name": "Slate",
-              "add": 2
+              "add": 2,
+              "hidden": true
             }
           ]
         },

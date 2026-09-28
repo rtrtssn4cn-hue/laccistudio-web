@@ -253,3 +253,13 @@ html.lz-lock, html.lz-lock body { overflow: hidden; }
 .lz-ib b { font-weight: 800; }
 .lz-colA { font-weight: 600 !important; line-height: 1; }
 .lz-colbar { display: block; width: 22px; height: 5px; border-radius: 3px; margin-top: 2px; box-shadow: 0 0 0 1px rgba(0,0,0,.15); }
+
+.lz-multi { flex: none; align-self: center; font-size: .78rem; font-weight: 700; padding: 0 8px; color: var(--lz-gold-deep); white-space: nowrap; }
+
+/* text tools in the right-hand panel (computer) */
+.lz-textslot:empty { display: none; }
+.lz-textslot { margin: 8px 0 12px; border: 1px solid var(--lz-line); border-radius: 12px; padding: 8px; background: #fff; }
+.lz-ctx.in-panel { flex-wrap: wrap; overflow: visible; justify-content: flex-start; gap: 2px; margin: 0; }
+.lz-ctx.in-panel button { min-width: 52px; }
+.lz-ctx.in-panel .lz-fmt { border: 0; padding: 0; margin: 0 0 4px; width: 100%; }
+.lz-textslot .lz-pop { position: static; margin-top: 8px; max-height: none; box-shadow: none; }
