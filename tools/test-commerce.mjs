@@ -494,16 +494,59 @@ await test("36. A cart line whose design uses a Lacci design picture is accepted
   eq((await checkout([{ ...base, files: { design: "/assets/img/other.png" } }])).status, 400, "other site paths still refused");
 });
 
-await test("37. Online orders are up to 20 items (coaster sets count their coasters); bigger orders are refused before payment", async () => {
+await test("37. Online checkout is up to 20 items (coaster sets count their coasters); bigger orders must be sent as a request", async () => {
   const c8 = (qty) => line("ceramic-coasters", { Quantity: "Set of 8", Material: "Ceramic", Shape: "Round" }, { qty });
   const mug = (qty) => line("sublimation-mug", { Size: "11 oz", Style: "Standard White" }, { qty });
   const c4 = (qty) => line("ceramic-coasters-square", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Square" }, { qty });
   const before = stripeState.created.length;
   const big = await checkout([c8(3)]);
-  eq(big.status, 400, "3 sets of 8 (24 coasters) refused"); ok(/request/.test(big.body.error), "customer is pointed to a request");
+  eq(big.status, 400, "3 sets of 8 (24 coasters) refused at checkout"); ok(/request/.test(big.body.error), "customer is pointed to a request");
   eq((await checkout([c8(2), mug(5)])).status, 400, "16 coasters + 5 mugs (21 items) refused");
   eq(stripeState.created.length, before, "no Stripe session for orders over the limit");
   eq((await checkout([c8(2), c4(1)])).status, 200, "16 + 4 = 20 items goes through");
+});
+
+await test("38. Order over 20 items: request saved without payment, owner confirms, then the customer can pay", async () => {
+  const c8 = (qty) => line("ceramic-coasters", { Quantity: "Set of 8", Material: "Ceramic", Shape: "Round" }, { qty });
+  const post = (path, body, headers = {}) => call(path, { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(body) });
+  const contact = { name: "Test Buyer", email: "buyer@example.com", phone: "", neededBy: "2099-12-01", message: "Wedding favours" };
+  const before = stripeState.created.length;
+  eq((await post("/api/order-request", { lines: [c8(1)], contact })).status, 400, "20 items or fewer: no request, pay online");
+  eq((await post("/api/order-request", { lines: [c8(3)], contact: { ...contact, email: "nope" } })).status, 400, "email required");
+  eq((await post("/api/order-request", { lines: [c8(3)], contact: { ...contact, neededBy: "2000-01-01" } })).status, 400, "past date refused");
+  const r = await post("/api/order-request", { lines: [c8(3)], contact });
+  eq(r.status, 200, "request saved " + JSON.stringify(r.body));
+  eq(stripeState.created.length, before, "no Stripe session when the request is sent");
+  const u = new URL(r.body.link), o = u.searchParams.get("o"), k = u.searchParams.get("k");
+  eq(u.pathname, "/order-request.html", "customer link");
+  const row = await env.DB.prepare("SELECT * FROM orders WHERE order_number = ?").bind(o).first();
+  eq(row.status, "requested", "order waits for the owner"); eq(row.subtotal_cents, 3 * C8, "catalog price");
+  eq((await call(`/api/order-request?o=${o}&k=${"0".repeat(32)}`)).status, 404, "wrong key refused");
+  eq((await call(`/api/order-request?o=${o}&k=${k}`)).body.stage, "requested", "customer sees: waiting");
+  eq((await post("/api/order-request/pay", { o, k })).status, 409, "can't pay before confirmation");
+  eq((await post("/api/admin/orders/" + o, { request: "confirm" })).status, 401, "only the owner confirms");
+  const reqs = await call("/api/admin/orders?status=requested&mode=test", { headers: { Authorization: "Bearer good" } });
+  ok(reqs.body.orders.some((x) => x.orderNumber === o && x.request && x.request.neededBy === "2099-12-01"), "owner sees the request with its date");
+  const conf = await post("/api/admin/orders/" + o, { request: "confirm", reply: "Ready by Nov 20" }, { Authorization: "Bearer good" });
+  eq(conf.body.order.status, "confirmed", "confirmed");
+  eq((await post("/api/admin/orders/" + o, { request: "decline" }, { Authorization: "Bearer good" })).status, 400, "a confirmed request can't then be declined");
+  const st = (await call(`/api/order-request?o=${o}&k=${k}`)).body;
+  eq(st.stage, "confirmed", "customer sees: confirmed"); eq(st.reply, "Ready by Nov 20", "owner's note shown");
+  const p1 = await post("/api/order-request/pay", { o, k });
+  eq(p1.status, 200, "payment page opens"); eq(stripeState.created.length, before + 1, "one Stripe session");
+  const s = stripeState.created.at(-1);
+  eq(s.amount_subtotal, 3 * C8, "charged the confirmed price");
+  s.status = "open";
+  eq((await post("/api/order-request/pay", { o, k })).body.url, s.url, "open payment page reused (can't pay twice)");
+  eq(stripeState.created.length, before + 1, "still one session");
+  const paid = pay(s.id);
+  eq((await webhook({ id: "evt_req_1", type: "checkout.session.completed", data: { object: paid } })).status, 200, "webhook");
+  eq((await order(s.id)).status, "paid", "request order paid");
+  eq((await call(`/api/order-request?o=${o}&k=${k}`)).body.stage, "paid", "customer sees: paid");
+  eq((await post("/api/order-request/pay", { o, k })).status, 409, "no second payment");
+  const r2 = await post("/api/order-request", { lines: [c8(3)], contact });
+  const o2 = new URL(r2.body.link).searchParams.get("o");
+  eq((await post("/api/admin/orders/" + o2, { request: "decline", reply: "Fully booked that week" }, { Authorization: "Bearer good" })).body.order.status, "declined", "declined");
 });
 
 for (const [r, n] of results) console.log(`${r}  ${n}`);

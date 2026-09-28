@@ -37,6 +37,7 @@
     if (/^https?:\/\//i.test(val)) return val;
     return SOCIAL_BASE[net] + val.replace(/^@/, '');
   }
+  if (cfg.instagram && !/^https?:/i.test(cfg.instagram)) setText('.js-ighandle', '@' + String(cfg.instagram).trim().replace(/^@/, ''));
   [['instagram', '.js-instagram'], ['facebook', '.js-facebook'], ['etsy', '.js-etsy'],
    ['tiktok', '.js-tiktok'], ['pinterest', '.js-pinterest'], ['youtube', '.js-youtube']
   ].forEach(function (pair) {
@@ -92,8 +93,6 @@
     // Arriving from a product (large order): fill in what we know. Dates before today aren't offered.
     try {
       var q = new URLSearchParams(location.search);
-      var sel = form.querySelector('#service'), want = q.get('service');
-      if (sel && want) [].forEach.call(sel.options, function (o) { if (o.text === want) sel.value = o.value || o.text; });
       if (q.get('item') && form.querySelector('#item')) form.querySelector('#item').value = q.get('item').slice(0, 120);
       if (q.get('quantity') && form.querySelector('#quantity')) form.querySelector('#quantity').value = q.get('quantity').slice(0, 20);
       var nd = form.querySelector('#needed'); if (nd) nd.min = new Date().toISOString().slice(0, 10);
@@ -103,7 +102,6 @@
       var data = new FormData(form);
       var name = (data.get('name') || '').toString().trim();
       var email = (data.get('email') || '').toString().trim();
-      var service = (data.get('service') || '').toString();
       var qty = (data.get('quantity') || '').toString();
       var item = (data.get('item') || '').toString();
       var needed = (data.get('needed') || '').toString();
@@ -111,13 +109,12 @@
       var body = encodeURIComponent(
         'Name: ' + name + '\n' +
         'Email: ' + email + '\n' +
-        'Service: ' + service + '\n' +
         'Product: ' + item + '\n' +
         'Estimated quantity: ' + qty + '\n' +
         'Needed by: ' + (needed || 'not given') + '\n\n' +
         'Project details:\n' + msg
       );
-      var subject = encodeURIComponent('Custom Order Inquiry — ' + (service || 'Lacci Studio'));
+      var subject = encodeURIComponent('Order Inquiry — ' + (item || 'Lacci Studio'));
       var to = form.getAttribute('data-to') || 'info@laccistudio.com';
       var success = document.querySelector('.form-success');
       if (success) success.classList.add('show');

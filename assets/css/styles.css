@@ -325,6 +325,7 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .page-hero-slim .crumb{margin-bottom:.25rem}
 .page-hero-slim h1{margin-bottom:0;font-size:clamp(1.7rem,3vw,2.2rem)}
 .page-hero-slim .lead{display:none}
+.page-hero-slim .lead.keep{display:block;margin-top:.3rem;font-size:1rem} /* order pages: the order number */
 .shop-section{padding:.9rem 0 2rem}
 
 /* Filter bar */
@@ -758,6 +759,12 @@ a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,te
 .ci-acts{display:flex;gap:.5rem;margin-top:.35rem}
 .ci-acts button,.rv-edit{background:none;border:0;padding:0;color:var(--gold-deep);font:600 .74rem 'Montserrat',sans-serif;text-decoration:underline;cursor:pointer}
 .rv-title{font:600 1.15rem 'Cormorant Garamond',serif;margin:.4rem 0 .8rem}
+/* order request (over 20 items) */
+.cart-limit{background:#fff4d6;color:#6b4a00;padding:.55rem .7rem;border-radius:6px;font-size:.8rem}
+.rq-form{display:grid;gap:.7rem;margin:.4rem 0 1rem}
+.rq-form label{display:grid;gap:.25rem;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe)}
+.rq-form small{text-transform:none;letter-spacing:0}
+.rq-form input,.rq-form textarea{font:inherit;font-size:.95rem;text-transform:none;letter-spacing:0;color:inherit;padding:.55rem .65rem;border:1px solid #ddd2c3;border-radius:6px;background:#fff}
 .rv-item{display:grid;grid-template-columns:120px 1fr;gap:.9rem;padding:.9rem 0;border-bottom:1px solid var(--sandstone)}
 .rv-imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:4px;align-content:start}
 .rv-imgs img:only-child{grid-column:1/-1}

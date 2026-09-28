@@ -55,10 +55,11 @@ const DEFAULT_AREAS = {
   "gift-fridge-magnet": [A("main", "Magnet", { x: 0.12, y: 0.1, w: 0.76, h: 0.76 }, { widthIn: 3, heightIn: 3 })],
   "gift-socks": [A("main", "Socks", { x: 0.25, y: 0.08, w: 0.5, h: 0.42 }, { widthIn: 7, heightIn: 5.9 })],
   "gift-mouse-pad": [A("main", "Mouse pad", { x: 0.08, y: 0.15, w: 0.84, h: 0.7 }, { widthIn: 9.25, heightIn: 7.7 })],
-  // Centred on the coaster face in the photos (centre 46.5% across, 47.3% down; the shadow sits to the right)
-  "ceramic-coasters": [A("main", "Coaster", { x: 0.085, y: 0.093, w: 0.76, h: 0.76 }, { widthIn: 4, heightIn: 4 },
-    { shape: "ellipse", shapeBy: { Shape: { Square: { shape: "rect", rect: { x: 0.084, y: 0.093, w: 0.76, h: 0.76 } } } } })],
-  "ceramic-coasters-square": [A("main", "Coaster", { x: 0.084, y: 0.093, w: 0.76, h: 0.76 }, { widthIn: 4, heightIn: 4 })],
+  // Centred on the coaster face as measured in the photos: round 47.6% across, 47.3% down; square 47.2% / 47.2%
+  // (the shadow sits to the right). Earlier values sat 1.1% / 0.8% left, so centred designs looked off-centre.
+  "ceramic-coasters": [A("main", "Coaster", { x: 0.096, y: 0.093, w: 0.76, h: 0.76 }, { widthIn: 4, heightIn: 4 },
+    { shape: "ellipse", shapeBy: { Shape: { Square: { shape: "rect", rect: { x: 0.092, y: 0.092, w: 0.76, h: 0.76 } } } } })],
+  "ceramic-coasters-square": [A("main", "Coaster", { x: 0.092, y: 0.092, w: 0.76, h: 0.76 }, { widthIn: 4, heightIn: 4 })],
   "custom-stickers": [A("main", "Sticker", { x: 0.15, y: 0.15, w: 0.7, h: 0.7 }, { widthIn: 3, heightIn: 3 },
     { base: "sticker", printFromOption: "Size" })],
 };
@@ -253,9 +254,24 @@ export function layoutText(layer, px, ctx) {
     return { glyphs, w: total >= Math.PI ? 2 * R + px : 2 * R * Math.sin(total / 2) + px * 0.4, h: sag + px * 1.1 };
   }
   const maxW = Math.max(0, ...widths), align = layer.align || "center";
+  // Centred lines are centred on their visible ink, not the letter boxes: script and italic letters
+  // overhang their boxes (measured up to 3.8% of the line width), which made "centred" text look off.
+  const m = measureCtx(); m.font = c.font; m.textAlign = "left";
+  const inkShift = (ln, w) => {
+    const ch = [...ln]; if (!ch.length) return 0;
+    const a = m.measureText(ch[0]), b = m.measureText(ch[ch.length - 1]);
+    const shift = (-a.actualBoundingBoxLeft + (w - b.width) + b.actualBoundingBoxRight) / 2 - w / 2;
+    return Number.isFinite(shift) ? shift : 0;
+  };
+  // Up / down the same way: letters are drawn on their middle line, so capitals sat above the centre.
+  m.textBaseline = "middle";
+  const top = m.measureText(lines[0] || " "), bot = m.measureText(lines[lines.length - 1] || " ");
+  const inkY = ((lines.length - 1) * lh + bot.actualBoundingBoxDescent - top.actualBoundingBoxAscent) / 2 - (lines.length - 1) * lh / 2;
+  const dy = Number.isFinite(inkY) && lines.some((ln) => ln.trim()) ? inkY : 0;
+  m.textBaseline = "alphabetic";
   lines.forEach((ln, li) => {
-    let x = align === "left" ? -maxW / 2 : align === "right" ? maxW / 2 - widths[li] : -widths[li] / 2;
-    const y = (li - (lines.length - 1) / 2) * lh;
+    let x = align === "left" ? -maxW / 2 : align === "right" ? maxW / 2 - widths[li] : -widths[li] / 2 - inkShift(ln, widths[li]);
+    const y = (li - (lines.length - 1) / 2) * lh - dy;
     for (const ch of ln) { const cw = c.measureText(ch).width; glyphs.push({ ch, x: x + cw / 2, y, r: 0 }); x += cw + sp; }
   });
   return { glyphs, w: Math.max(px * 0.6, ...widths), h: lines.length * lh };

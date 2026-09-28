@@ -16,8 +16,9 @@ const raw = () => window.LACCI_RAW || { products: [], colors: [] };
 const productOf = (id) => raw().products.find((p) => p.id === id);
 // Physical items in the cart (a coaster set counts its coasters), optionally leaving one line out.
 function cartItems(skip = -1) { return cart.reduce((s, l, i) => (i === skip ? s : s + itemCount(productOf(l.productId), { options: l.options }, l.qty)), 0); }
-let limitNote = "";
-const LIMIT_TEXT = `Online orders are up to ${MAX_ITEMS_PER_ORDER} items. Need more? <a href="contact.html?service=Custom%20or%20bulk%20order">Send us a request</a> with the date you need them by.`;
+// Over 20 items the order is sent as a request: nothing is paid until the owner confirms it.
+const isRequest = () => cartItems() > MAX_ITEMS_PER_ORDER;
+const REQUEST_TEXT = `Orders over ${MAX_ITEMS_PER_ORDER} items are sent as a request. You won't pay now: we'll confirm the date, then you'll get a link to pay.`;
 function price(line) { return priceLine(productOf(line.productId), { options: line.options, color: line.color }, raw().colors); }
 // Lines from the visual customizer carry their own design id, so two different designs of the same
 // product never merge; re-adding the very same design only raises the quantity.
@@ -64,7 +65,7 @@ function render(message) {
     return;
   }
   let subtotal = 0, blocked = false;
-  box.innerHTML = (limitNote ? `<p class="cart-note cart-limit" role="alert">${limitNote}</p>` : "") + cart.map((l, i) => {
+  box.innerHTML = (isRequest() ? `<p class="cart-note cart-limit">${REQUEST_TEXT}</p>` : "") + cart.map((l, i) => {
     const p = price(l);
     if (p.ok) subtotal += p.unitCents * l.qty; else blocked = true;
     const opts = p.ok ? p.summary.map((o) => `${esc(o.label)}: ${esc(o.value)}`).join("<br>") : "";
@@ -83,9 +84,13 @@ function render(message) {
   foot.innerHTML =
     (message ? `<p class="cart-note" role="alert" style="color:#b3261e">${esc(message)}</p>` : "") +
     `<div class="cart-subtotal"><span>Subtotal</span><strong id="sc-subtotal">${money(subtotal)}</strong></div>` +
-    `<p class="cart-note">Shipping and any sales tax are added at checkout. Promo codes can be entered there too.</p>` +
-    `<button class="btn btn-gold" id="sc-checkout" style="width:100%;justify-content:center"${blocked ? " disabled" : ""}>Checkout</button>` +
-    `<p class="cart-note" style="text-align:center;margin-top:.5rem">Secure payment by Stripe</p>` +
+    (isRequest()
+      ? `<p class="cart-note">${cartItems()} items. Shipping and any sales tax are added when you pay.</p>` +
+        `<button class="btn btn-gold" id="sc-checkout" style="width:100%;justify-content:center"${blocked ? " disabled" : ""}>Send order request</button>` +
+        `<p class="cart-note" style="text-align:center;margin-top:.5rem">No payment now</p>`
+      : `<p class="cart-note">Shipping and any sales tax are added at checkout. Promo codes can be entered there too.</p>` +
+        `<button class="btn btn-gold" id="sc-checkout" style="width:100%;justify-content:center"${blocked ? " disabled" : ""}>Checkout</button>` +
+        `<p class="cart-note" style="text-align:center;margin-top:.5rem">Secure payment by Stripe</p>`) +
     `<button class="cart-continue" id="sc-continue">Continue shopping</button>`;
   box.querySelectorAll("[data-inc]").forEach((b) => (b.onclick = () => setQty(+b.dataset.inc, cart[+b.dataset.inc].qty + 1)));
   box.querySelectorAll("[data-dec]").forEach((b) => (b.onclick = () => setQty(+b.dataset.dec, cart[+b.dataset.dec].qty - 1)));
@@ -93,7 +98,7 @@ function render(message) {
   box.querySelectorAll("[data-edit]").forEach((b) => (b.onclick = () => customizer().then((m) => m.edit(+b.dataset.edit))));
   box.querySelectorAll("[data-dup]").forEach((b) => (b.onclick = () => customizer().then((m) => m.edit(+b.dataset.dup, true))));
   document.querySelector("#sc-continue").onclick = close;
-  document.querySelector("#sc-checkout").onclick = cart.some((l) => l.customization) ? review : checkout;
+  document.querySelector("#sc-checkout").onclick = cart.some((l) => l.customization) ? review : isRequest() ? requestForm : checkout;
 }
 
 // Last look before paying: every customized design large, with its options and text.
@@ -115,18 +120,62 @@ function review() {
       (c ? `<button type="button" class="rv-edit" data-edit="${i}">Edit design</button>` : "") + `</div></div>`;
   }).join("");
   foot.innerHTML = `<div class="cart-subtotal"><span>Subtotal</span><strong>${money(subtotal)}</strong></div>` +
-    `<p class="cart-note">Shipping and any sales tax are added on the next page.</p>` +
-    `<button class="btn btn-gold" id="sc-pay" style="width:100%;justify-content:center">Continue to secure checkout</button>` +
+    (isRequest() ? `<p class="cart-note">${REQUEST_TEXT}</p>` +
+      `<button class="btn btn-gold" id="sc-pay" style="width:100%;justify-content:center">Continue to order request</button>`
+    : `<p class="cart-note">Shipping and any sales tax are added on the next page.</p>` +
+      `<button class="btn btn-gold" id="sc-pay" style="width:100%;justify-content:center">Continue to secure checkout</button>`) +
     `<button class="cart-continue" id="sc-back">Back to cart</button>`;
   box.querySelectorAll("[data-edit]").forEach((b) => (b.onclick = () => customizer().then((m) => m.edit(+b.dataset.edit))));
-  document.querySelector("#sc-pay").onclick = checkout;
+  document.querySelector("#sc-pay").onclick = isRequest() ? requestForm : checkout;
   document.querySelector("#sc-back").onclick = () => render();
+}
+
+// Contact details and the date needed, for an order over 20 items. Sent without payment.
+function requestForm(message) {
+  const box = document.querySelector("#sc-items"), foot = document.querySelector("#sc-foot");
+  const today = new Date().toISOString().slice(0, 10);
+  let subtotal = 0; for (const l of cart) { const p = price(l); if (p.ok) subtotal += p.unitCents * l.qty; }
+  box.innerHTML = `<h4 class="rv-title">Send your order request</h4>
+    <p class="cart-note">${REQUEST_TEXT}</p>
+    <form class="rq-form" id="rq-form" novalidate>
+      <label>Your name<input name="name" autocomplete="name" required></label>
+      <label>Email<input name="email" type="email" autocomplete="email" required></label>
+      <label>Phone <small>(optional)</small><input name="phone" type="tel" autocomplete="tel"></label>
+      <label>When do you need it by?<input name="neededBy" type="date" min="${today}"></label>
+      <label>Anything we should know? <small>(optional)</small><textarea name="message" rows="3"></textarea></label>
+    </form>`;
+  foot.innerHTML = (message ? `<p class="cart-note" role="alert" style="color:#b3261e">${esc(message)}</p>` : "") +
+    `<div class="cart-subtotal"><span>${cartItems()} items · subtotal</span><strong>${money(subtotal)}</strong></div>` +
+    `<button class="btn btn-gold" id="rq-send" style="width:100%;justify-content:center">Send order request</button>` +
+    `<p class="cart-note" style="text-align:center;margin-top:.5rem">No payment now. You'll pay after we confirm.</p>` +
+    `<button class="cart-continue" id="sc-back">Back to cart</button>`;
+  const form = document.querySelector("#rq-form");
+  if (requestForm.saved) for (const [k, v] of Object.entries(requestForm.saved)) if (form.elements[k]) form.elements[k].value = v;
+  document.querySelector("#sc-back").onclick = () => render();
+  document.querySelector("#rq-send").onclick = () => sendRequest(form);
+}
+
+async function sendRequest(form) {
+  const contact = Object.fromEntries(["name", "email", "phone", "neededBy", "message"].map((k) => [k, form.elements[k].value.trim()]));
+  requestForm.saved = contact; // kept if the form has to be shown again
+  if (!contact.name) return requestForm("Please enter your name.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(contact.email)) return requestForm("Please enter a valid email so we can reply.");
+  const btn = document.querySelector("#rq-send");
+  btn.disabled = true; btn.textContent = "Sending…";
+  const lines = cart.map(({ thumbs, ...l }) => ({ ...l, expectedUnitCents: price(l).unitCents }));
+  try {
+    const res = await fetch("/api/order-request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lines, contact }) });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.link) { clear(); requestForm.saved = null; location.href = data.link; return; }
+    if (res.status === 409) { await reloadCatalog(); return render(data.error); }
+    requestForm(data.error || "We couldn't send your request. Please try again.");
+  } catch {
+    requestForm("We couldn't reach our server. Check your connection and try again.");
+  }
 }
 
 function setQty(i, q) {
   if (!cart[i]) return;
-  if (q > cart[i].qty && cartItems(i) + itemCount(productOf(cart[i].productId), { options: cart[i].options }, q) > MAX_ITEMS_PER_ORDER) { limitNote = LIMIT_TEXT; render(); return; }
-  limitNote = "";
   if (q <= 0) cart.splice(i, 1); else cart[i].qty = Math.min(q, 50);
   save(cart); render();
 }

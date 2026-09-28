@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order confirmed — Lacci Studio</title>
+<title>Your order request — Lacci Studio</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="assets/logo/favicon.png" type="image/png">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -36,15 +36,13 @@
 
 <section class="page-hero page-hero-slim">
   <div class="wrap">
-    <h1 id="oc-title">Thank you!</h1>
-    <p class="lead keep" id="oc-lead">Checking your payment…</p>
+    <h1 id="rq-title">Your order request</h1>
+    <p class="lead keep" id="rq-lead">Loading…</p>
   </div>
 </section>
 <section>
   <div class="wrap" style="max-width:640px">
-    <div class="form-card" id="oc-card" aria-live="polite">
-      <p id="oc-status">One moment while we confirm your order with our payment provider.</p>
-    </div>
+    <div class="form-card" id="rq-card" aria-live="polite"><p>One moment…</p></div>
     <p style="text-align:center;margin-top:1.5rem"><a href="shop.html" class="btn btn-outline">Back to the shop</a></p>
   </div>
 </section>
@@ -75,38 +73,60 @@
 <script src="assets/js/main.js"></script>
 
 <script type="module">
-  // Shows the order once the server has confirmed payment with Stripe. Nothing here marks an order paid.
+  // A customer's order request (over 20 items). It is paid only after the owner confirms it; the Pay
+  // button asks the server, which checks the confirmation before opening Stripe Checkout.
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const money = (c) => (c == null ? "—" : "$" + (c / 100).toFixed(2));
-  const id = new URLSearchParams(location.search).get("session_id");
-  const card = document.querySelector("#oc-card"), lead = document.querySelector("#oc-lead"), title = document.querySelector("#oc-title");
-  async function check(tries) {
-    if (!id) { lead.textContent = "We couldn't find an order reference."; card.innerHTML = "<p>If you completed a payment, your receipt email has your order details. Questions? Email <a href='mailto:info@laccistudio.com'>info@laccistudio.com</a>.</p>"; return; }
-    const res = await fetch("/api/order-status?session_id=" + encodeURIComponent(id)).catch(() => null);
-    const d = res && res.ok ? await res.json() : null;
-    if (!d) { lead.textContent = "We couldn't look up your order."; card.innerHTML = "<p>If you completed a payment, your receipt email has your order details. Questions? Email <a href='mailto:info@laccistudio.com'>info@laccistudio.com</a>.</p>"; return; }
-    if (d.status === "paid" || d.status === "fulfilled") {
-      try { localStorage.removeItem("lacci_stripe_cart_v1"); } catch (e) {}
-      title.textContent = "Thank you — your order is in!";
-      lead.textContent = "Order " + d.orderNumber + (d.email ? " · a receipt is on its way to " + d.email : "");
-      card.innerHTML = "<table style='width:100%;border-collapse:collapse'>" +
-        d.items.map((i) => "<tr><td style='padding:.4rem 0'><strong>" + esc(i.name) + "</strong> × " + i.qty + "<br><small>" + esc(i.options) + "</small></td><td style='text-align:right'>" + money(i.line) + "</td></tr>").join("") +
-        "<tr><td style='padding-top:.8rem'>Subtotal</td><td style='text-align:right;padding-top:.8rem'>" + money(d.subtotal) + "</td></tr>" +
-        (d.discount ? "<tr><td>Discount</td><td style='text-align:right'>−" + money(d.discount) + "</td></tr>" : "") +
-        "<tr><td>Shipping</td><td style='text-align:right'>" + money(d.shipping) + "</td></tr>" +
-        "<tr><td>Tax</td><td style='text-align:right'>" + money(d.tax) + "</td></tr>" +
-        "<tr><td><strong>Total</strong></td><td style='text-align:right'><strong>" + money(d.total) + "</strong></td></tr></table>" +
-        "<p style='margin-top:1rem'>If you asked for a proof, we'll email it before we print. Questions? <a href='mailto:info@laccistudio.com'>info@laccistudio.com</a></p>";
-      return;
-    }
-    if (d.status === "pending" && tries < 10) { setTimeout(() => check(tries + 1), 2000); return; }
-    title.textContent = d.status === "pending" ? "Almost there" : "Payment not completed";
-    lead.textContent = d.status === "pending" ? "Your payment is still being confirmed." : "Your order wasn't charged.";
-    card.innerHTML = d.status === "pending"
-      ? "<p>This can take a minute. We'll email your receipt as soon as it clears. Order reference: " + esc(d.orderNumber) + "</p>"
-      : "<p>Your cart is still saved. <a href='shop.html'>Return to the shop</a> to try again.</p>";
+  const q = new URLSearchParams(location.search), o = q.get("o"), k = q.get("k");
+  const card = document.querySelector("#rq-card"), lead = document.querySelector("#rq-lead"), title = document.querySelector("#rq-title");
+  const day = (s) => new Date(s + "T12:00:00").toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+  const HELP = "Questions? Email <a class='js-email' href='mailto:info@laccistudio.com'>info@laccistudio.com</a>.";
+  function items(d) {
+    return "<table style='width:100%;border-collapse:collapse'>" +
+      d.items.map((i) => "<tr><td style='padding:.4rem 0'><strong>" + esc(i.name) + "</strong> × " + i.qty + "<br><small>" + esc(i.options) + "</small></td><td style='text-align:right'>" + money(i.line) + "</td></tr>").join("") +
+      "<tr><td style='padding-top:.8rem'><strong>Subtotal</strong></td><td style='text-align:right;padding-top:.8rem'><strong>" + money(d.subtotal) + "</strong></td></tr></table>" +
+      "<p class='form-note'>Shipping and any sales tax are added when you pay.</p>";
   }
-  check(0);
+  async function load() {
+    const res = await fetch("/api/order-request?o=" + encodeURIComponent(o || "") + "&k=" + encodeURIComponent(k || "")).catch(() => null);
+    const d = res && res.ok ? await res.json() : null;
+    if (!d) { lead.textContent = "We couldn't find this request."; card.innerHTML = "<p>Please use the full link from your request. " + HELP + "</p>"; return; }
+    const need = d.neededBy ? "<p>Needed by: <strong>" + esc(day(d.neededBy)) + "</strong></p>" : "";
+    const reply = d.reply ? "<p class='rq-reply'>Message from Lacci Studio: <em>" + esc(d.reply) + "</em></p>" : "";
+    if (d.stage === "requested") {
+      title.textContent = "Request received — thank you!";
+      lead.textContent = "Request " + d.orderNumber + ". Nothing has been charged.";
+      card.innerHTML = "<p><strong>What happens next:</strong> we'll check the date and reply" + (d.email ? " to " + esc(d.email) : "") + ". Once we confirm, this page shows a <strong>Pay now</strong> button.</p>" +
+        "<p><strong>Save this page's link</strong> (bookmark it) to come back and pay.</p>" + need + items(d) + "<p>" + HELP + "</p>";
+    } else if (d.stage === "confirmed") {
+      title.textContent = "Your order is confirmed";
+      lead.textContent = "Order " + d.orderNumber + ". It's ready for payment.";
+      card.innerHTML = reply + need + items(d) + "<button class='btn btn-gold' id='rq-pay' style='width:100%;justify-content:center'>Pay now</button><p class='form-note' style='text-align:center'>Secure payment by Stripe</p><p id='rq-err' role='alert' style='color:#b3261e'></p>";
+      document.querySelector("#rq-pay").onclick = pay;
+    } else if (d.stage === "paid") {
+      title.textContent = "Thank you — your order is paid!";
+      lead.textContent = "Order " + d.orderNumber + (d.email ? " · a receipt was sent to " + d.email : "");
+      card.innerHTML = need + items(d) + "<p>" + HELP + "</p>";
+    } else if (d.stage === "declined") {
+      title.textContent = "We can't take this order";
+      lead.textContent = "Request " + d.orderNumber + ". Nothing was charged.";
+      card.innerHTML = reply + "<p>Sorry we couldn't make this one work. " + HELP + "</p>";
+    } else {
+      lead.textContent = "Request " + d.orderNumber;
+      card.innerHTML = items(d) + "<p>" + HELP + "</p>";
+    }
+  }
+  async function pay() {
+    const b = document.querySelector("#rq-pay"), err = document.querySelector("#rq-err");
+    b.disabled = true; b.textContent = "Opening secure checkout…";
+    const res = await fetch("/api/order-request/pay", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ o, k }) }).catch(() => null);
+    const d = res ? await res.json().catch(() => ({})) : {};
+    if (res && res.ok && d.url) { location.href = d.url; return; }
+    err.textContent = d.error || "We couldn't reach our server. Please try again.";
+    b.disabled = false; b.textContent = "Pay now";
+    if (res && res.status === 409) load();
+  }
+  load();
 </script>
 </body>
 </html>

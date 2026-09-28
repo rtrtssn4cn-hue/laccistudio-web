@@ -7,6 +7,9 @@
 //   POST /api/checkout                 validate the cart on the server, create a Stripe Checkout Session
 //   POST /api/stripe/webhook           Stripe events (signature-checked, idempotent)
 //   GET  /api/order-status?session_id  confirmation page status (asks Stripe directly if still pending)
+//   POST /api/order-request            order over 20 items: saved for the owner to confirm, no payment yet
+//   GET  /api/order-request?o&k        the customer's request page (status, items)
+//   POST /api/order-request/pay        after the owner confirms: opens Stripe Checkout for that order
 //   GET  /api/admin/orders[/:number]   order list / detail for repo editors (GitHub login)
 //   POST /api/admin/orders/:number     mark fulfilled, add a note
 //   /api/admin/content/*               new admin: products, draft / publish (worker/admin-content.js)
@@ -90,7 +93,7 @@ function shippingOptions(catalog, grams, withTax) {
 // ("dynamic_tax_rates") were tried first and are rejected by Stripe as deprecated.
 
 // ---------------------------------------------------------------- checkout
-async function validateCart(env, body) {
+async function validateCart(env, body, opts = {}) {
   const catalog = await loadCatalog(env);
   const input = Array.isArray(body && body.lines) ? body.lines : [];
   if (!input.length) return { error: "Your cart is empty.", status: 400 };
@@ -128,7 +131,8 @@ async function validateCart(env, body) {
     });
   }
   const items = lines.reduce((s, l) => s + (l.items || 0), 0);
-  if (items > MAX_ITEMS_PER_ORDER) return { error: `Online orders are up to ${MAX_ITEMS_PER_ORDER} items. For more, please send us a request with the date you need them by and we'll confirm a time and price.`, status: 400, tooMany: true };
+  if (items > MAX_ITEMS_PER_ORDER && !opts.request) return { error: `Orders over ${MAX_ITEMS_PER_ORDER} items are sent as a request: we confirm the date first, then you pay. Please use "Send order request".`, status: 400, tooMany: true };
+  if (items <= MAX_ITEMS_PER_ORDER && opts.request) return { error: "This order can be paid online now; no request is needed.", status: 400 };
   if (mismatch) return { error: "Prices in your cart were out of date and have been updated. Please review your cart and check out again.", status: 409, fresh };
   return { lines, catalog };
 }
@@ -170,18 +174,32 @@ async function handleCheckout(request, env) {
     "INSERT INTO orders (order_number, status, created_at, livemode, subtotal_cents, lines_json, packing_json) VALUES (?, 'pending', ?, ?, ?, ?, ?)"
   ).bind(orderNumber, created, live ? 1 : 0, subtotal, JSON.stringify(v.lines), JSON.stringify(packing)).run();
 
-  const origin = siteOrigin(env, request);
+  try {
+    const session = await openSession(env, v.catalog, orderNumber, v.lines, `${siteOrigin(env, request)}/shop.html?checkout=cancelled`, siteOrigin(env, request));
+    return json({ url: session.url, orderNumber });
+  } catch (e) {
+    await env.DB.prepare("UPDATE orders SET status = 'cancelled', notes = ? WHERE order_number = ?").bind(`Checkout could not start: ${e.message}`.slice(0, 500), orderNumber).run();
+    return json({ error: "We couldn't start checkout. Please try again in a moment." }, 502);
+  }
+}
+
+// Stripe Checkout for an order row that already exists; records the session on the row.
+async function openSession(env, catalog, orderNumber, lines, cancelUrl, origin) {
+  const grams = lines.reduce((s, l) => s + (l.grams || 0), 0);
+  const withTax = env.TAX_MODE === "stripe_tax";
+  const shipping = shippingOptions(catalog, grams, withTax);
+  if (!shipping) throw new Error("no shipping method for this weight");
   const params = {
     mode: "payment",
     client_reference_id: orderNumber,
     success_url: `${origin}/order-confirmed.html?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/shop.html?checkout=cancelled`,
-    line_items: v.lines.map((l) => ({
+    cancel_url: cancelUrl,
+    line_items: lines.map((l) => ({
       quantity: l.qty,
       price_data: { currency: "usd", unit_amount: l.unitCents, ...(withTax ? { tax_behavior: "exclusive" } : {}),
         product_data: { name: l.name, description: lineDescription(l), metadata: { product_id: l.productId }, ...(withTax ? { tax_code: TAX_CODE_GOODS } : {}) } },
     })),
-    shipping_address_collection: { allowed_countries: v.catalog.shipping.allowedCountries || ["US"] },
+    shipping_address_collection: { allowed_countries: catalog.shipping.allowedCountries || ["US"] },
     shipping_options: shipping,
     phone_number_collection: { enabled: true },
     allow_promotion_codes: true,
@@ -194,13 +212,104 @@ async function handleCheckout(request, env) {
     payment_intent_data: { metadata: { order_number: orderNumber }, description: `Lacci Studio order ${orderNumber}` },
   };
   if (withTax) params.automatic_tax = { enabled: true };
+  // A confirmed request can be paid again after an earlier session expired, so each session gets its own key.
+  const session = await stripe(env, "POST", "checkout/sessions", params, `create-${orderNumber}-${Date.now()}`);
+  await env.DB.prepare("UPDATE orders SET session_id = ?, status = 'pending' WHERE order_number = ?").bind(session.id, orderNumber).run();
+  return session;
+}
+
+// ---------------------------------------------------------------- order requests (over 20 items)
+// The cart is checked exactly like a checkout and saved as status 'requested' with the customer's
+// contact details. Nothing is charged. The owner confirms (or declines) it in Orders; once confirmed,
+// the customer's private link (order number + key) shows a Pay button that opens Stripe Checkout at
+// the confirmed prices. The request table is created on first use, so no manual database step is needed.
+let requestsReady = false;
+async function ensureRequests(env) {
+  if (requestsReady) return;
+  await env.DB.prepare(`CREATE TABLE IF NOT EXISTS order_requests (
+    order_number TEXT PRIMARY KEY, access_key TEXT NOT NULL, needed_by TEXT, message TEXT,
+    created_at TEXT NOT NULL, confirmed_at TEXT, declined_at TEXT, reply TEXT)`).run();
+  requestsReady = true;
+}
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+function requestLink(origin, orderNumber, key) { return `${origin}/order-request.html?o=${encodeURIComponent(orderNumber)}&k=${key}`; }
+
+async function handleRequestCreate(request, env) {
+  const len = Number(request.headers.get("content-length") || 0);
+  if (len > LIMITS.body) return json({ error: "Request too large." }, 413);
+  let body;
+  try { body = await request.json(); } catch { return json({ error: "Invalid request." }, 400); }
+  const c = (body && body.contact) || {};
+  const name = clip(c.name, 120), email = clip(c.email, 200), phone = clip(c.phone, 40), message = clip(c.message, 1000);
+  const neededBy = typeof c.neededBy === "string" && DATE_RE.test(c.neededBy) ? c.neededBy : "";
+  if (!name) return json({ error: "Please enter your name." }, 400);
+  if (!EMAIL_RE.test(email)) return json({ error: "Please enter a valid email so we can reply." }, 400);
+  if (neededBy && neededBy < new Date(Date.now() - 86400000).toISOString().slice(0, 10)) return json({ error: "The date you need it by has already passed." }, 400);
+  const v = await validateCart(env, body, { request: true });
+  if (v.error) return json({ error: v.error, fresh: v.fresh, productId: v.productId }, v.status);
+  await ensureRequests(env);
+  const subtotal = v.lines.reduce((s, l) => s + l.lineCents, 0);
+  const created = nowIso();
+  const live = !isTestKey(env);
+  const orderNumber = await nextOrderNumber(env, live);
+  const key = [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, "0")).join("");
+  await env.DB.prepare(
+    "INSERT INTO orders (order_number, status, created_at, livemode, subtotal_cents, lines_json, packing_json, customer_name, customer_email, customer_phone) VALUES (?, 'requested', ?, ?, ?, ?, ?, ?, ?, ?)"
+  ).bind(orderNumber, created, live ? 1 : 0, subtotal, JSON.stringify(v.lines), JSON.stringify(packingFor(v.catalog, v.lines)), name, email, phone || null).run();
+  await env.DB.prepare("INSERT INTO order_requests (order_number, access_key, needed_by, message, created_at) VALUES (?, ?, ?, ?, ?)")
+    .bind(orderNumber, key, neededBy || null, message || null, created).run();
+  return json({ orderNumber, link: requestLink(siteOrigin(env, request), orderNumber, key) });
+}
+
+// Order + request row for a customer link; null unless the key matches.
+async function requestFor(env, orderNumber, key) {
+  if (!/^(TEST-)?LS-\d+$/.test(orderNumber || "") || !/^[0-9a-f]{32}$/.test(key || "")) return null;
+  await ensureRequests(env);
+  const r = await env.DB.prepare("SELECT * FROM order_requests WHERE order_number = ?").bind(orderNumber).first();
+  if (!r || r.access_key !== key) return null;
+  const o = await env.DB.prepare("SELECT * FROM orders WHERE order_number = ?").bind(orderNumber).first();
+  return o ? { o, r } : null;
+}
+// What the customer sees: 'requested' (waiting for us), 'confirmed' (can pay), 'paid', 'declined'.
+function requestView(o, r) {
+  const stage = o.status === "requested" ? "requested" : o.status === "declined" ? "declined"
+    : ["paid", "fulfilled"].includes(o.status) ? "paid" : r.confirmed_at ? "confirmed" : o.status;
+  return {
+    orderNumber: o.order_number, stage, neededBy: r.needed_by, reply: r.reply, confirmedAt: r.confirmed_at,
+    email: o.customer_email ? o.customer_email.replace(/^(.).*(@.*)$/, "$1…$2") : null, subtotal: o.subtotal_cents,
+    items: JSON.parse(o.lines_json || "[]").map((l) => ({ name: l.name, qty: l.qty, options: (l.options || []).map((x) => `${x.label}: ${x.value}`).join(" · "), line: l.lineCents })),
+  };
+}
+async function handleRequestStatus(url, env) {
+  const hit = await requestFor(env, url.searchParams.get("o"), url.searchParams.get("k"));
+  if (!hit) return json({ error: "We couldn't find this request. Please use the link you were given." }, 404);
+  return json(requestView(hit.o, hit.r));
+}
+async function handleRequestPay(request, env) {
+  let body; try { body = await request.json(); } catch { return json({ error: "Invalid request." }, 400); }
+  const hit = await requestFor(env, body && body.o, body && body.k);
+  if (!hit) return json({ error: "We couldn't find this request. Please use the link you were given." }, 404);
+  const { o, r } = hit;
+  if (["paid", "fulfilled"].includes(o.status)) return json({ error: "This order is already paid. Thank you!" }, 409);
+  if (!r.confirmed_at || !["confirmed", "pending", "expired", "payment_failed"].includes(o.status)) return json({ error: "We haven't confirmed this order yet. You'll be able to pay once we do." }, 409);
+  // An earlier payment page that is still open is reused, so the order can't be paid twice.
+  if (o.status === "pending" && o.session_id) {
+    try {
+      const s = await stripe(env, "GET", `checkout/sessions/${o.session_id}`, {});
+      if (s.payment_status === "paid") { await markPaid(env, s); return json({ error: "This order is already paid. Thank you!" }, 409); }
+      if (s.status === "open" && s.url) return json({ url: s.url });
+    } catch {
+      // unknown state of the open payment page: don't open a second one that could be paid as well
+      return json({ error: "We couldn't open the payment page. Please try again in a moment." }, 502);
+    }
+  }
+  const origin = siteOrigin(env, request);
   try {
-    const session = await stripe(env, "POST", "checkout/sessions", params, `create-${orderNumber}`);
-    await env.DB.prepare("UPDATE orders SET session_id = ? WHERE order_number = ?").bind(session.id, orderNumber).run();
-    return json({ url: session.url, orderNumber });
-  } catch (e) {
-    await env.DB.prepare("UPDATE orders SET status = 'cancelled', notes = ? WHERE order_number = ?").bind(`Checkout could not start: ${e.message}`.slice(0, 500), orderNumber).run();
-    return json({ error: "We couldn't start checkout. Please try again in a moment." }, 502);
+    const session = await openSession(env, await loadCatalog(env), o.order_number, JSON.parse(o.lines_json || "[]"), requestLink(origin, o.order_number, r.access_key), origin);
+    return json({ url: session.url });
+  } catch {
+    return json({ error: "We couldn't open the payment page. Please try again in a moment." }, 502);
   }
 }
 
@@ -306,7 +415,8 @@ async function adminUser(request, env) {
 }
 
 function orderView(o, full) {
-  const base = { orderNumber: o.order_number, status: o.status, createdAt: o.created_at, paidAt: o.paid_at, customerName: o.customer_name, customerEmail: o.customer_email, total: o.total_cents, subtotal: o.subtotal_cents, livemode: !!o.livemode };
+  const req = o.req_key ? { neededBy: o.req_needed_by, message: o.req_message, confirmedAt: o.req_confirmed_at, declinedAt: o.req_declined_at, reply: o.req_reply, key: o.req_key } : null;
+  const base = { request: req, orderNumber: o.order_number, status: o.status, createdAt: o.created_at, paidAt: o.paid_at, customerName: o.customer_name, customerEmail: o.customer_email, total: o.total_cents, subtotal: o.subtotal_cents, livemode: !!o.livemode };
   if (!full) return base;
   return { ...base, phone: o.customer_phone, shipping: o.shipping_cents, tax: o.tax_cents, discount: o.discount_cents, shippingAddress: o.shipping_json ? JSON.parse(o.shipping_json) : null,
     lines: JSON.parse(o.lines_json || "[]"), packing: o.packing_json ? JSON.parse(o.packing_json) : null, paymentIntent: o.payment_intent, fulfilledAt: o.fulfilled_at, notes: o.notes };
@@ -316,6 +426,8 @@ async function handleAdmin(request, env, url) {
   const user = await adminUser(request, env);
   if (!user) return json({ error: "Please log in to the Lacci admin first." }, 401);
   if (url.pathname.startsWith("/api/admin/content/")) return handleAdminContent(request, env, url, (request.headers.get("authorization") || "").slice(7), user);
+  await ensureRequests(env);
+  const WITH_REQ = "SELECT o.*, r.access_key AS req_key, r.needed_by AS req_needed_by, r.message AS req_message, r.confirmed_at AS req_confirmed_at, r.declined_at AS req_declined_at, r.reply AS req_reply FROM orders o LEFT JOIN order_requests r ON r.order_number = o.order_number";
   const m = url.pathname.match(/^\/api\/admin\/orders(?:\/((?:TEST-)?LS-\d+))?$/);
   if (url.pathname === "/api/admin/whoami") return json({ user });
   if (!m) return json({ error: "Not found." }, 404);
@@ -324,25 +436,38 @@ async function handleAdmin(request, env, url) {
     const status = url.searchParams.get("status");
     const mode = url.searchParams.get("mode") || "live";
     const where = [], args = [];
-    if (status && status !== "all") { where.push("status = ?"); args.push(status); } else where.push("status != 'cancelled'");
-    if (mode !== "all") { where.push("livemode = ?"); args.push(mode === "test" ? 0 : 1); }
-    const { results } = await env.DB.prepare(`SELECT * FROM orders WHERE ${where.join(" AND ")} ORDER BY id DESC LIMIT 200`).bind(...args).all();
+    if (status && status !== "all") { where.push("o.status = ?"); args.push(status); } else where.push("o.status != 'cancelled'");
+    if (mode !== "all") { where.push("o.livemode = ?"); args.push(mode === "test" ? 0 : 1); }
+    const { results } = await env.DB.prepare(`${WITH_REQ} WHERE ${where.join(" AND ")} ORDER BY o.id DESC LIMIT 200`).bind(...args).all();
+    const reqs = await env.DB.prepare("SELECT COUNT(*) AS n FROM orders WHERE status = 'requested' AND livemode = ?").bind(mode === "test" ? 0 : 1).first();
     const tests = await env.DB.prepare("SELECT COUNT(*) AS n FROM orders WHERE livemode = 0 AND status != 'cancelled'").first();
-    return json({ orders: results.map((o) => orderView(o, true)), sandboxCount: tests ? tests.n : 0 });
+    return json({ orders: results.map((o) => orderView(o, true)), sandboxCount: tests ? tests.n : 0, requestCount: reqs ? reqs.n : 0, origin: siteOrigin(env, request) });
   }
   if (!m[1]) return json({ error: "Not found." }, 404);
-  const order = await env.DB.prepare("SELECT * FROM orders WHERE order_number = ?").bind(m[1]).first();
+  const one = () => env.DB.prepare(`${WITH_REQ} WHERE o.order_number = ?`).bind(m[1]).first();
+  const order = await one();
   if (!order) return json({ error: "Order not found." }, 404);
   if (request.method === "GET") return json({ order: orderView(order, true) });
   if (request.method === "POST") {
     let body; try { body = await request.json(); } catch { return json({ error: "Invalid request." }, 400); }
+    if (body.request === "confirm" || body.request === "decline") {
+      if (order.status !== "requested") return json({ error: "Only a request that is waiting can be confirmed or declined." }, 400);
+      const reply = clip(body.reply, 500) || null;
+      if (body.request === "confirm") {
+        await env.DB.prepare("UPDATE order_requests SET confirmed_at = ?, reply = ? WHERE order_number = ?").bind(nowIso(), reply, m[1]).run();
+        await env.DB.prepare("UPDATE orders SET status = 'confirmed' WHERE order_number = ? AND status = 'requested'").bind(m[1]).run();
+      } else {
+        await env.DB.prepare("UPDATE order_requests SET declined_at = ?, reply = ? WHERE order_number = ?").bind(nowIso(), reply, m[1]).run();
+        await env.DB.prepare("UPDATE orders SET status = 'declined' WHERE order_number = ? AND status = 'requested'").bind(m[1]).run();
+      }
+    }
     if (body.status === "fulfilled" && order.status !== "paid") return json({ error: "Only paid orders can be marked fulfilled." }, 400);
     if (body.status === "paid" && order.status !== "fulfilled") return json({ error: "Only a fulfilled order can be moved back to paid." }, 400);
     if (body.status === "fulfilled" || body.status === "paid") {
       await env.DB.prepare("UPDATE orders SET status = ?, fulfilled_at = ? WHERE order_number = ?").bind(body.status, body.status === "fulfilled" ? nowIso() : null, m[1]).run();
     }
     if (typeof body.notes === "string") await env.DB.prepare("UPDATE orders SET notes = ? WHERE order_number = ?").bind(clip(body.notes, 2000), m[1]).run();
-    const updated = await env.DB.prepare("SELECT * FROM orders WHERE order_number = ?").bind(m[1]).first();
+    const updated = await one();
     return json({ order: orderView(updated, true) });
   }
   return json({ error: "Method not allowed." }, 405);
@@ -356,6 +481,9 @@ export default {
       if (url.pathname === "/api/checkout" && request.method === "POST") return await handleCheckout(request, env);
       if (url.pathname === "/api/stripe/webhook" && request.method === "POST") return await handleWebhook(request, env);
       if (url.pathname === "/api/order-status" && request.method === "GET") return await handleOrderStatus(url, env);
+      if (url.pathname === "/api/order-request" && request.method === "POST") return await handleRequestCreate(request, env);
+      if (url.pathname === "/api/order-request" && request.method === "GET") return await handleRequestStatus(url, env);
+      if (url.pathname === "/api/order-request/pay" && request.method === "POST") return await handleRequestPay(request, env);
       if (url.pathname.startsWith("/api/admin/")) return await handleAdmin(request, env, url);
       if (url.pathname.startsWith("/api/")) return json({ error: "Not found." }, 404);
       return env.ASSETS.fetch(request);
