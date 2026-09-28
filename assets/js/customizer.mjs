@@ -480,6 +480,23 @@ function renderCtx() {
 // Printed text size: the letter size (font size) in inches on the product, and the same in points.
 const textInches = (l) => l.size * ((area().print || {}).heightIn || 0);
 const sizeLabel = (l) => { const i = textInches(l); return i ? `${i.toFixed(2)} in` : ""; };
+// Fonts: every tap or arrow step changes the text at once; the list stays open while trying fonts.
+function fontList() {
+  const own = personalization().fonts && personalization().fonts.length ? personalization().fonts : null;
+  return own || R.FONT_GROUPS.flatMap((g) => g.fonts);
+}
+function setFont(l, f) {
+  const pop = root.querySelector("#lz-pop"), keep = pop.querySelector(".lz-fontlist"), top = keep ? keep.scrollTop : 0;
+  l.font = f; afterFont(l); commit(); renderPop(); draw();
+  const list = pop.querySelector(".lz-fontlist"); if (list) list.scrollTop = top;
+  showChosenFont(pop);
+}
+function stepFont(dir) {
+  const l = selected(); if (!l || l.type !== "text") return;
+  const all = fontList(), i = all.indexOf(l.font);
+  setFont(l, all[((i < 0 ? (dir > 0 ? -1 : 0) : i) + dir + all.length) % all.length]);
+}
+function showChosenFont(pop) { const on = pop.querySelector('.lz-fontlist [aria-selected="true"]'); if (on) on.scrollIntoView({ block: "nearest" }); }
 // Curve and spacing show a number next to their slider; both stay in step.
 const curveSay = (v) => (v === 0 ? "straight" : v > 0 ? `arch up ${v}` : `arch down ${-v}`);
 function syncMeasure(pop, key, v) {
@@ -499,7 +516,7 @@ function renderPop() {
   if (S.tool === "t-font") {
     const own = personalization().fonts && personalization().fonts.length ? [{ label: "Fonts", fonts }] : R.FONT_GROUPS;
     pop.innerHTML = `<div class="lz-styles">${[["light", "Light"], ["regular", "Regular"], ["bold", "Bold"]].map(([k, t]) => `<button type="button" data-weight="${k}" aria-pressed="${(k === "bold" && l.bold) || (k === "light" && l.light && !l.bold) || (k === "regular" && !l.bold && !l.light)}">${t}</button>`).join("")}<button type="button" data-italic="1" aria-pressed="${!!l.italic}"><i>Italic</i></button></div>
-      <div class="lz-fontdd"><button type="button" class="lz-fontbtn" data-fontdd="1" aria-expanded="${!!S.fontOpen}" style="font-family:${esc(R.fontFamily(l.font))}">${esc((l.font || "Font").replace(/ \/.*/, ""))}<span aria-hidden="true">▾</span></button>
+      <div class="lz-fontdd"><div class="lz-fontrow"><button type="button" class="lz-fontstep" data-fontstep="-1" aria-label="Previous font">▲</button><button type="button" class="lz-fontstep" data-fontstep="1" aria-label="Next font">▼</button><button type="button" class="lz-fontbtn" data-fontdd="1" aria-expanded="${!!S.fontOpen}" style="font-family:${esc(R.fontFamily(l.font))}">${esc((l.font || "Font").replace(/ \/.*/, ""))}<span aria-hidden="true">▾</span></button></div>
       ${S.fontOpen ? `<div class="lz-fontlist" role="listbox">${own.map((g) => `<div class="lz-fgroup"><span>${esc(g.label)}</span>${g.fonts.map((f) => `<button type="button" role="option" data-font="${esc(f)}" aria-selected="${l.font === f}" style="font-family:${esc(R.fontFamily(f))}">${esc(f.replace(/ \/.*/, ""))}</button>`).join("")}</div>`).join("")}</div>` : ""}</div>`;
   }
   if (S.tool === "t-color") pop.innerHTML = `<div class="lz-swatches">${R.TEXT_SWATCHES.map((s) => `<button type="button" data-color="${s.hex}" aria-label="${s.name}" title="${s.name}" aria-pressed="${l.color.toLowerCase() === s.hex.toLowerCase()}" style="background:${s.hex}"></button>`).join("")}</div>
@@ -512,8 +529,9 @@ function renderPop() {
     <label class="lz-sizebox"><span>Curve</span><input type="number" data-num="curve" min="-100" max="100" step="5" value="${l.curve || 0}" inputmode="numeric"> <small id="lz-curve-say">${curveSay(l.curve || 0)}</small></label>${l.text.includes("\n") ? `<p class="lz-note">Curves apply to one line of text.</p>` : ""}`;
   pop.onclick = (e) => {
     const t = e.target.closest("button"); if (!t) return;
-    if (t.dataset.fontdd) { S.fontOpen = !S.fontOpen; renderPop(); if (S.fontOpen) { const on = pop.querySelector('.lz-fontlist [aria-selected="true"]'); if (on) on.scrollIntoView({ block: "nearest" }); } return; }
-    if (t.dataset.font) { l.font = t.dataset.font; S.fontOpen = false; afterFont(l); commit(); renderPop(); draw(); }
+    if (t.dataset.fontdd) { S.fontOpen = !S.fontOpen; renderPop(); showChosenFont(pop); return; }
+    if (t.dataset.fontstep) { stepFont(+t.dataset.fontstep); return; }
+    if (t.dataset.font) { setFont(l, t.dataset.font); return; } // the list stays open to try the next one
     if (t.dataset.weight) { l.bold = t.dataset.weight === "bold"; l.light = t.dataset.weight === "light"; afterFont(l); commit(); renderPop(); renderCtx(); draw(); }
     if (t.dataset.italic) { l.italic = !l.italic; afterFont(l); commit(); renderPop(); draw(); }
     if (t.dataset.color) { l.color = t.dataset.color; commit(); renderCtx(); draw(); }
@@ -1278,6 +1296,8 @@ function onKey(e) {
     const t = e.target;
     if (t && (t.closest && t.closest("input, textarea, select, [contenteditable]"))) return;
     if (root.querySelector(".lz-crop")) return;
+    if (S.tool === "t-font" && selected() && selected().type === "text" && (e.key === "ArrowDown" || e.key === "ArrowUp")) { e.preventDefault(); stepFont(e.key === "ArrowDown" ? 1 : -1); return; }
+    if (S.tool === "t-font" && S.fontOpen && (e.key === "Enter" || e.key === "Escape")) { e.preventDefault(); S.fontOpen = false; renderPop(); return; }
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "a") {
       if (!layers().length) return;
       e.preventDefault(); S.all = true; S.sel = -1; render(); return;

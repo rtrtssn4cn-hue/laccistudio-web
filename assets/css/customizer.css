@@ -241,3 +241,6 @@ html.lz-lock, html.lz-lock body { overflow: hidden; }
 .lz-fontlist { margin-top: 6px; max-height: 230px; overflow-y: auto; border: 1px solid var(--lz-line); border-radius: 10px; background: #fff; padding: 4px 8px 8px; }
 .lz-fontlist button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 7px 8px; border-radius: 8px; font-size: 1.1rem; }
 .lz-fontlist button:hover, .lz-fontlist button[aria-selected=true] { background: var(--lz-ivory); }
+.lz-fontrow { display: flex; gap: 6px; }
+.lz-fontrow .lz-fontbtn { flex: 1; }
+.lz-fontstep { border: 1px solid var(--lz-line); background: #fff; border-radius: 10px; width: 40px; font-size: .8rem; }
