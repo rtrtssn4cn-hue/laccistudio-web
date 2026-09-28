@@ -549,6 +549,28 @@ await test("38. Order over 20 items: request saved without payment, owner confir
   eq((await post("/api/admin/orders/" + o2, { request: "decline", reply: "Fully booked that week" }, { Authorization: "Bearer good" })).body.order.status, "declined", "declined");
 });
 
+await test("39. Free local delivery is offered only for a ZIP in the delivery area (entered in the cart), listed first", async () => {
+  const ship = JSON.parse(readFileSync(new URL("../content/shipping.json", import.meta.url)));
+  const local = ship.methods.find((m) => m.postalCodePattern);
+  const re = new RegExp(local.postalCodePattern);
+  let inZip = ""; for (let z = 77000; z < 78000 && !inZip; z++) if (re.test(String(z))) inZip = String(z);
+  let outZip = ""; for (let z = 90000; z < 99999 && !outZip; z++) if (!re.test(String(z))) outZip = String(z);
+  ok(inZip && outZip, "test ZIPs found");
+  const c1 = line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" });
+  const names = async (localZip) => { const r = await call("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lines: [c1], localZip }) }); eq(r.status, 200, "checkout opens"); const p = stripeState.created.at(-1).params; const out = []; for (let i = 0; p[`shipping_options[${i}][shipping_rate_data][display_name]`]; i++) out.push([p[`shipping_options[${i}][shipping_rate_data][display_name]`], Number(p[`shipping_options[${i}][shipping_rate_data][fixed_amount][amount]`])]); return out; };
+  const none = await names(undefined);
+  ok(!none.some(([n]) => n === local.name), "no ZIP: no local delivery");
+  ok(!(await names(outZip)).some(([n]) => n === local.name), "ZIP outside the area: no local delivery");
+  ok(!(await names("7702")).some(([n]) => n === local.name), "incomplete ZIP: no local delivery");
+  const inside = await names(inZip);
+  eq(inside[0][0], local.name, "ZIP in the area: local delivery listed first"); eq(inside[0][1], 0, "and free");
+  eq(inside.length, none.length + 1, "shipping options still offered too");
+  const s = stripeState.created.at(-1);
+  const paid = pay(s.id, { shipping: 0, zip: outZip, method: local.name });
+  await webhook({ id: "evt_local_1", type: "checkout.session.completed", data: { object: paid } });
+  ok(/LOCAL DELIVERY OUTSIDE AREA/.test((await order(s.id)).notes || ""), "address outside the area after choosing local delivery is flagged");
+});
+
 for (const [r, n] of results) console.log(`${r}  ${n}`);
 console.log(`\n${pass} passed, ${fail} failed; simulated Stripe calls: ${stripeState.calls.length}`);
 process.exit(fail ? 1 : 0);

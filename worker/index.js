@@ -75,8 +75,14 @@ function packingFor(catalog, lines) {
 const TAX_CODE_GOODS = "txcd_99999999";
 const TAX_CODE_SHIPPING = "txcd_92010001";
 
-function shippingOptions(catalog, grams, withTax) {
-  const methods = (catalog.shipping.methods || []).filter((m) => m && m.enabled !== false && m.name && Array.isArray(m.bands) && m.bands.length);
+// A method with a postalCodePattern (free local delivery) is offered only when the ZIP the customer
+// entered in the cart is in that area, and then listed first. Stripe's page can't hide a rate by the
+// address typed there, so the address is checked again after payment (markPaid flags a mismatch).
+const cleanZip = (z) => (typeof z === "string" && /^\d{5}$/.test(z.trim()) ? z.trim() : "");
+function shippingOptions(catalog, grams, withTax, zip = "") {
+  const inArea = (m) => { try { return !!zip && new RegExp(m.postalCodePattern).test(zip); } catch { return false; } };
+  const methods = (catalog.shipping.methods || []).filter((m) => m && m.enabled !== false && m.name && Array.isArray(m.bands) && m.bands.length && (!m.postalCodePattern || inArea(m)))
+    .sort((a, b) => (b.postalCodePattern ? 1 : 0) - (a.postalCodePattern ? 1 : 0));
   const opts = methods.slice(0, 5).map((m) => {
     const band = m.bands.find((b) => b.maxGrams === null || b.maxGrams === undefined || grams <= b.maxGrams);
     if (!band || !Number.isFinite(Number(band.amount))) return null;
@@ -162,7 +168,8 @@ async function handleCheckout(request, env) {
   if (v.error) return json({ error: v.error, fresh: v.fresh, productId: v.productId }, v.status);
   const grams = v.lines.reduce((s, l) => s + l.grams, 0);
   const withTax = env.TAX_MODE === "stripe_tax";
-  const shipping = shippingOptions(v.catalog, grams, withTax);
+  const zip = cleanZip(body.localZip);
+  const shipping = shippingOptions(v.catalog, grams, withTax, zip);
   if (!shipping) return json({ error: "Online checkout isn't open yet. Please contact us to order." }, 503);
 
   const subtotal = v.lines.reduce((s, l) => s + l.lineCents, 0);
@@ -175,7 +182,7 @@ async function handleCheckout(request, env) {
   ).bind(orderNumber, created, live ? 1 : 0, subtotal, JSON.stringify(v.lines), JSON.stringify(packing)).run();
 
   try {
-    const session = await openSession(env, v.catalog, orderNumber, v.lines, `${siteOrigin(env, request)}/shop.html?checkout=cancelled`, siteOrigin(env, request));
+    const session = await openSession(env, v.catalog, orderNumber, v.lines, `${siteOrigin(env, request)}/shop.html?checkout=cancelled`, siteOrigin(env, request), zip);
     return json({ url: session.url, orderNumber });
   } catch (e) {
     await env.DB.prepare("UPDATE orders SET status = 'cancelled', notes = ? WHERE order_number = ?").bind(`Checkout could not start: ${e.message}`.slice(0, 500), orderNumber).run();
@@ -184,10 +191,10 @@ async function handleCheckout(request, env) {
 }
 
 // Stripe Checkout for an order row that already exists; records the session on the row.
-async function openSession(env, catalog, orderNumber, lines, cancelUrl, origin) {
+async function openSession(env, catalog, orderNumber, lines, cancelUrl, origin, zip = "") {
   const grams = lines.reduce((s, l) => s + (l.grams || 0), 0);
   const withTax = env.TAX_MODE === "stripe_tax";
-  const shipping = shippingOptions(catalog, grams, withTax);
+  const shipping = shippingOptions(catalog, grams, withTax, zip);
   if (!shipping) throw new Error("no shipping method for this weight");
   const params = {
     mode: "payment",
@@ -306,7 +313,7 @@ async function handleRequestPay(request, env) {
   }
   const origin = siteOrigin(env, request);
   try {
-    const session = await openSession(env, await loadCatalog(env), o.order_number, JSON.parse(o.lines_json || "[]"), requestLink(origin, o.order_number, r.access_key), origin);
+    const session = await openSession(env, await loadCatalog(env), o.order_number, JSON.parse(o.lines_json || "[]"), requestLink(origin, o.order_number, r.access_key), origin, cleanZip(body.localZip));
     return json({ url: session.url });
   } catch {
     return json({ error: "We couldn't open the payment page. Please try again in a moment." }, 502);

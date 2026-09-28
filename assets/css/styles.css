@@ -762,6 +762,11 @@ a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,te
 /* order request (over 20 items) */
 .cart-limit{background:#fff4d6;color:#6b4a00;padding:.55rem .7rem;border-radius:6px;font-size:.8rem}
 .rq-form{display:grid;gap:.7rem;margin:.4rem 0 1rem}
+/* free local delivery ZIP check */
+.cart-local{margin:.2rem 0 .8rem}
+.cart-local label{display:block;font-size:.78rem;margin-bottom:.3rem}
+.cart-local input{width:9rem;font:inherit;padding:.45rem .6rem;border:1px solid #ddd2c3;border-radius:6px;background:#fff}
+.cart-zipmsg{font-size:.76rem;margin:.35rem 0 0}.cart-zipmsg.ok{color:#2e6b3f}.cart-zipmsg.no{color:#8a5a00}
 .rq-form label{display:grid;gap:.25rem;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe)}
 .rq-form small{text-transform:none;letter-spacing:0}
 .rq-form input,.rq-form textarea{font:inherit;font-size:.95rem;text-transform:none;letter-spacing:0;color:inherit;padding:.55rem .65rem;border:1px solid #ddd2c3;border-radius:6px;background:#fff}
