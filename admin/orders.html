@@ -27,6 +27,11 @@
   .order > summary::-webkit-details-marker { display:none }
   .badge { display:inline-block; padding:.15rem .6rem; border-radius:99px; font-size:.78rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; background:var(--beige) }
   .paid { background:#e3f1e6; color:var(--ok) } .fulfilled { background:#e8e8e8; color:#444 } .pending { background:#fff4d6; color:var(--warn) } .expired,.payment_failed { background:#f8e1e1; color:var(--bad) }
+  .requested { background:#fde7c7; color:#7a4300 } .confirmed { background:#e0ecfa; color:#1d4f86 } .declined { background:#eee; color:#666 }
+  .req { grid-column:1 / -1; background:#fff8ea; border:1px solid #f0d9a8; border-radius:8px; padding:.8rem 1rem }
+  .req h3 { margin:0 0 .4rem; font-size:1rem } .req .row { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.5rem }
+  .req input[type=text] { width:100%; font:inherit; border:1px solid var(--line); border-radius:6px; padding:.45rem .5rem; margin-top:.3rem }
+  button.ghost, a.ghost { background:#fff; border:1px solid var(--line); padding:.5rem .9rem; border-radius:6px; font:inherit; cursor:pointer; color:var(--espresso); text-decoration:none }
   .test { font-size:.72rem; color:var(--warn); font-weight:600 }
   .sandbox { display:inline-block; margin-top:.2rem; padding:.1rem .5rem; border-radius:4px; background:#5b4a9e; color:#fff; font-size:.7rem; font-weight:700; letter-spacing:.06em; white-space:nowrap }
   .order.is-test { border:2px dashed #5b4a9e; background:#faf8ff }
@@ -59,6 +64,7 @@
 <main>
   <h1>Orders</h1>
   <div class="tabs" role="tablist">
+    <button data-s="requested">Requests to confirm<span id="request-count"></span></button>
     <button data-s="paid" class="on">To make &amp; ship</button>
     <button data-s="fulfilled">Fulfilled</button>
     <button data-s="all">All</button>
@@ -86,13 +92,15 @@
     return fetch(path, opts).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || ("Error " + r.status)); return d; }); });
   }
   // Sandbox (Stripe test mode) orders only appear in the "Sandbox tests" tab.
-  var status = "paid", mode = "live";
+  var status = "paid", mode = "live", origin = location.origin;
   function load() {
     var list = document.querySelector("#list");
     if (!token()) { list.replaceChildren(el("div", { cls: "error" }, ["Please log in first: open ", el("a", { href: "/admin/", text: "the site editor" }), ", log in with GitHub, then come back to this page."])); return; }
     list.replaceChildren(el("div", { cls: "empty", text: "Loading orders…" }));
     api("/api/admin/orders?status=" + status + "&mode=" + mode).then(function (d) {
       document.querySelector("#sandbox-count").textContent = d.sandboxCount ? " (" + d.sandboxCount + ")" : "";
+      document.querySelector("#request-count").textContent = d.requestCount ? " (" + d.requestCount + ")" : "";
+      origin = d.origin || location.origin;
       if (!d.orders.length) { list.replaceChildren(el("div", { cls: "empty", text: "No orders here yet." })); return; }
       list.replaceChildren.apply(list, d.orders.map(render));
     }).catch(function (e) { list.replaceChildren(el("div", { cls: "error", text: e.message })); });
@@ -186,7 +194,41 @@
       return b;
     }
     var testNote = o.livemode ? null : el("div", { cls: "sandbox-note", text: "Sandbox test order: paid with a Stripe test card, no money was taken. Do not make or ship." });
-    return el("details", { cls: "order" + (o.livemode ? "" : " is-test") }, [sum, el("div", { cls: "body" }, [testNote, el("div", {}, [el("h3", { text: "Items" }), lines]), el("div", {}, [ship, actions])])]);
+    return el("details", { cls: "order" + (o.livemode ? "" : " is-test") }, [sum, el("div", { cls: "body" }, [testNote, requestBox(o), el("div", {}, [el("h3", { text: "Items" }), lines]), el("div", {}, [ship, actions])])]);
+  }
+  // Order over 20 items sent without payment. Confirming unlocks "Pay now" on the customer's page;
+  // the site sends no email, so the customer is told with the Email customer button (or the copied link).
+  function requestBox(o) {
+    var r = o.request; if (!r) return null;
+    var link = origin + "/order-request.html?o=" + encodeURIComponent(o.orderNumber) + "&k=" + r.key;
+    var need = r.neededBy ? new Date(r.neededBy + "T12:00:00").toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" }) : "not given";
+    var first = (o.customerName || "").split(" ")[0];
+    var mail = function (reply) {
+      var body = "Hi " + first + ",\n\n" + (reply ? reply + "\n\n" : "") + "Your Lacci Studio order " + o.orderNumber + " is confirmed. You can review it and pay here:\n" + link + "\n\nThank you!\nLacci Studio";
+      return "mailto:" + encodeURIComponent(o.customerEmail || "") + "?subject=" + encodeURIComponent("Your Lacci Studio order " + o.orderNumber + " is confirmed") + "&body=" + encodeURIComponent(body);
+    };
+    var kids = [el("h3", { text: "Order request · needed by " + need }),
+      r.message ? el("div", {}, ["Customer's note: ", el("em", { text: r.message })]) : null,
+      el("div", { cls: "muted", text: "Prices shown are the shop prices at the time of the request. Nothing is charged until the customer pays after you confirm." })];
+    if (o.status === "requested") {
+      var reply = el("input", { type: "text", maxlength: "500", placeholder: "Message for the customer (optional), e.g. Ready by Nov 20", "aria-label": "Message for the customer" });
+      var go = function (what, b) {
+        if (what === "decline" && !confirm("Decline order request " + o.orderNumber + "?")) return;
+        b.disabled = true;
+        api("/api/admin/orders/" + o.orderNumber, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ request: what, reply: reply.value }) })
+          .then(function (d) { if (what === "confirm" && d.order.customerEmail) location.href = mail(reply.value); load(); })
+          .catch(function (e) { alert(e.message); b.disabled = false; });
+      };
+      var yes = el("button", { cls: "act", type: "button", text: "Confirm & email customer" }); yes.onclick = function () { go("confirm", yes); };
+      var no = el("button", { cls: "ghost", type: "button", text: "Decline" }); no.onclick = function () { go("decline", no); };
+      kids.push(reply, el("div", { cls: "row" }, [yes, no]));
+    } else if (r.confirmedAt) {
+      var copy = el("button", { cls: "ghost", type: "button", text: "Copy pay link" });
+      copy.onclick = function () { (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(function () { copy.textContent = "Copied"; }, function () { prompt("Pay link:", link); }); };
+      kids.push(el("div", { cls: "muted", text: "Confirmed " + when(r.confirmedAt) + (r.reply ? " · your message: " + r.reply : "") }),
+        el("div", { cls: "row" }, [el("a", { cls: "ghost", href: mail(r.reply), text: "Email customer again" }), copy, el("a", { cls: "ghost", href: link, target: "_blank", rel: "noopener", text: "Open customer page" })]));
+    } else if (r.declinedAt) kids.push(el("div", { cls: "muted", text: "Declined " + when(r.declinedAt) + (r.reply ? " · " + r.reply : "") }));
+    return el("div", { cls: "req" }, kids);
   }
   document.querySelectorAll(".tabs button").forEach(function (b) {
     b.onclick = function () { document.querySelectorAll(".tabs button").forEach(function (x) { x.classList.remove("on"); }); b.classList.add("on"); status = b.getAttribute("data-s"); mode = b.getAttribute("data-mode") || "live"; load(); };

@@ -266,3 +266,6 @@ html.lz-lock, html.lz-lock body { overflow: hidden; }
 .lz-textslot .lz-pop { position: static; margin-top: 8px; max-height: none; box-shadow: none; }
 .lz-alignbox > span { display: block; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--lz-muted); margin: 4px 0; }
 .lz-alignbox .lz-chips { flex-wrap: wrap; }
+#lz-ctx-space { flex: none; width: 100%; }
+/* computer: the toolbar row under the product always takes the same height, so the product never moves */
+.lz-stage > #lz-ctx, #lz-ctx-space { height: 64px; min-height: 64px; box-sizing: border-box; align-items: center; } /* same height with or without a selection, on every screen */

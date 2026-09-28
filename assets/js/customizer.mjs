@@ -811,7 +811,6 @@ function cartItemsElsewhere() {
 }
 const itemsFor = (qty) => itemCount(rawProduct(), { options: S.options }, qty);
 const fitsLimit = (qty) => cartItemsElsewhere() + itemsFor(qty) <= MAX_ITEMS_PER_ORDER;
-function limitError() { S.limitHit = true; renderPanel(); }
 
 // ---------------------------------------------------------------- touch up
 // Brush over the picture to bring back parts the background removal took away (Restore) or to
@@ -971,12 +970,17 @@ function renderPanel() {
 function placeTextTools() {
   const ctx = root.querySelector("#lz-ctx"), pop = root.querySelector("#lz-pop"), slot = root.querySelector("#lz-textslot");
   const textSel = multiOn() ? tgt().length > 0 : !!(selected() && selected().type === "text");
-  if (slot && textSel && !isMobile()) { slot.append(ctx, pop); ctx.classList.add("in-panel"); return; }
+  if (slot && textSel && !isMobile()) {
+    // hold the toolbar's space under the product so the product doesn't resize (and jump) when the tools move
+    const stage = root.querySelector(".lz-stage");
+    if (ctx.parentNode === stage) { let sp = root.querySelector("#lz-ctx-space"); if (!sp) { sp = document.createElement("div"); sp.id = "lz-ctx-space"; stage.insertBefore(sp, ctx); } }
+    slot.append(ctx, pop); ctx.classList.add("in-panel"); return;
+  }
   parkTextTools();
 }
 function parkTextTools() {
   const ctx = root.querySelector("#lz-ctx"), pop = root.querySelector("#lz-pop"), stage = root.querySelector(".lz-stage"), warn = root.querySelector("#lz-warn");
-  if (ctx && ctx.parentNode !== stage) { stage.insertBefore(ctx, warn); stage.insertBefore(pop, warn); ctx.classList.remove("in-panel"); }
+  if (ctx && ctx.parentNode !== stage) { const sp = root.querySelector("#lz-ctx-space"); stage.insertBefore(ctx, sp || warn); stage.insertBefore(pop, warn); if (sp) sp.remove(); ctx.classList.remove("in-panel"); }
 }
 function layerLabel(l) { return l.type === "image" ? "🖼 " + esc((imgs[l.src] || {}).name || l.name || "Your upload") + statusOf(l) + qualityBadge(l) : "T “" + esc(l.text.trim() || "Your text") + "”" + `<small class="lz-sz">${sizeLabel(l)}</small>`; }
 function designPanel() {
@@ -1091,7 +1095,7 @@ function productPanel() {
         const name = choiceName(c), pr = priceLine(rp, { options: { ...S.options, [g.label]: name }, color: S.color }, raw().colors);
         const n = setSize({ Quantity: name });
         return `<button type="button" data-opt="${esc(g.label)}" data-v="${esc(name)}" aria-pressed="${S.options[g.label] === name}"><strong>${n}</strong><small>${n > 1 ? "coasters" : "coaster"}</small>${pr.ok ? `<em>${money(pr.unitCents)}</em>${n > 1 ? `<small>${money(Math.round(pr.unitCents / n))} each</small>` : ""}` : ""}</button>`;
-      }).join("")}<a class="lz-qbulk" href="${quoteLink()}"><strong>21+</strong><small>Large order</small><em>Request a quote</em></a></div></div>`;
+      }).join("")}<button type="button" class="lz-qbulk" data-qbulk="1"><strong>21+</strong><small>Large order</small><em>Pay after we confirm</em></button></div></div>`;
     }
     return `<div class="lz-field"><span>${esc(g.label)}</span><div class="lz-chips">${g.choices.map((c) => {
       const name = choiceName(c);
@@ -1106,7 +1110,8 @@ function productPanel() {
   return `${html}${colors}
     ${singles.length ? `<p class="lz-info-line">${singles.map((g) => `<span><small>${esc(g.label)}</small> ${esc(choiceName(g.choices[0]))}</span>`).join("")}</p>` : ""}
     <div class="lz-field"><span>${n > 1 ? "Number of sets" : "Quantity"}</span><div class="lz-stepper"><button type="button" data-qty="-1" aria-label="Fewer">−</button><output id="lz-qty">${S.qty}</output><button type="button" data-qty="1" aria-label="More">+</button></div></div>
-    <p class="lz-note${S.limitHit ? " lz-qnote" : ""}">Online orders are up to ${MAX_ITEMS_PER_ORDER} items${cartItemsElsewhere() ? ` (${cartItemsElsewhere()} already in your cart)` : ""}. Need more? <a href="${quoteLink()}">Send us a request</a> with the date you need them by.</p>`;
+    ${fitsLimit(S.qty) ? `<p class="lz-note${S.limitHit ? " lz-qnote" : ""}">Orders over ${MAX_ITEMS_PER_ORDER} items${cartItemsElsewhere() ? ` (you have ${cartItemsElsewhere()} in your cart)` : ""} are sent as a request: tell us the date you need them by, we confirm, then you pay. Raise the ${n > 1 ? "number of sets" : "quantity"} above to order more.</p>`
+      : `<p class="lz-note lz-qnote">This order is over ${MAX_ITEMS_PER_ORDER} items, so it will be sent as a <strong>request</strong>. You won't pay now: we'll confirm the date you need it by, then send you a link to pay.</p>`}`;
 }
 
 function reviewPanel() {
@@ -1155,9 +1160,9 @@ function bindPanel(box) {
     else if (t.dataset.pos) position(t.dataset.pos);
     else if (t.dataset.garment) { S.color = t.dataset.garment; commit(); render(); }
     else if (t.dataset.opt) setOption(t.dataset.opt, t.dataset.v);
+    else if (t.dataset.qbulk) { while (fitsLimit(S.qty) && S.qty < 50) S.qty++; commit(); render(); } // 21+: the smallest quantity that makes it a request
     else if (t.dataset.qty) {
       const q = clamp(S.qty + Number(t.dataset.qty), 1, 50);
-      if (Number(t.dataset.qty) > 0 && !fitsLimit(q)) return limitError(); // up to 20 items per order
       S.limitHit = false; S.qty = q; commit(); render();
     }
     else if (t.closest("[data-bind=layout]")) setLayout(t.dataset.v);
@@ -1185,9 +1190,6 @@ function setOption(label, value) {
   const after = setSize({ ...S.options, [label]: value });
   if (S.layout === "each" && after < before && S.items.slice(after).some(hasContent) && !confirm(`Coasters ${after + 1}–${before} have designs. Remove them?`)) return;
   S.options[label] = value;
-  // a bigger set can push the order past 20 items: lower the number of sets to what fits
-  while (S.qty > 1 && !fitsLimit(S.qty)) S.qty--;
-  S.limitHit = !fitsLimit(S.qty);
   if (S.layout === "each") S.items = S.items.slice(0, Math.max(after, 1));
   if (after <= 1) { if (S.layout === "each") S.shared = S.items[0] || S.shared; S.layout = "same"; S.item = 0; }
   S.sel = -1;
@@ -1525,12 +1527,9 @@ function liveLayer(l) {
   return key ? { ...l, src: key } : l;
 }
 
-// Request form link with this product filled in.
-function quoteLink() { return `contact.html?service=Custom%20or%20bulk%20order&item=${encodeURIComponent(product().name)}&quantity=21%2B`; }
 async function addToCart() {
   const add = root.querySelector("#lz-add");
   if (uploadingAny()) return;
-  if (!fitsLimit(S.qty)) { limitError(); return error(`Online orders are up to ${MAX_ITEMS_PER_ORDER} items. Lower the quantity, or send us a request for a larger order.`); }
   const pr = priced(); if (!pr.ok) return error(pr.error);
   const used = new Set(Object.values(S.shared).concat(...S.items.map((d) => Object.values(d))).flat().filter((l) => l && l.type === "image").map((l) => l.src));
   if ([...used].some((k) => imgs[k] && imgs[k].failed)) return error("One of your files didn't upload. Delete it and upload it again.");
