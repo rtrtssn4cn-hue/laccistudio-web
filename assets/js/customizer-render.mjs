@@ -129,7 +129,7 @@ export function removeWhite(img, maxSide = 2200) {
   const T1 = 34, T2 = 64; // same colour up to T1 (JPEG noise); T1–T2 is the soft edge
   let same = 0;
   for (const p of edge) if (diff(p) <= T1) same++;
-  if (same < edge.length * 0.6) { c.bgKind = "busy"; return c; }
+  if (same < edge.length * 0.85) { c.bgKind = "busy"; return c; } // most of the edge must be one colour; photos go to the AI cut-out
   const seen = new Uint8Array(w * h), stack = [];
   for (const p of edge) if (!seen[p] && diff(p) <= T1) { seen[p] = 1; stack.push(p); }
   while (stack.length) {

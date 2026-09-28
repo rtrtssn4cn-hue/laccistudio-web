@@ -470,7 +470,7 @@ function renderCtx() {
   const ls = layers(), i = S.sel;
   const order = (ls.length > 1 && !l.clip ? btn("forward", "Forward", "⬆", i === ls.length - 1 ? "disabled" : "") + btn("backward", "Back", "⬇", i === 0 ? "disabled" : "") : "");
   box.innerHTML = l.type === "image"
-    ? btn("replace", "Replace", "⇄") + (bgKind(l) === "plain" ? btn("bg", "Remove bg", "◩", l.removeWhite !== false ? 'aria-pressed="true"' : "") : "") + ((imgs[l.src] || {}).img ? btn("touchup", "Touch up", "🖌") : "") + btn("crop", "Crop", "⌗") + btn("flip", "Flip", "⇋") + btn("fit", "Fit", "⤢") + btn("fill", "Fill", "⛶") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("reset", "Reset", "↺") + btn("delete", "Delete", "🗑", 'class="lz-danger"')
+    ? btn("replace", "Replace", "⇄") + ((imgs[l.src] || {}).img && bgKind(l) !== "transparent" ? btn("bg", S.bgBusy ? "Removing…" : "Remove bg", "◩", S.bgBusy ? "disabled" : (bgKind(l) === "plain" && l.removeWhite !== false ? 'aria-pressed="true"' : "")) : "") + ((imgs[l.src] || {}).img ? btn("touchup", "Touch up", "🖌") : "") + btn("crop", "Crop", "⌗") + btn("flip", "Flip", "⇋") + btn("fit", "Fit", "⤢") + btn("fill", "Fill", "⛶") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("reset", "Reset", "↺") + btn("delete", "Delete", "🗑", 'class="lz-danger"')
     : btn("edittext", "Edit", "✎") + btn("t-font", "Font", "Aa", S.tool === "t-font" ? 'aria-pressed="true"' : "") + btn("t-size", "Size", "↕", S.tool === "t-size" ? 'aria-pressed="true"' : "") + btn("t-color", "Color", "●", (S.tool === "t-color" ? 'aria-pressed="true" ' : "") + `style="--dot:${esc(l.color)}"`) +
       btn("bold", "Bold", "B", l.bold ? 'aria-pressed="true"' : "") + btn("align", "Align", l.align === "left" ? "⇤" : l.align === "right" ? "⇥" : "≡") + btn("t-spacing", "Spacing", "↔", S.tool === "t-spacing" ? 'aria-pressed="true"' : "") +
       btn("t-curve", "Curve", "◠", S.tool === "t-curve" ? 'aria-pressed="true"' : "") + btn("vertical", l.vertical ? "Across" : "Down", l.vertical ? "⇥" : "⇩") + btn("center", "Center", "✛") + btn("duplicate", "Duplicate", "⧉") + order + btn("delete", "Delete", "🗑", 'class="lz-danger"');
@@ -518,7 +518,11 @@ function tool(act, el) {
   if (act === "crop") return openCrop(l);
   if (act === "touchup") return openTouchUp(l);
   if (act === "flip") l.flipX = !l.flipX;
-  if (act === "bg") l.removeWhite = l.removeWhite === false;
+  if (act === "bg") {
+    const info = imgs[l.src] || {};
+    if (bgKind(l) === "plain") l.removeWhite = l.removeWhite === false; // on / off
+    else if (info.img && !S.bgBusy) { cutOutSubject(l, info); return; }  // detailed background: AI cut-out
+  }
   if (act === "bold") l.bold = !l.bold;
   if (act === "align") l.align = l.align === "left" ? "center" : l.align === "right" ? "left" : l.align === "center" || !l.align ? "right" : "center";
   if (act === "vertical") l.vertical = !l.vertical;
@@ -629,6 +633,61 @@ function useDesign(d) {
     }
     commit(); render();
   }).catch(() => error("That design couldn't be loaded. Please try again."));
+}
+
+// ---------------------------------------------------------------- AI background removal
+// Cuts the main subject out of a photo with a detailed background, on the customer's own device
+// (U-2-Net small model, assets/models/u2netp.onnx, Apache-2.0; see LICENSE-U2Net.txt). Nothing is sent
+// anywhere. The result becomes the picture's background-removed version, so Remove bg switches it
+// on and off, Touch up can refine it, and the print copy follows it.
+const ORT = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/";
+let ortLoad = null, u2 = null;
+function loadOrt() {
+  if (ortLoad) return ortLoad;
+  ortLoad = new Promise((res, rej) => {
+    if (window.ort) return res(window.ort);
+    const s = document.createElement("script"); s.src = ORT + "ort.min.js";
+    s.onload = () => { window.ort.env.wasm.wasmPaths = ORT; window.ort.env.wasm.numThreads = 1; res(window.ort); };
+    s.onerror = () => { ortLoad = null; rej(new Error("load")); };
+    document.head.appendChild(s);
+  });
+  return ortLoad;
+}
+async function aiCutout(img) {
+  const ort = await loadOrt();
+  if (!u2) u2 = await ort.InferenceSession.create("/assets/models/u2netp.onnx", { executionProviders: ["wasm"] });
+  const N = 320, c = document.createElement("canvas"); c.width = c.height = N;
+  const x = c.getContext("2d"); x.drawImage(img, 0, 0, N, N);
+  const d = x.getImageData(0, 0, N, N).data;
+  let mx = 1; for (let i = 0; i < d.length; i += 4) mx = Math.max(mx, d[i], d[i + 1], d[i + 2]);
+  const mean = [0.485, 0.456, 0.406], sd = [0.229, 0.224, 0.225], input = new Float32Array(3 * N * N);
+  for (let p = 0; p < N * N; p++) for (let k = 0; k < 3; k++) input[k * N * N + p] = (d[p * 4 + k] / mx - mean[k]) / sd[k];
+  const out = await u2.run({ [u2.inputNames[0]]: new ort.Tensor("float32", input, [1, 3, N, N]) });
+  const pred = out[u2.outputNames[0]].data;
+  let lo = Infinity, hi = -Infinity; for (let i = 0; i < N * N; i++) { lo = Math.min(lo, pred[i]); hi = Math.max(hi, pred[i]); }
+  const m = document.createElement("canvas"); m.width = m.height = N;
+  const mctx = m.getContext("2d"), md = mctx.createImageData(N, N);
+  for (let i = 0; i < N * N; i++) {
+    const v = (pred[i] - lo) / ((hi - lo) || 1), a = Math.max(0, Math.min(1, (v - 0.12) / 0.76)); // soft edge
+    md.data[i * 4 + 3] = Math.round(a * 255);
+  }
+  mctx.putImageData(md, 0, 0);
+  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height, s = Math.min(1, 2200 / Math.max(iw, ih));
+  const r = document.createElement("canvas"); r.width = Math.round(iw * s); r.height = Math.round(ih * s);
+  const rc = r.getContext("2d"); rc.drawImage(img, 0, 0, r.width, r.height);
+  rc.globalCompositeOperation = "destination-in"; rc.imageSmoothingQuality = "high"; rc.drawImage(m, 0, 0, r.width, r.height);
+  r.bgKind = "plain";
+  return r;
+}
+async function cutOutSubject(l, info) {
+  S.bgBusy = true; renderCtx();
+  try {
+    const cut = await aiCutout(info.img);
+    info.display = cut; info.touched = true;
+    layers().forEach((x) => { if (x.src === l.src) x.removeWhite = true; });
+    commit();
+  } catch { error("Background removal isn't available on this device right now. You can use Touch up instead."); }
+  S.bgBusy = false; render();
 }
 
 // ---------------------------------------------------------------- touch up
@@ -806,7 +865,7 @@ function bgNote(ls) {
   const im = ls.filter((l) => l.type === "image" && !l.clip && !l.design), kinds = im.map((l) => [l, bgKind(l)]);
   if (kinds.some(([l, k]) => k === "plain" && l.removeWhite !== false)) return `<p class="lz-note">The plain background around your picture is removed, so only your design is printed. Tap <b>Remove bg</b> to keep it.</p>`;
   if (kinds.some(([, k]) => k === "plain")) return `<p class="lz-note">The background around your picture is kept and will be printed. Tap <b>Remove bg</b> to remove it.</p>`;
-  if (kinds.some(([, k]) => k === "busy")) return `<p class="lz-note">This photo has a detailed background, so it's printed as it is.</p>`;
+  if (kinds.some(([, k]) => k === "busy")) return `<p class="lz-note">This photo has a detailed background. Tap <b>Remove bg</b> to cut out the main subject, or leave it to print the whole photo.</p>`;
   return "";
 }
 function statusOf(l) { const i = imgs[l.src] || {}; return i.uploading ? " · uploading…" : i.failed ? " · upload failed" : ""; }
