@@ -73,6 +73,9 @@ const checkout = (lines) => call("/api/checkout", { method: "POST", headers: { "
 const webhook = async (event, secret) => { const raw = JSON.stringify(event); return call("/api/stripe/webhook", { method: "POST", headers: { "stripe-signature": await sign(raw, secret) }, body: raw }); };
 const order = (sessionId) => env.DB.prepare("SELECT * FROM orders WHERE session_id = ?").bind(sessionId).first();
 const P = (id) => products.find((p) => p.id === id);
+// Coaster set prices, read from products.json so a price change doesn't need test edits.
+const CP = (q) => Math.round(P("ceramic-coasters").optionGroups.find((g) => g.label === "Quantity").choices.find((c) => c.name === q).price * 100);
+const [C1, C2, C4, C6, C8] = ["Single", "Set of 2", "Set of 4", "Set of 6", "Set of 8"].map(CP);
 // What the browser shows for a line (same module as the cart drawer).
 const browserUnit = (l) => pricing.priceLine(P(l.productId), { options: l.options, color: l.color }, colors).unitCents;
 const line = (productId, options, extra = {}) => ({ productId, qty: 1, options, color: null, personalization: { text: "Smith" }, files: {}, ...extra });
@@ -107,7 +110,7 @@ async function chain(lines, expectUnits) {
 
 // ---------------------------------------------------------------- tests
 await test("1. Single coaster $7.99 with text", async () => {
-  const { r } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })], [799]);
+  const { r } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })], [C1]);
   ok(/^TEST-LS-\d+$/.test(r.body.orderNumber), "sandbox order number format");
 });
 await test("2. Coaster quantities: Set of 4 x2, Set of 8 x1, Single x3", async () => {
@@ -115,10 +118,10 @@ await test("2. Coaster quantities: Set of 4 x2, Set of 8 x1, Single x3", async (
     line("ceramic-coasters-square", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Square" }, { qty: 2 }),
     line("ceramic-coasters", { Quantity: "Set of 8", Material: "Ceramic", Shape: "Round" }),
     line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" }, { qty: 3 }),
-  ], [1999, 3999, 799]);
+  ], [C4, C8, C1]);
 });
 await test("3. Personalized coaster with uploaded artwork (no text)", async () => {
-  const { o } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" }, { personalization: {}, files: { design: UC, preview: UC } })], [799]);
+  const { o } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" }, { personalization: {}, files: { design: UC, preview: UC } })], [C1]);
   eq(JSON.parse(o.lines_json)[0].files.design, UC, "artwork link stored on the order");
 });
 await test("4. Artwork link from an unknown host is refused", async () => {
@@ -149,7 +152,7 @@ await test("11. Cart with multiple different products", async () => {
     line("sublimation-mug", { Size: "11 oz", Style: "Standard White" }, { qty: 2 }),
     line("sublimation-tumbler", { Size: "20 oz", Finish: "Glossy" }),
     line("apparel-t-shirt", { "Print location": "Front only", Size: "M" }, { color: "white" }),
-  ], [1999, 1199, 1899, 1799]);
+  ], [C4, 1199, 1899, 1799]);
 });
 await test("12. Shipping: owner's Snipcart bands chosen by weight", async () => {
   await checkout([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })]); // 260 g
@@ -207,13 +210,13 @@ await test("17. Webhook with a bad signature is rejected and changes nothing", a
   eq(r.status, 400, "status"); eq((await order(s.id)).status, "pending", "still pending");
 });
 await test("18. Successful payment: webhook marks the order paid with everything needed to fulfil it", async () => {
-  const { s } = await chain([line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Round" }, { files: { design: UC } })], [1999]);
+  const { s } = await chain([line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Round" }, { files: { design: UC } })], [C4]);
   pay(s.id, { tax: 206, shipping: 895 });
   const r = await webhook({ id: "evt_ok_1", type: "checkout.session.completed", data: { object: s } });
   eq(r.status, 200, "status");
   const o = await order(s.id);
   eq(o.status, "paid", "paid"); eq(o.customer_email, "buyer@example.com", "email"); eq(o.customer_name, "Test Buyer", "name");
-  eq(o.shipping_cents, 895, "shipping"); eq(o.tax_cents, 206, "tax"); eq(o.total_cents, 1999 + 895 + 206, "total"); eq(o.total_cents, s.amount_total, "order total = Stripe total");
+  eq(o.shipping_cents, 895, "shipping"); eq(o.tax_cents, 206, "tax"); eq(o.total_cents, C4 + 895 + 206, "total"); eq(o.total_cents, s.amount_total, "order total = Stripe total");
   const ship = JSON.parse(o.shipping_json); eq(ship.address.postal_code, "90210", "address"); ok(/Ground/.test(ship.method), "shipping method recorded");
   eq(JSON.parse(o.packing_json).suggestedBox, "9 x 6 x 2 in", "4 coasters -> 9x6x2 box");
   ok(!o.notes, "no warnings");
@@ -244,7 +247,7 @@ await test("20. Declined card: order stays unpaid; failed async payment and expi
   eq((await order(s2.id)).status, "payment_failed", "payment_failed");
 });
 await test("21. Confirmation page before the webhook: server asks Stripe, then confirms", async () => {
-  const { s } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })], [799]);
+  const { s } = await chain([line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" })], [C1]);
   pay(s.id, { shipping: 895, zip: "77020" });
   const r = await call("/api/order-status?session_id=" + s.id);
   eq(r.body.status, "paid", "paid via server-side Stripe lookup"); eq(r.body.email, "b…@example.com", "email masked");
@@ -289,16 +292,17 @@ await test("26. Cart captured from the real browser flow: customizer -> cart -> 
   // square coasters have their own listing now
   body.lines = body.lines.map((l) => (l.productId === "ceramic-coasters" && (l.options || {}).Shape === "Square" ? { ...l, productId: "ceramic-coasters-square" } : l));
   const stale = await checkout(body.lines);
-  eq(stale.status, 409, "old-price cart refused"); eq(stale.body.fresh.map((f) => f.unitCents).join(","), "799,1999,1799", "fresh prices returned");
+  eq(stale.status, 409, "old-price cart refused"); eq(stale.body.fresh.map((f) => f.unitCents).join(","), `${C1},${C4},1799`, "fresh prices returned");
   const r = await checkout(body.lines.map((l, i) => ({ ...l, expectedUnitCents: stale.body.fresh[i].unitCents })));
   eq(r.status, 200, "checkout " + JSON.stringify(r.body));
   const s = stripeState.created.at(-1);
-  eq(s.amount_subtotal, 6596, "Stripe subtotal = cart subtotal $65.96");
-  [799, 1999, 1799].forEach((c, i) => eq(Number(s.params[`line_items[${i}][price_data][unit_amount]`]), c, "Stripe unit line " + i));
+  const SUB = C1 + 2 * C4 + 1799; // single coaster, two sets of 4, one tee
+  eq(s.amount_subtotal, SUB, "Stripe subtotal = cart subtotal");
+  [C1, C4, 1799].forEach((c, i) => eq(Number(s.params[`line_items[${i}][price_data][unit_amount]`]), c, "Stripe unit line " + i));
   pay(s.id, { tax: 0, shipping: 1195 });
   await webhook({ id: "evt_browser_cart", type: "checkout.session.completed", data: { object: s } });
   const o = await order(s.id);
-  eq(o.subtotal_cents, 6596, "order subtotal"); eq(o.total_cents, 6596 + 1195, "order total"); eq(o.total_cents, s.amount_total, "order total = Stripe total");
+  eq(o.subtotal_cents, SUB, "order subtotal"); eq(o.total_cents, SUB + 1195, "order total"); eq(o.total_cents, s.amount_total, "order total = Stripe total");
   const lines = JSON.parse(o.lines_json);
   eq(lines[2].options.find((x) => x.label === "Garment colour").value, "White", "garment colour on the order");
   eq(lines[0].personalization.text, "Smith", "personalization on the order");
@@ -386,10 +390,10 @@ await test("31. Coaster shapes switched off (Heart, Hexagon) are kept in the dat
   eq(sq.join(","), "Square", "the square listing offers Square only");
   const priced = await checkout([line("ceramic-coasters-square", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Square" })]);
   eq(priced.status, 200, "Square sells on its own listing");
-  eq(pricing.fromPriceCents(P("ceramic-coasters")), 799, "switched-off shapes don't change the from-price");
+  eq(pricing.fromPriceCents(P("ceramic-coasters")), C1, "switched-off shapes don't change the from-price");
 });
 
-await test("32. Coaster Growth ladder: 1 $7.99 · 2 $13.99 · 4 $19.99 · 6 $29.99 · 8 $39.99; sets of 10 and 12 kept but off", async () => {
+await test("32. Coaster ladder: 1 $9.99 · 2 $15.99 · 4 $21.99 · 6 $30.99 · 8 $39.99 (bigger sets a little cheaper each); sets of 10 and 12 kept but off", async () => {
   const q = P("ceramic-coasters").optionGroups.find((g) => g.label === "Quantity");
   eq(pricing.visibleGroups(P("ceramic-coasters")).find((g) => g.label === "Quantity").choices.map((c) => c.name).join(","), "Single,Set of 2,Set of 4,Set of 6,Set of 8", "customers see 1, 2, 4, 6, 8");
   const { o } = await chain([
@@ -398,15 +402,16 @@ await test("32. Coaster Growth ladder: 1 $7.99 · 2 $13.99 · 4 $19.99 · 6 $29.
     line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Round" }),
     line("ceramic-coasters", { Quantity: "Set of 6", Material: "Ceramic", Shape: "Round" }),
     line("ceramic-coasters", { Quantity: "Set of 8", Material: "Ceramic", Shape: "Round" }),
-  ], [799, 1399, 1999, 2999, 3999]);
-  eq(o.subtotal_cents, 799 + 1399 + 1999 + 2999 + 3999, "order subtotal matches the ladder");
+  ], [999, 1599, 2199, 3099, 3999]);
+  eq(o.subtotal_cents, 999 + 1599 + 2199 + 3099 + 3999, "order subtotal matches the ladder");
   const two = await checkout([line("ceramic-coasters", { Quantity: "Set of 2", Material: "Ceramic", Shape: "Round" })]);
   eq(two.status, 200, "set of 2 sells on its own");
   for (const n of ["Set of 10", "Set of 12"]) {
     const c = q.choices.find((x) => x.name === n); ok(c && c.hidden === true && c.price > 0, n + " kept with its price, switched off");
     eq((await checkout([line("ceramic-coasters", { Quantity: n, Material: "Ceramic", Shape: "Round" })])).status, 400, "checkout refuses " + n);
   }
-  eq(pricing.fromPriceCents(P("ceramic-coasters")), 799, "shop card shows from $7.99");
+  eq(pricing.fromPriceCents(P("ceramic-coasters")), 999, "shop card shows from $9.99");
+  for (let i = 1; i < 5; i++) ok([C1, C2 / 2, C4 / 4, C6 / 6, C8 / 8][i] < [C1, C2 / 2, C4 / 4, C6 / 6, C8 / 8][i - 1], "bigger sets cost less per coaster");
 });
 
 await test("33. Aggressive Growth prices for every product on sale reach Stripe exactly; plans are never charged", async () => {

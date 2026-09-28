@@ -2056,26 +2056,26 @@
       "category": "Gifts"
     },
     {
-      "price": 7.99,
+      "price": 9.99,
       "optionGroups": [
         {
           "label": "Quantity",
           "choices": [
             {
               "name": "Single",
-              "price": 7.99
+              "price": 9.99
             },
             {
               "name": "Set of 2",
-              "price": 13.99
+              "price": 15.99
             },
             {
               "name": "Set of 4",
-              "price": 19.99
+              "price": 21.99
             },
             {
               "name": "Set of 6",
-              "price": 29.99
+              "price": 30.99
             },
             {
               "name": "Set of 8",
@@ -2176,26 +2176,26 @@
       }
     },
     {
-      "price": 7.99,
+      "price": 9.99,
       "optionGroups": [
         {
           "label": "Quantity",
           "choices": [
             {
               "name": "Single",
-              "price": 7.99
+              "price": 9.99
             },
             {
               "name": "Set of 2",
-              "price": 13.99
+              "price": 15.99
             },
             {
               "name": "Set of 4",
-              "price": 19.99
+              "price": 21.99
             },
             {
               "name": "Set of 6",
-              "price": 29.99
+              "price": 30.99
             },
             {
               "name": "Set of 8",
