@@ -14,7 +14,8 @@
             {
               "name": "30 oz",
               "price": 21.99,
-              "img": "assets/img/mock/mock-variant-tumbler-30.png?v=12"
+              "img": "assets/img/mock/mock-variant-tumbler-30.png?v=12",
+              "hidden": true
             },
             {
               "name": "40 oz",
@@ -31,15 +32,18 @@
             },
             {
               "name": "Matte",
-              "add": 2
+              "add": 2,
+              "hidden": true
             },
             {
               "name": "Glitter",
-              "add": 4
+              "add": 4,
+              "hidden": true
             },
             {
               "name": "Sparkle / Holographic",
-              "add": 5
+              "add": 5,
+              "hidden": true
             }
           ]
         }
@@ -67,7 +71,8 @@
           "Size / 30 oz": 33.99,
           "Size / 40 oz": 37.99
         }
-      }
+      },
+      "updatedAt": "2026-09-28T08:01:23.152Z"
     },
     {
       "price": 11.99,
