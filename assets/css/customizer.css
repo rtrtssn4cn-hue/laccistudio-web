@@ -225,3 +225,19 @@ html.lz-lock, html.lz-lock body { overflow: hidden; }
 .lz-sizebox { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: .8rem; }
 .lz-sizebox input { width: 72px; padding: 6px 8px; border: 1px solid var(--lz-line); border-radius: 8px; font: inherit; }
 .lz-sizebox small { color: var(--lz-muted); }
+
+/* font picker */
+.lz-styles { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.lz-styles button { border: 1px solid var(--lz-line); background: #fff; border-radius: 99px; padding: 5px 12px; font-size: .78rem; }
+.lz-styles button[aria-pressed=true] { background: var(--lz-ink); color: #fff; border-color: var(--lz-ink); }
+.lz-fgroup { margin: 6px 0; }
+.lz-fgroup > span { display: block; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--lz-muted); margin-bottom: 4px; }
+.lz-fontchips { flex-wrap: wrap; }
+.lz-fontchips button { font-size: 1rem; padding: 6px 12px; }
+.lz-pop { max-height: 46vh; overflow-y: auto; }
+.lz-fontdd { position: relative; }
+.lz-fontbtn { width: 100%; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--lz-line); background: #fff; border-radius: 10px; padding: 8px 12px; font-size: 1.15rem; }
+.lz-fontbtn span { font-family: 'Montserrat', sans-serif; font-size: .8rem; color: var(--lz-muted); }
+.lz-fontlist { margin-top: 6px; max-height: 230px; overflow-y: auto; border: 1px solid var(--lz-line); border-radius: 10px; background: #fff; padding: 4px 8px 8px; }
+.lz-fontlist button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 7px 8px; border-radius: 8px; font-size: 1.1rem; }
+.lz-fontlist button:hover, .lz-fontlist button[aria-selected=true] { background: var(--lz-ivory); }

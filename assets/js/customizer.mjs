@@ -152,6 +152,7 @@ function restoreImages(d) {
 
 // ---------------------------------------------------------------- open / close
 function ensureCss() {
+  if (!document.querySelector("#lz-fonts")) { const f = document.createElement("link"); f.id = "lz-fonts"; f.rel = "stylesheet"; f.href = R.FONT_CSS; document.head.appendChild(f); }
   if (document.querySelector("#lz-css")) return;
   const l = document.createElement("link"); l.id = "lz-css"; l.rel = "stylesheet"; l.href = "/assets/css/customizer.css?v=1";
   document.head.appendChild(l);
@@ -479,29 +480,50 @@ function renderCtx() {
 // Printed text size: the letter size (font size) in inches on the product, and the same in points.
 const textInches = (l) => l.size * ((area().print || {}).heightIn || 0);
 const sizeLabel = (l) => { const i = textInches(l); return i ? `${i.toFixed(2)} in` : ""; };
+// Curve and spacing show a number next to their slider; both stay in step.
+const curveSay = (v) => (v === 0 ? "straight" : v > 0 ? `arch up ${v}` : `arch down ${-v}`);
+function syncMeasure(pop, key, v) {
+  const r = pop.querySelector(`[data-range=${key}]`), n = pop.querySelector(`[data-num=${key}]`);
+  if (r && document.activeElement !== r) r.value = v; if (n && document.activeElement !== n) n.value = v;
+}
+// Draws again once the chosen font has arrived, and refits a design line to its space.
+function afterFont(l) {
+  const again = () => { if (l.fromDesign) fitText(l); draw(); };
+  if (document.fonts) document.fonts.load(R.fontString(l, 40)).then(again).catch(() => {}); again();
+}
 function renderPop() {
   const pop = root.querySelector("#lz-pop"), l = selected();
   if (!l || l.type !== "text" || !S.tool) { pop.hidden = true; return; }
   pop.hidden = false;
   const fonts = (personalization().fonts && personalization().fonts.length ? personalization().fonts : R.FONT_NAMES);
-  if (S.tool === "t-font") pop.innerHTML = `<div class="lz-chips">${fonts.map((f) => `<button type="button" data-font="${esc(f)}" aria-pressed="${l.font === f}" style="font-family:${esc(R.fontFamily(f))}">${esc(f.replace(/ \/.*/, ""))}</button>`).join("")}</div>`;
+  if (S.tool === "t-font") {
+    const own = personalization().fonts && personalization().fonts.length ? [{ label: "Fonts", fonts }] : R.FONT_GROUPS;
+    pop.innerHTML = `<div class="lz-styles">${[["light", "Light"], ["regular", "Regular"], ["bold", "Bold"]].map(([k, t]) => `<button type="button" data-weight="${k}" aria-pressed="${(k === "bold" && l.bold) || (k === "light" && l.light && !l.bold) || (k === "regular" && !l.bold && !l.light)}">${t}</button>`).join("")}<button type="button" data-italic="1" aria-pressed="${!!l.italic}"><i>Italic</i></button></div>
+      <div class="lz-fontdd"><button type="button" class="lz-fontbtn" data-fontdd="1" aria-expanded="${!!S.fontOpen}" style="font-family:${esc(R.fontFamily(l.font))}">${esc((l.font || "Font").replace(/ \/.*/, ""))}<span aria-hidden="true">▾</span></button>
+      ${S.fontOpen ? `<div class="lz-fontlist" role="listbox">${own.map((g) => `<div class="lz-fgroup"><span>${esc(g.label)}</span>${g.fonts.map((f) => `<button type="button" role="option" data-font="${esc(f)}" aria-selected="${l.font === f}" style="font-family:${esc(R.fontFamily(f))}">${esc(f.replace(/ \/.*/, ""))}</button>`).join("")}</div>`).join("")}</div>` : ""}</div>`;
+  }
   if (S.tool === "t-color") pop.innerHTML = `<div class="lz-swatches">${R.TEXT_SWATCHES.map((s) => `<button type="button" data-color="${s.hex}" aria-label="${s.name}" title="${s.name}" aria-pressed="${l.color.toLowerCase() === s.hex.toLowerCase()}" style="background:${s.hex}"></button>`).join("")}</div>
     <details class="lz-adv"><summary>Exact colour (HEX)</summary><input type="text" id="lz-hex" maxlength="7" value="${esc(l.color)}" spellcheck="false" autocapitalize="characters" placeholder="#D79D41"></details>`;
   if (S.tool === "t-size") pop.innerHTML = `<label class="lz-range"><span>A</span><input type="range" min="3" max="60" value="${Math.round(l.size * 100)}" data-range="size" aria-label="Text size"><span style="font-size:1.3em">A</span></label>
     <label class="lz-sizebox"><span>Size</span><input type="number" id="lz-size-in" min="0.1" max="12" step="0.05" value="${textInches(l).toFixed(2)}" inputmode="decimal"> <span>in</span> <small id="lz-size-pt">${Math.round(textInches(l) * 72)} pt</small></label>`;
-  if (S.tool === "t-spacing") pop.innerHTML = `<label class="lz-range"><span>Tight</span><input type="range" min="0" max="50" value="${Math.round((l.spacing || 0) * 100)}" data-range="spacing" aria-label="Letter spacing"><span>Wide</span></label>`;
-  if (S.tool === "t-curve") pop.innerHTML = `<label class="lz-range"><span>◡</span><input type="range" min="-100" max="100" step="5" value="${l.curve || 0}" data-range="curve" aria-label="Curve: arch down to arch up"><span>◠</span></label>${l.text.includes("\n") ? `<p class="lz-note">Curves apply to one line of text.</p>` : ""}`;
+  if (S.tool === "t-spacing") pop.innerHTML = `<label class="lz-range"><span>Tight</span><input type="range" min="0" max="50" value="${Math.round((l.spacing || 0) * 100)}" data-range="spacing" aria-label="Letter spacing"><span>Wide</span></label>
+    <label class="lz-sizebox"><span>Spacing</span><input type="number" data-num="spacing" min="0" max="50" step="1" value="${Math.round((l.spacing || 0) * 100)}" inputmode="numeric"> <small>0 = normal, 50 = widest</small></label>`;
+  if (S.tool === "t-curve") pop.innerHTML = `<label class="lz-range"><span>◡</span><input type="range" min="-100" max="100" step="5" value="${l.curve || 0}" data-range="curve" aria-label="Curve: arch down to arch up"><span>◠</span></label>
+    <label class="lz-sizebox"><span>Curve</span><input type="number" data-num="curve" min="-100" max="100" step="5" value="${l.curve || 0}" inputmode="numeric"> <small id="lz-curve-say">${curveSay(l.curve || 0)}</small></label>${l.text.includes("\n") ? `<p class="lz-note">Curves apply to one line of text.</p>` : ""}`;
   pop.onclick = (e) => {
     const t = e.target.closest("button"); if (!t) return;
-    if (t.dataset.font) { l.font = t.dataset.font; commit(); renderPop(); draw(); }
+    if (t.dataset.fontdd) { S.fontOpen = !S.fontOpen; renderPop(); if (S.fontOpen) { const on = pop.querySelector('.lz-fontlist [aria-selected="true"]'); if (on) on.scrollIntoView({ block: "nearest" }); } return; }
+    if (t.dataset.font) { l.font = t.dataset.font; S.fontOpen = false; afterFont(l); commit(); renderPop(); draw(); }
+    if (t.dataset.weight) { l.bold = t.dataset.weight === "bold"; l.light = t.dataset.weight === "light"; afterFont(l); commit(); renderPop(); renderCtx(); draw(); }
+    if (t.dataset.italic) { l.italic = !l.italic; afterFont(l); commit(); renderPop(); draw(); }
     if (t.dataset.color) { l.color = t.dataset.color; commit(); renderCtx(); draw(); }
   };
   pop.oninput = (e) => {
     const t = e.target;
     if (t.dataset.range === "size") { l.size = Number(t.value) / 100; const b = pop.querySelector("#lz-size-in"); if (b) b.value = textInches(l).toFixed(2); const p = pop.querySelector("#lz-size-pt"); if (p) p.textContent = Math.round(textInches(l) * 72) + " pt"; }
     if (t.id === "lz-size-in") { const h = (area().print || {}).heightIn, v = Number(t.value); if (h && v > 0) { l.size = round(clamp(v / h, 0.01, 1.5)); if (l.fromDesign) { l.baseSize = l.size; l.maxW = 0; } const r = pop.querySelector("[data-range=size]"); if (r) r.value = Math.round(l.size * 100); const p = pop.querySelector("#lz-size-pt"); if (p) p.textContent = Math.round(v * 72) + " pt"; } }
-    if (t.dataset.range === "spacing") l.spacing = Number(t.value) / 100;
-    if (t.dataset.range === "curve") l.curve = Number(t.value);
+    if (t.dataset.range === "spacing" || t.dataset.num === "spacing") { l.spacing = clamp(Number(t.value) || 0, 0, 50) / 100; syncMeasure(pop, "spacing", Math.round(l.spacing * 100)); }
+    if (t.dataset.range === "curve" || t.dataset.num === "curve") { l.curve = clamp(Math.round(Number(t.value) || 0), -100, 100); syncMeasure(pop, "curve", l.curve); const s = pop.querySelector("#lz-curve-say"); if (s) s.textContent = curveSay(l.curve); }
     if (t.id === "lz-hex") { const v = t.value.trim(); if (/^#?[0-9a-f]{6}$/i.test(v)) l.color = (v[0] === "#" ? v : "#" + v).toUpperCase(); }
     draw();
   };
@@ -528,7 +550,7 @@ function tool(act, el) {
     if (bgKind(l) === "plain") l.removeWhite = l.removeWhite === false; // on / off
     else if (info.img && !S.bgBusy) { cutOutSubject(l, info); return; }  // detailed background: AI cut-out
   }
-  if (act === "bold") l.bold = !l.bold;
+  if (act === "bold") { l.bold = !l.bold; if (l.bold) l.light = false; afterFont(l); }
   if (act === "align") l.align = l.align === "left" ? "center" : l.align === "right" ? "left" : l.align === "center" || !l.align ? "right" : "center";
   if (act === "vertical") l.vertical = !l.vertical;
   if (act === "bigger") l[k] = round(clamp(l[k] * 1.1, 0.03, 3));
@@ -902,7 +924,7 @@ function fitText(t) {
   if (!t.maxW || !t.baseSize) return;
   const ab = R.areaBox(area(), 1000, 1000), c = fitText.ctx || (fitText.ctx = document.createElement("canvas").getContext("2d"));
   const shown = /Monogram/.test(t.font || "") ? t.text.toUpperCase() : t.text;
-  c.font = `${t.bold ? 700 : 500} 100px ${R.fontFamily(t.font)}`;
+  c.font = R.fontString(t, 100);
   const wFrac = (c.measureText(shown).width * (t.baseSize * ab.h / 100)) / ab.w;
   t.size = round(wFrac > t.maxW ? t.baseSize * t.maxW / wFrac : t.baseSize);
 }
@@ -1299,7 +1321,7 @@ function recordLayer(l) {
     if (l.design) o.design = l.design; if (l.locked) o.locked = true; if (l.clip) o.clip = l.clip; if (l.spot) o.spot = l.spot;
     return o;
   }
-  return { type: "text", text: l.text.trim(), font: l.font, color: l.color, size: l.size, x: l.x, y: l.y, rotation: l.rotation, spacing: l.spacing || 0, curve: l.curve || 0, bold: !!l.bold, vertical: !!l.vertical, align: l.align || "center" };
+  return { type: "text", text: l.text.trim(), font: l.font, color: l.color, size: l.size, x: l.x, y: l.y, rotation: l.rotation, spacing: l.spacing || 0, curve: l.curve || 0, bold: !!l.bold, italic: !!l.italic, light: !!l.light, vertical: !!l.vertical, align: l.align || "center" };
 }
 function recordAreas(d, ar) {
   const out = {};

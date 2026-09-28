@@ -10,7 +10,18 @@
 // overridden per product in content/products.json with "printAreas".
 
 export const FONT_NAMES = ["Script / Cursive", "Serif / Classic", "Sans-serif / Modern", "Handwritten", "Bold / Block", "Monogram"];
+// Popular font families for personalized gifts, grouped by style (Google Fonts, open licence).
+export const FONT_GROUPS = [
+  { label: "Script", fonts: ["Great Vibes", "Pinyon Script", "Alex Brush", "Allura", "Dancing Script", "Parisienne", "Sacramento"] },
+  { label: "Classic", fonts: ["Playfair Display", "Cormorant Garamond", "Libre Baskerville", "Cinzel", "EB Garamond"] },
+  { label: "Modern", fonts: ["Montserrat", "Poppins", "Raleway", "Josefin Sans", "Lato"] },
+  { label: "Bold", fonts: ["Bebas Neue", "Anton", "Oswald", "Abril Fatface"] },
+  { label: "Handwritten", fonts: ["Pacifico", "Caveat", "Amatic SC", "Shadows Into Light", "Kalam"] },
+];
+const FAMILY_SET = new Set(FONT_GROUPS.flatMap((g) => g.fonts));
+export const FONT_CSS = "https://fonts.googleapis.com/css2?family=Great+Vibes&family=Pinyon+Script&family=Alex+Brush&family=Allura&family=Dancing+Script:wght@400;700&family=Parisienne&family=Sacramento&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Poppins:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Raleway:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Josefin+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Bebas+Neue&family=Anton&family=Oswald:wght@300;400;700&family=Abril+Fatface&family=Pacifico&family=Caveat:wght@400;700&family=Amatic+SC:wght@400;700&family=Shadows+Into+Light&family=Kalam:wght@300;400;700&display=swap";
 export function fontFamily(name) {
+  if (FAMILY_SET.has(name)) return `'${name}', ${FONT_GROUPS.find((g) => g.fonts.includes(name)).label === "Script" ? "cursive" : "serif"}`;
   if (/Script|Handwritten/.test(name || "")) return "'Pinyon Script', cursive";
   if (/Sans|Bold|Block/.test(name || "")) return "'Montserrat', sans-serif";
   return "'Cormorant Garamond', serif";
@@ -201,7 +212,8 @@ export const areaBox = (area, W, H) => ({ x: area.rect.x * W, y: area.rect.y * H
 // Text is laid out on a scratch canvas in "area units": font size = size x area height.
 let scratch = null;
 function measureCtx() { if (!scratch) scratch = document.createElement("canvas").getContext("2d"); return scratch; }
-function fontString(layer, px) { return `${layer.bold ? 700 : 500} ${px}px ${fontFamily(layer.font)}`; }
+// Weight: Light 300, Regular, Bold 700; italic when chosen.
+export function fontString(layer, px) { return `${layer.italic ? "italic " : ""}${layer.bold ? 700 : layer.light ? 300 : 500} ${px}px ${fontFamily(layer.font)}`; }
 const displayText = (layer) => (/Monogram/.test(layer.font || "") ? String(layer.text || "").toUpperCase() : String(layer.text || ""));
 
 // Glyph placements for a text layer, relative to its centre, in px at font size px.
@@ -404,4 +416,4 @@ export function findPhotoSpot(img) {
   return { x: x0 / w, y: y0 / h, w: bw / w, h: bh / h, round: n / (bw * bh) < 0.86 };
 }
 
-export default { findPhotoSpot, FONT_NAMES, fontFamily, TEXT_SWATCHES, swatchName, areasFor, mockupFor, loadImage, removeWhite, tinted, areaBox, layoutText, layerBox, corners, isOutside, hitLayer, drawComposite, handlePoints, renderPrintFile };
+export default { fontString, FONT_GROUPS, FONT_CSS, findPhotoSpot, FONT_NAMES, fontFamily, TEXT_SWATCHES, swatchName, areasFor, mockupFor, loadImage, removeWhite, tinted, areaBox, layoutText, layerBox, corners, isOutside, hitLayer, drawComposite, handlePoints, renderPrintFile };
