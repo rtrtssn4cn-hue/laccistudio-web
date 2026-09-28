@@ -93,7 +93,16 @@
     // Arriving from a product (large order): fill in what we know. Dates before today aren't offered.
     try {
       var q = new URLSearchParams(location.search);
-      if (q.get('item') && form.querySelector('#item')) form.querySelector('#item').value = q.get('item').slice(0, 120);
+      // Product list: the products on sale in the shop (switching one off in Admin removes it here too).
+      var itemSel = form.querySelector('#item');
+      if (itemSel && itemSel.tagName === 'SELECT') {
+        var other = itemSel.options[itemSel.options.length - 1];
+        ((window.LACCI_SHOP || {}).products || []).forEach(function (p) {
+          var o = document.createElement('option'); o.textContent = p.name; itemSel.insertBefore(o, other);
+        });
+        var want = q.get('item');
+        if (want) [].forEach.call(itemSel.options, function (o) { if (o.text === want) itemSel.value = o.text; });
+      }
       if (q.get('quantity') && form.querySelector('#quantity')) form.querySelector('#quantity').value = q.get('quantity').slice(0, 20);
       var nd = form.querySelector('#needed'); if (nd) nd.min = new Date().toISOString().slice(0, 10);
     } catch (e) {}
