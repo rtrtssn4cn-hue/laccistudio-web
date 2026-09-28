@@ -11,16 +11,16 @@
 
 export const FONT_NAMES = ["Script / Cursive", "Serif / Classic", "Sans-serif / Modern", "Handwritten", "Bold / Block", "Monogram"];
 // Popular font families for personalized gifts, grouped by style (Google Fonts, open licence).
-// Grouped by look, like Canva; a font can sit in more than one group.
+// Grouped by look, like Canva; each font belongs to one group only.
 export const FONT_GROUPS = [
-  { label: "Elegant", fonts: ["Great Vibes", "Pinyon Script", "Parisienne", "Allura", "Cormorant Garamond", "Playfair Display"] },
-  { label: "Minimalist", fonts: ["Josefin Sans", "Raleway", "Quicksand", "Lato", "Montserrat"] },
-  { label: "Modern", fonts: ["Poppins", "Montserrat", "Oswald", "Bebas Neue"] },
-  { label: "Classic", fonts: ["Libre Baskerville", "EB Garamond", "Cinzel", "Cormorant Garamond"] },
-  { label: "Bold", fonts: ["Anton", "Bebas Neue", "Abril Fatface", "Oswald"] },
-  { label: "Playful", fonts: ["Pacifico", "Fredoka", "Amatic SC", "Lobster"] },
+  { label: "Elegant", fonts: ["Great Vibes", "Pinyon Script", "Parisienne", "Allura", "Cormorant Garamond"] },
+  { label: "Minimalist", fonts: ["Josefin Sans", "Raleway", "Quicksand", "Lato"] },
+  { label: "Modern", fonts: ["Poppins", "Montserrat", "Oswald"] },
+  { label: "Classic", fonts: ["Libre Baskerville", "EB Garamond", "Playfair Display"] },
+  { label: "Bold", fonts: ["Anton", "Bebas Neue"] },
+  { label: "Playful", fonts: ["Pacifico", "Fredoka", "Amatic SC"] },
   { label: "Handwritten", fonts: ["Caveat", "Kalam", "Shadows Into Light", "Coming Soon", "Dancing Script", "Sacramento", "Alex Brush"] },
-  { label: "Vintage", fonts: ["Lobster", "Abril Fatface", "Cinzel", "Playfair Display"] },
+  { label: "Vintage", fonts: ["Lobster", "Abril Fatface", "Cinzel"] },
 ];
 const SCRIPTY = new Set(["Great Vibes", "Pinyon Script", "Parisienne", "Allura", "Dancing Script", "Sacramento", "Alex Brush", "Pacifico", "Lobster"]);
 const FAMILY_SET = new Set(FONT_GROUPS.flatMap((g) => g.fonts));
