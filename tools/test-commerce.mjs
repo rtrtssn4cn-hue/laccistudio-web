@@ -112,7 +112,7 @@ await test("1. Single coaster $7.99 with text", async () => {
 });
 await test("2. Coaster quantities: Set of 4 x2, Set of 8 x1, Single x3", async () => {
   await chain([
-    line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Square" }, { qty: 2 }),
+    line("ceramic-coasters-square", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Square" }, { qty: 2 }),
     line("ceramic-coasters", { Quantity: "Set of 8", Material: "Ceramic", Shape: "Round" }),
     line("ceramic-coasters", { Quantity: "Single", Material: "Ceramic", Shape: "Round" }, { qty: 3 }),
   ], [1999, 3999, 799]);
@@ -286,6 +286,8 @@ await test("26. Cart captured from the real browser flow: customizer -> cart -> 
   // prices (customizer: $6.99, $24.99 x2, $31.98). A cart saved at old prices is refused with the fresh
   // prices (nobody is charged a price they didn't see); re-sent with those prices it goes through.
   const body = JSON.parse(readFileSync(new URL("./fixtures/cart-from-browser.json", import.meta.url)));
+  // square coasters have their own listing now
+  body.lines = body.lines.map((l) => (l.productId === "ceramic-coasters" && (l.options || {}).Shape === "Square" ? { ...l, productId: "ceramic-coasters-square" } : l));
   const stale = await checkout(body.lines);
   eq(stale.status, 409, "old-price cart refused"); eq(stale.body.fresh.map((f) => f.unitCents).join(","), "799,1999,1799", "fresh prices returned");
   const r = await checkout(body.lines.map((l, i) => ({ ...l, expectedUnitCents: stale.body.fresh[i].unitCents })));
@@ -378,9 +380,12 @@ await test("31. Coaster shapes switched off (Heart, Hexagon) are kept in the dat
     eq(r.status, 400, "checkout refuses " + n);
   }
   const offered = pricing.visibleGroups(P("ceramic-coasters")).find((g) => g.label === "Shape").choices.map((c) => c.name);
-  eq(offered.join(","), "Round,Square", "customers see Round and Square only");
-  const priced = await checkout([line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Square" })]);
-  eq(priced.status, 200, "Square still sells");
+  eq(offered.join(","), "Round", "the round listing offers Round only");
+  eq((await checkout([line("ceramic-coasters", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Square" })])).status, 400, "Square is refused on the round listing");
+  const sq = pricing.visibleGroups(P("ceramic-coasters-square")).find((g) => g.label === "Shape").choices.map((c) => pricing.choiceName(c));
+  eq(sq.join(","), "Square", "the square listing offers Square only");
+  const priced = await checkout([line("ceramic-coasters-square", { Quantity: "Set of 4", Material: "Ceramic", Shape: "Square" })]);
+  eq(priced.status, 200, "Square sells on its own listing");
   eq(pricing.fromPriceCents(P("ceramic-coasters")), 799, "switched-off shapes don't change the from-price");
 });
 

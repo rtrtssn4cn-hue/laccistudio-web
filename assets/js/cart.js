@@ -379,6 +379,7 @@
     }
     if (id === "sublimation-tumbler" || /tumbler|bottle/.test(n)) return "tumbler";
     if (id === "sublimation-mug" || /mug/.test(n)) return "mug";
+    if (id === "ceramic-coasters-square" || /square coaster/.test(n)) return "board";
     if (id === "ceramic-coasters" || /coaster/.test(n)) return "round";
     if (id === "engraved-board" || /board/.test(n)) return "board";
     if (id === "personalized-ornament" || /ornament/.test(n)) return "ornament";

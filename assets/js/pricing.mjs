@@ -110,7 +110,7 @@ export const money = (c) => "$" + (c / 100).toFixed(2);
 
 // Coaster count in a line (set size x quantity) for the packaging rules; null if not a coaster line.
 export function coasterCount(product, selections, qty) {
-  if (!product || product.id !== "ceramic-coasters") return null;
+  if (!product || !/^ceramic-coasters(-square)?$/.test(product.id)) return null; // round and square coaster listings
   const q = (selections && selections.options && selections.options.Quantity) || "Single";
   const m = /(\d+)/.exec(q);
   return (m ? Number(m[1]) : 1) * qty;
