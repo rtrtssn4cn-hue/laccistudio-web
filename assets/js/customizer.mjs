@@ -483,7 +483,7 @@ const sizeLabel = (l) => { const i = textInches(l); return i ? `${i.toFixed(2)} 
 // Fonts: every tap or arrow step changes the text at once; the list stays open while trying fonts.
 function fontList() {
   const own = personalization().fonts && personalization().fonts.length ? personalization().fonts : null;
-  return own || R.FONT_GROUPS.flatMap((g) => g.fonts);
+  return own || [...new Set(R.FONT_GROUPS.flatMap((g) => g.fonts))]; // each font once, in list order
 }
 function setFont(l, f) {
   const pop = root.querySelector("#lz-pop"), keep = pop.querySelector(".lz-fontlist"), top = keep ? keep.scrollTop : 0;

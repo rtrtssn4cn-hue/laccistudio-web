@@ -11,17 +11,22 @@
 
 export const FONT_NAMES = ["Script / Cursive", "Serif / Classic", "Sans-serif / Modern", "Handwritten", "Bold / Block", "Monogram"];
 // Popular font families for personalized gifts, grouped by style (Google Fonts, open licence).
+// Grouped by look, like Canva; a font can sit in more than one group.
 export const FONT_GROUPS = [
-  { label: "Script", fonts: ["Great Vibes", "Pinyon Script", "Alex Brush", "Allura", "Dancing Script", "Parisienne", "Sacramento"] },
-  { label: "Classic", fonts: ["Playfair Display", "Cormorant Garamond", "Libre Baskerville", "Cinzel", "EB Garamond"] },
-  { label: "Modern", fonts: ["Montserrat", "Poppins", "Raleway", "Josefin Sans", "Lato"] },
-  { label: "Bold", fonts: ["Bebas Neue", "Anton", "Oswald", "Abril Fatface"] },
-  { label: "Handwritten", fonts: ["Pacifico", "Caveat", "Amatic SC", "Shadows Into Light", "Kalam"] },
+  { label: "Elegant", fonts: ["Great Vibes", "Pinyon Script", "Parisienne", "Allura", "Cormorant Garamond", "Playfair Display"] },
+  { label: "Minimalist", fonts: ["Josefin Sans", "Raleway", "Quicksand", "Lato", "Montserrat"] },
+  { label: "Modern", fonts: ["Poppins", "Montserrat", "Oswald", "Bebas Neue"] },
+  { label: "Classic", fonts: ["Libre Baskerville", "EB Garamond", "Cinzel", "Cormorant Garamond"] },
+  { label: "Bold", fonts: ["Anton", "Bebas Neue", "Abril Fatface", "Oswald"] },
+  { label: "Playful", fonts: ["Pacifico", "Fredoka", "Amatic SC", "Lobster"] },
+  { label: "Handwritten", fonts: ["Caveat", "Kalam", "Shadows Into Light", "Dancing Script", "Sacramento", "Alex Brush"] },
+  { label: "Vintage", fonts: ["Lobster", "Abril Fatface", "Cinzel", "Playfair Display"] },
 ];
+const SCRIPTY = new Set(["Great Vibes", "Pinyon Script", "Parisienne", "Allura", "Dancing Script", "Sacramento", "Alex Brush", "Pacifico", "Lobster"]);
 const FAMILY_SET = new Set(FONT_GROUPS.flatMap((g) => g.fonts));
-export const FONT_CSS = "https://fonts.googleapis.com/css2?family=Great+Vibes&family=Pinyon+Script&family=Alex+Brush&family=Allura&family=Dancing+Script:wght@400;700&family=Parisienne&family=Sacramento&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Poppins:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Raleway:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Josefin+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Bebas+Neue&family=Anton&family=Oswald:wght@300;400;700&family=Abril+Fatface&family=Pacifico&family=Caveat:wght@400;700&family=Amatic+SC:wght@400;700&family=Shadows+Into+Light&family=Kalam:wght@300;400;700&display=swap";
+export const FONT_CSS = "https://fonts.googleapis.com/css2?family=Great+Vibes&family=Pinyon+Script&family=Alex+Brush&family=Allura&family=Dancing+Script:wght@400;700&family=Parisienne&family=Sacramento&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Poppins:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Raleway:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Josefin+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Bebas+Neue&family=Anton&family=Oswald:wght@300;400;700&family=Abril+Fatface&family=Pacifico&family=Caveat:wght@400;700&family=Amatic+SC:wght@400;700&family=Shadows+Into+Light&family=Kalam:wght@300;400;700&family=Quicksand:wght@300;400;700&family=Fredoka:wght@300;400;700&family=Lobster&display=swap";
 export function fontFamily(name) {
-  if (FAMILY_SET.has(name)) return `'${name}', ${FONT_GROUPS.find((g) => g.fonts.includes(name)).label === "Script" ? "cursive" : "serif"}`;
+  if (FAMILY_SET.has(name)) return `'${name}', ${SCRIPTY.has(name) ? "cursive" : "serif"}`;
   if (/Script|Handwritten/.test(name || "")) return "'Pinyon Script', cursive";
   if (/Sans|Bold|Block/.test(name || "")) return "'Montserrat', sans-serif";
   return "'Cormorant Garamond', serif";
