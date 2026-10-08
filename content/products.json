@@ -2088,13 +2088,11 @@
             },
             {
               "name": "Set of 10",
-              "price": 52.99,
-              "hidden": true
+              "price": 52.99
             },
             {
               "name": "Set of 12",
-              "price": 60.99,
-              "hidden": true
+              "price": 60.99
             }
           ]
         },
@@ -2178,7 +2176,8 @@
           "Quantity / Set of 6": 38.99,
           "Quantity / Set of 8": 48.99
         }
-      }
+      },
+      "updatedAt": "2026-10-08T10:57:46.043Z"
     },
     {
       "price": 7.99,
