@@ -145,7 +145,7 @@ async function sendOrderEmail(env, order, token, origin) {
 }
 async function sendAdminTestEmail(env, to, origin) {
   if (!env.EMAIL_API_KEY || !env.EMAIL_API_URL || !env.ORDER_EMAIL_FROM) throw new Error("Order email is not configured.");
-  if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) throw new Error("The signed-in administrator has no email address available.");
+  if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) throw new Error("Enter a valid email address for the test.");
   const html = `<div style="font-family:Arial,sans-serif;color:#2b1d12;max-width:640px;margin:auto"><img src="${origin}/assets/logo/lacci-primary.png" alt="Lacci Studio" style="width:190px;height:auto"><h1 style="font-family:Georgia,serif;font-weight:500">Order confirmation email test</h1><p>This message confirms that Lacci Studio can send its own order emails.</p><p>No customer order was used or changed for this test.</p><p style="font-size:12px;color:#6f6258">Future paid-order messages will include the private Track &amp; Review link and every saved design preview.</p></div>`;
   const minute = nowIso().slice(0, 16);
   const res = await fetch(env.EMAIL_API_URL, { method: "POST", headers: { Authorization: `Bearer ${env.EMAIL_API_KEY}`, "Content-Type": "application/json", "Idempotency-Key": `admin-email-test-${minute}` }, body: JSON.stringify({ from: env.ORDER_EMAIL_FROM, to: [to], subject: "Lacci Studio — order confirmation email test", html }) });
@@ -579,7 +579,7 @@ async function adminUser(request, env) {
   const repo = await res.json();
   if (!repo.permissions || !(repo.permissions.push || repo.permissions.admin)) return null;
   const me = await gh("/user").then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
-  const user = { login: me.login || "editor", email: typeof me.email === "string" ? me.email : "" };
+  const user = { login: me.login || "editor" };
   adminCache.set(digest, { user, until: Date.now() + 5 * 60_000 });
   return user;
 }
@@ -602,7 +602,8 @@ async function handleAdmin(request, env, url) {
   const m = url.pathname.match(/^\/api\/admin\/orders(?:\/((?:TEST-)?LS-\d+))?$/);
   if (url.pathname === "/api/admin/whoami") return json({ user: { login: user.login } });
   if (url.pathname === "/api/admin/email-test" && request.method === "POST") {
-    try { await sendAdminTestEmail(env, user.email, siteOrigin(env, request)); return json({ sent: true }); }
+    let body; try { body = await request.json(); } catch { return json({ error: "Enter the email address that should receive the test." }, 400); }
+    try { await sendAdminTestEmail(env, clip(body.to, 254), siteOrigin(env, request)); return json({ sent: true }); }
     catch (e) { return json({ error: e.message || "Test email failed." }, 502); }
   }
   if (!m) return json({ error: "Not found." }, 404);

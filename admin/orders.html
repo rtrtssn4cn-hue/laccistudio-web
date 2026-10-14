@@ -68,7 +68,7 @@
 </header>
 <main>
   <h1>Orders</h1>
-  <p><button id="email-test" class="ghost" type="button">Send order-email test to me</button> <span id="email-test-status" class="muted" aria-live="polite"></span></p>
+  <p><input id="email-test-to" type="email" autocomplete="email" placeholder="Email address for test" aria-label="Email address for test"> <button id="email-test" class="ghost" type="button">Send order-email test</button> <span id="email-test-status" class="muted" aria-live="polite"></span></p>
   <div class="tabs" role="tablist">
     <button data-s="requested">Requests to confirm<span id="request-count"></span></button>
     <button data-s="paid" class="on">To make &amp; ship</button>
@@ -98,9 +98,10 @@
     return fetch(path, opts).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error(d.error || ("Error " + r.status)); return d; }); });
   }
   document.querySelector("#email-test").onclick = function () {
-    var button = this, statusText = document.querySelector("#email-test-status");
+    var button = this, statusText = document.querySelector("#email-test-status"), to = document.querySelector("#email-test-to").value.trim();
+    if (!to) { statusText.textContent = "Enter the email address for the test."; return; }
     button.disabled = true; statusText.textContent = "Sending…";
-    api("/api/admin/email-test", { method: "POST" }).then(function () { statusText.textContent = "Test sent."; }).catch(function (e) { statusText.textContent = e.message; button.disabled = false; });
+    api("/api/admin/email-test", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: to }) }).then(function () { statusText.textContent = "Test sent."; }).catch(function (e) { statusText.textContent = e.message; button.disabled = false; });
   };
   // Sandbox (Stripe test mode) orders only appear in the "Sandbox tests" tab.
   var status = "paid", mode = "live", origin = location.origin;

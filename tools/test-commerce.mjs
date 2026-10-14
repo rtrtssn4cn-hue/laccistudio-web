@@ -42,7 +42,7 @@ globalThis.fetch = async (input, init = {}) => {
   if (url.startsWith("https://api.github.com/")) {
     const tok = (init.headers.Authorization || "").slice(7);
     if (url.includes("/repos/")) return tok === "good" ? reply({ permissions: { push: true } }) : tok === "readonly" ? reply({ permissions: { push: false } }) : reply({}, 401);
-    if (url.endsWith("/user")) return reply({ login: "owner", email: "owner@example.com" });
+    if (url.endsWith("/user")) return reply({ login: "owner" });
   }
   return realFetch(input, init);
 };
@@ -272,7 +272,7 @@ await test("24. Admin orders: login required, write access required, fulfil flow
   eq((await call("/api/admin/orders")).status, 401, "no token");
   eq((await call("/api/admin/orders", { headers: { Authorization: "Bearer readonly" } })).status, 401, "read-only GitHub user");
   const emailsBefore = emailState.length;
-  eq((await call("/api/admin/email-test", { method: "POST", headers: { Authorization: "Bearer good" } })).status, 200, "editor can send an email test");
+  eq((await call("/api/admin/email-test", { method: "POST", headers: { Authorization: "Bearer good", "Content-Type": "application/json" }, body: JSON.stringify({ to: "owner@example.com" }) })).status, 200, "editor can send an email test");
   eq(emailState.length, emailsBefore + 1, "one test email sent");
   eq(emailState.at(-1).body.to[0], "owner@example.com", "test goes to the signed-in editor");
   ok(!/buyer|order number|shipping/i.test(emailState.at(-1).body.html), "test contains no customer record");
