@@ -42,7 +42,7 @@ globalThis.fetch = async (input, init = {}) => {
   if (url.startsWith("https://api.github.com/")) {
     const tok = (init.headers.Authorization || "").slice(7);
     if (url.includes("/repos/")) return tok === "good" ? reply({ permissions: { push: true } }) : tok === "readonly" ? reply({ permissions: { push: false } }) : reply({}, 401);
-    if (url.endsWith("/user")) return reply({ login: "owner" });
+    if (url.endsWith("/user")) return reply({ login: "owner", email: "owner@example.com" });
   }
   return realFetch(input, init);
 };
@@ -271,6 +271,11 @@ await test("23. Unknown session ids and malformed ids are not found", async () =
 await test("24. Admin orders: login required, write access required, fulfil flow", async () => {
   eq((await call("/api/admin/orders")).status, 401, "no token");
   eq((await call("/api/admin/orders", { headers: { Authorization: "Bearer readonly" } })).status, 401, "read-only GitHub user");
+  const emailsBefore = emailState.length;
+  eq((await call("/api/admin/email-test", { method: "POST", headers: { Authorization: "Bearer good" } })).status, 200, "editor can send an email test");
+  eq(emailState.length, emailsBefore + 1, "one test email sent");
+  eq(emailState.at(-1).body.to[0], "owner@example.com", "test goes to the signed-in editor");
+  ok(!/buyer|order number|shipping/i.test(emailState.at(-1).body.html), "test contains no customer record");
   const list = await call("/api/admin/orders?status=paid&mode=test", { headers: { Authorization: "Bearer good" } });
   eq(list.status, 200, "editor can list"); ok(list.body.orders.length >= 3, "paid orders listed");
   const o = list.body.orders[0];
