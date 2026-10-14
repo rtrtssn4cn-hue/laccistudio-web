@@ -410,9 +410,14 @@ function render() {
   const singles = visibleGroups(rawProduct() || { optionGroups: [] }).filter((g) => g.choices.length === 1).map((g) => choiceName(g.choices[0]));
   root.querySelector("#lz-info").textContent = singles.join(" · ");
   const at = root.querySelector("#lz-areatabs");
-  at.hidden = ar.length < 2;
-  at.innerHTML = ar.map((a) => `<button type="button" role="tab" data-area="${a.id}" aria-selected="${a.id === S.area}">${esc(a.label)}${hasContent({ x: layers(a.id) }) ? " ✓" : ""}</button>`).join("");
-  at.onclick = (e) => { const b = e.target.closest("[data-area]"); if (b) { S.area = b.dataset.area; S.sel = -1; render(); } };
+  // Apparel with a Print location option: Front and Back are always offered above the product, and
+  // choosing a side sets the print location (a second side with a design becomes "Front and back").
+  const locG = sideGroup(), all = locG ? R.areasFor(Object.assign({}, rawProduct() || {}, p), { ...S.options, [locG.label]: sideChoice(locG, /^Front and back/) }) : ar;
+  const both = ar.length > 1, extra = locG && both ? (locG.choices.find((c) => /^Front and back/.test(choiceName(c))) || {}).add : 0;
+  at.hidden = all.length < 2;
+  at.innerHTML = all.map((a) => `<button type="button" role="tab" data-area="${a.id}" aria-selected="${a.id === S.area}">${esc(a.label)}${hasContent({ x: layers(a.id) }) ? " ✓" : ""}</button>`).join("")
+    + (locG ? `<span class="lz-sidenote">${both ? `Printing front and back${extra ? ` (+${money(Math.round(extra * 100))})` : ""}` : `Printing ${S.area === "back" ? "back" : "front"} only`}</span>` : "");
+  at.onclick = (e) => { const b = e.target.closest("[data-area]"); if (b) pickSide(b.dataset.area); };
   const n = setSize(S.options), it = root.querySelector("#lz-itemtabs");
   if (S.layout === "each" && n > 1) {
     while (S.items.length < n) S.items.push(clone(S.items[0] || S.shared));
@@ -1185,6 +1190,22 @@ function position(a) {
   commit(); draw();
 }
 
+// Print location group (apparel), and the choice in it matching a pattern.
+function sideGroup() {
+  const g = visibleGroups(rawProduct() || { optionGroups: [] }).find((x) => /^print location$/i.test(x.label));
+  return g && g.choices.some((c) => /^Front and back/.test(choiceName(c))) ? g : null;
+}
+function sideChoice(g, re) { const c = g.choices.find((x) => re.test(choiceName(x))); return c ? choiceName(c) : S.options[g.label]; }
+// Switch to a side. If it isn't printed yet: that side only when the other side is empty, otherwise both.
+function pickSide(id) {
+  const g = sideGroup();
+  if (g && !areas().some((a) => a.id === id)) {
+    const other = id === "back" ? "front" : "back";
+    S.options[g.label] = sideChoice(g, hasContent({ x: layers(other) }) ? /^Front and back/ : id === "back" ? /^Back only/ : /^Front only/);
+    commit();
+  }
+  S.area = id; S.sel = -1; render();
+}
 function setOption(label, value) {
   const before = setSize(S.options);
   const after = setSize({ ...S.options, [label]: value });

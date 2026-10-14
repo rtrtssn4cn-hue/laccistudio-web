@@ -326,6 +326,9 @@ section{padding:clamp(2.4rem,5vw,4rem) 0}
 .page-hero-slim h1{margin-bottom:0;font-size:clamp(1.7rem,3vw,2.2rem)}
 .page-hero-slim .lead{display:none}
 .page-hero-slim .lead.keep{display:block;margin-top:.3rem;font-size:1rem} /* order pages: the order number */
+.oc-thanks{margin-top:1.4rem;padding:1rem;border:1px dashed var(--gold,#C9A24B);border-radius:10px;text-align:center}
+.oc-thanks p{margin:.2rem 0}
+.oc-code{font:600 1.5rem 'Cormorant Garamond',serif;letter-spacing:.08em;margin:.4rem 0 .7rem!important}
 .shop-section{padding:.9rem 0 2rem}
 
 /* Filter bar */
