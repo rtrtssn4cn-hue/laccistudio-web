@@ -17,8 +17,12 @@ const HIDDEN = [/^\/worker\//, /^\/migrations\//, /^\/tools\//, /^\/docs\//, /^\
 // Applies every file in migrations/ in order, or only the ones named (used to test an upgrade).
 export function localD1(file = ":memory:", only = null) {
   const db = new DatabaseSync(file);
+  db.exec("CREATE TABLE IF NOT EXISTS _local_migrations (name TEXT PRIMARY KEY, applied_at TEXT NOT NULL)");
   for (const f of readdirSync(join(ROOT, "migrations")).filter((f) => f.endsWith(".sql")).sort()) {
-    if (!only || only.includes(f)) db.exec(readFileSync(join(ROOT, "migrations", f), "utf8"));
+    if (only && !only.includes(f)) continue;
+    if (!only && db.prepare("SELECT 1 FROM _local_migrations WHERE name = ?").get(f)) continue;
+    db.exec(readFileSync(join(ROOT, "migrations", f), "utf8"));
+    if (!only) db.prepare("INSERT OR IGNORE INTO _local_migrations (name, applied_at) VALUES (?, ?)").run(f, new Date().toISOString());
   }
   const norm = (a) => a.map((v) => (v === undefined ? null : typeof v === "boolean" ? (v ? 1 : 0) : v));
   const stmt = (sql, args = []) => ({
@@ -57,16 +61,17 @@ export function makeEnv(overrides = {}) {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   mkdirSync(join(ROOT, ".wrangler"), { recursive: true });
-  const env = makeEnv({ dbFile: join(ROOT, ".wrangler/local-orders.sqlite") });
+  const port = Number(process.env.PORT || 8787);
+  const env = makeEnv({ dbFile: join(ROOT, ".wrangler/local-orders.sqlite"), SITE_URL: `http://localhost:${port}` });
   if (!env.STRIPE_SECRET_KEY) console.log("Note: no STRIPE_SECRET_KEY in .dev.vars; checkout calls will fail.");
   else if (!/^sk_test_|^rk_test_/.test(env.STRIPE_SECRET_KEY)) { console.error("Refusing to run locally with a live Stripe key."); process.exit(1); }
   createServer(async (req, res) => {
     const chunks = []; for await (const c of req) chunks.push(c);
     const body = chunks.length ? Buffer.concat(chunks) : undefined;
-    const request = new Request(`http://localhost:8787${req.url}`, { method: req.method, headers: req.headers, body: ["GET", "HEAD"].includes(req.method) ? undefined : body });
+    const request = new Request(`http://localhost:${port}${req.url}`, { method: req.method, headers: req.headers, body: ["GET", "HEAD"].includes(req.method) ? undefined : body });
     const url = new URL(request.url);
     const response = url.pathname.startsWith("/api/") ? await worker.fetch(request, env) : await env.ASSETS.fetch(request);
     res.writeHead(response.status, Object.fromEntries(response.headers));
     res.end(Buffer.from(await response.arrayBuffer()));
-  }).listen(8787, "127.0.0.1", () => console.log("Lacci local worker on http://localhost:8787"));
+  }).listen(port, "127.0.0.1", () => console.log(`Lacci local worker on http://localhost:${port}`));
 }

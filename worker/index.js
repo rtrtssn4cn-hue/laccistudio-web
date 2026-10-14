@@ -59,6 +59,110 @@ function cleanFileUrl(env, v) {
 }
 function siteOrigin(env, request) { return (env.SITE_URL || new URL(request.url).origin).replace(/\/$/, ""); }
 
+// Guest order links use a random nonce plus an HMAC. D1 stores the nonce and a SHA-256 digest,
+// never the usable token. The HMAC secret stays in Cloudflare as ORDER_LINK_SECRET, so a database
+// export alone cannot be turned into working customer links.
+const enc = new TextEncoder();
+function bytesHex(buf) { return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join(""); }
+async function sha256(value) { return bytesHex(await crypto.subtle.digest("SHA-256", enc.encode(value))); }
+function base64url(bytes) {
+  let s = ""; for (const b of bytes) s += String.fromCharCode(b);
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+async function signOrderToken(secret, orderNumber, nonce) {
+  const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return `${nonce}.${base64url(new Uint8Array(await crypto.subtle.sign("HMAC", key, enc.encode(`${orderNumber}:${nonce}`))))}`;
+}
+function proofRequired(line) {
+  if (line && line.customization) return line.customization.proof === true;
+  const proof = clip(line && line.personalization && line.personalization.proof, 120).toLowerCase();
+  return !!proof && !proof.startsWith("no") && proof !== "false";
+}
+function proofUnits(lines) {
+  const out = [];
+  lines.forEach((line, lineIndex) => {
+    if (!proofRequired(line)) return;
+    const c = line.customization;
+    if (c && c.layout === "each" && Array.isArray(c.items)) {
+      c.items.forEach((item, itemIndex) => out.push({ proofKey: `line-${lineIndex}-item-${itemIndex}`, lineIndex, itemIndex, name: `${line.name} · design ${itemIndex + 1}`, previews: item.previews || {} }));
+    } else {
+      out.push({ proofKey: `line-${lineIndex}`, lineIndex, itemIndex: null, name: line.name, previews: (c && c.previews) || (line.files && line.files.preview ? { main: line.files.preview } : {}) });
+    }
+  });
+  return out;
+}
+async function createAccess(env, orderNumber, rotate = false) {
+  if (!env.ORDER_LINK_SECRET) throw new Error("Order links are not configured.");
+  if (!rotate) {
+    const found = await env.DB.prepare("SELECT * FROM order_access WHERE order_number = ?").bind(orderNumber).first();
+    if (found) return { row: found, token: await signOrderToken(env.ORDER_LINK_SECRET, orderNumber, found.token_nonce) };
+  }
+  const nonce = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
+  const token = await signOrderToken(env.ORDER_LINK_SECRET, orderNumber, nonce);
+  const created = nowIso(), expires = new Date(Date.now() + 180 * 86400_000).toISOString();
+  await env.DB.prepare(`INSERT INTO order_access (order_number, token_nonce, token_hash, created_at, expires_at, revoked_at, email_sent_at, email_error_at)
+    VALUES (?, ?, ?, ?, ?, NULL, NULL, NULL)
+    ON CONFLICT(order_number) DO UPDATE SET token_nonce = excluded.token_nonce, token_hash = excluded.token_hash, created_at = excluded.created_at,
+      expires_at = excluded.expires_at, revoked_at = NULL, email_sent_at = NULL, email_error_at = NULL`)
+    .bind(orderNumber, nonce, await sha256(token), created, expires).run();
+  return { row: { order_number: orderNumber, token_nonce: nonce, token_hash: await sha256(token), created_at: created, expires_at: expires }, token };
+}
+async function authorizedOrder(request, env) {
+  const auth = request.headers.get("authorization") || "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  if (!/^[a-f0-9]{64}\.[A-Za-z0-9_-]{43}$/.test(token)) return null;
+  const access = await env.DB.prepare("SELECT * FROM order_access WHERE token_hash = ?").bind(await sha256(token)).first();
+  if (!access || access.revoked_at || access.expires_at <= nowIso()) return null;
+  const expected = await signOrderToken(env.ORDER_LINK_SECRET || "", access.order_number, access.token_nonce);
+  if ((await sha256(expected)) !== access.token_hash) return null;
+  const order = await env.DB.prepare("SELECT * FROM orders WHERE order_number = ?").bind(access.order_number).first();
+  if (!order || !["paid", "fulfilled"].includes(order.status)) return null;
+  await env.DB.prepare("UPDATE order_access SET last_used_at = ? WHERE order_number = ?").bind(nowIso(), access.order_number).run();
+  return { access, order };
+}
+
+function htmlEsc(v) { return String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function emailPreviews(lines) {
+  const urls = [];
+  for (const line of lines) {
+    const c = line.customization;
+    if (c && Array.isArray(c.items)) c.items.forEach((i) => urls.push(...Object.values(i.previews || {})));
+    else if (c) urls.push(...Object.values(c.previews || {}));
+    else if (line.files && line.files.preview) urls.push(line.files.preview);
+  }
+  return [...new Set(urls.filter(Boolean))].slice(0, 12);
+}
+async function sendOrderEmail(env, order, token, origin) {
+  if (!env.EMAIL_API_KEY || !env.EMAIL_API_URL || !env.ORDER_EMAIL_FROM) throw new Error("Order email is not configured.");
+  if (!order.customer_email) throw new Error("Order has no customer email.");
+  const lines = JSON.parse(order.lines_json || "[]"), needsProof = proofUnits(lines).length > 0;
+  const link = `${origin}/track-order.html#token=${encodeURIComponent(token)}`;
+  const pictures = emailPreviews(lines).map((src, i) => `<img src="${htmlEsc(src)}" alt="Saved design ${i + 1}" style="width:140px;height:140px;object-fit:contain;border:1px solid #e8e1d7;border-radius:8px;margin:4px;background:#fff">`).join("");
+  const itemRows = lines.map((l) => `<tr><td style="padding:8px 0;border-bottom:1px solid #eee">${htmlEsc(l.name)} × ${Number(l.qty) || 1}</td><td style="padding:8px 0;border-bottom:1px solid #eee;text-align:right">${money(l.lineCents)}</td></tr>`).join("");
+  const html = `<div style="font-family:Arial,sans-serif;color:#2b1d12;max-width:640px;margin:auto"><img src="${origin}/assets/logo/lacci-primary.png" alt="Lacci Studio" style="width:190px;height:auto"><h1 style="font-family:Georgia,serif;font-weight:500">Your order means the world to us.</h1><p>Thank you for your order. Your payment is confirmed.</p><p><strong>Order ${htmlEsc(order.order_number)}</strong></p><table style="width:100%;border-collapse:collapse">${itemRows}<tr><td style="padding-top:10px"><strong>Total</strong></td><td style="padding-top:10px;text-align:right"><strong>${money(order.total_cents)}</strong></td></tr></table>${pictures ? `<h2 style="font-family:Georgia,serif;font-weight:500">Your saved design${emailPreviews(lines).length > 1 ? "s" : ""}</h2><div>${pictures}</div>` : ""}<p>${needsProof ? "Please review and approve each design before production can begin." : "You can review your order and follow its status at any time."}</p><p><a href="${htmlEsc(link)}" style="display:inline-block;background:#2b1d12;color:#fff;text-decoration:none;padding:13px 20px;border-radius:4px">Track &amp; review my order</a></p><p style="font-size:12px;color:#6f6258">This private link expires in 180 days. Do not forward it.</p></div>`;
+  const res = await fetch(env.EMAIL_API_URL, { method: "POST", headers: { Authorization: `Bearer ${env.EMAIL_API_KEY}`, "Content-Type": "application/json", "Idempotency-Key": `order-confirmation-${order.order_number}` }, body: JSON.stringify({ from: env.ORDER_EMAIL_FROM, to: [order.customer_email], subject: `Lacci Studio order ${order.order_number} — confirmed`, html }) });
+  if (!res.ok) throw new Error(`Order email failed (${res.status}).`);
+}
+
+async function ensurePaidExperience(env, orderNumber, requestOrigin) {
+  const order = await env.DB.prepare("SELECT * FROM orders WHERE order_number = ?").bind(orderNumber).first();
+  if (!order || !["paid", "fulfilled"].includes(order.status)) return;
+  const lines = JSON.parse(order.lines_json || "[]"), units = proofUnits(lines);
+  for (const u of units) await env.DB.prepare("INSERT OR IGNORE INTO proof_decisions (order_number, proof_key, line_index, item_index) VALUES (?, ?, ?, ?)").bind(orderNumber, u.proofKey, u.lineIndex, u.itemIndex).run();
+  if (order.production_status === "not_started") {
+    await env.DB.prepare("UPDATE orders SET production_status = ? WHERE order_number = ? AND production_status = 'not_started'").bind(units.length ? "awaiting_approval" : "ready", orderNumber).run();
+  }
+  const access = await createAccess(env, orderNumber);
+  if (access.row.email_sent_at) return;
+  try {
+    await sendOrderEmail(env, order, access.token, requestOrigin);
+    await env.DB.prepare("UPDATE order_access SET email_sent_at = ?, email_error_at = NULL WHERE order_number = ? AND email_sent_at IS NULL").bind(nowIso(), orderNumber).run();
+  } catch (e) {
+    await env.DB.prepare("UPDATE order_access SET email_error_at = ? WHERE order_number = ?").bind(nowIso(), orderNumber).run();
+    throw e;
+  }
+}
+
 function packingFor(catalog, lines) {
   let coasters = 0, other = 0;
   for (const l of lines) { if (l.coasters) coasters += l.coasters; else other += l.qty; }
@@ -326,7 +430,7 @@ async function markPaid(env, session) {
   const cd = session.customer_details || {};
   const ship = session.shipping_details || (session.collected_information && session.collected_information.shipping_details) || null;
   const td = session.total_details || {};
-  const row = await env.DB.prepare("SELECT subtotal_cents FROM orders WHERE session_id = ?").bind(session.id).first();
+  const row = await env.DB.prepare("SELECT order_number, subtotal_cents FROM orders WHERE session_id = ?").bind(session.id).first();
   if (!row) return 0;
   const notes = [];
   if (session.amount_subtotal !== row.subtotal_cents) notes.push(`AMOUNT CHECK: Stripe subtotal ${session.amount_subtotal} vs order ${row.subtotal_cents}`);
@@ -347,6 +451,7 @@ async function markPaid(env, session) {
     ship || rateName ? JSON.stringify({ ...(ship || {}), method: rateName || (td.amount_shipping === 0 && local ? local.name : null) }) : null, td.amount_shipping ?? null, td.amount_tax ?? null, td.amount_discount ?? null,
     session.amount_total ?? null, typeof session.payment_intent === "string" ? session.payment_intent : (session.payment_intent && session.payment_intent.id) || null,
     note, session.id).run();
+  if (row && env.ORDER_LINK_SECRET) await ensurePaidExperience(env, row.order_number, (env.SITE_URL || "https://laccistudio.com").replace(/\/$/, ""));
   return res.meta.changes;
 }
 
@@ -391,6 +496,7 @@ async function handleOrderStatus(url, env) {
       const session = await stripe(env, "GET", `checkout/sessions/${id}`, { expand: ["shipping_cost.shipping_rate"] });
       if (await markPaid(env, session)) order = await env.DB.prepare("SELECT * FROM orders WHERE session_id = ?").bind(id).first();
     } catch { /* keep showing pending; the webhook will confirm */ }
+    order = await env.DB.prepare("SELECT * FROM orders WHERE session_id = ?").bind(id).first();
   }
   const lines = JSON.parse(order.lines_json || "[]");
   const email = order.customer_email ? order.customer_email.replace(/^(.).*(@.*)$/, "$1…$2") : null;
@@ -399,6 +505,55 @@ async function handleOrderStatus(url, env) {
     subtotal: order.subtotal_cents, shipping: order.shipping_cents, tax: order.tax_cents, discount: order.discount_cents, total: order.total_cents,
     items: lines.map((l) => ({ name: l.name, qty: l.qty, options: l.options.map((o) => `${o.label}: ${o.value}`).join(" · "), line: l.lineCents })),
   });
+}
+
+function customerOrderView(order, decisions) {
+  const lines = JSON.parse(order.lines_json || "[]"), units = proofUnits(lines);
+  const byKey = Object.fromEntries((decisions || []).map((d) => [d.proof_key, d]));
+  return {
+    orderNumber: order.order_number, status: order.status, productionStatus: order.production_status,
+    createdAt: order.created_at, paidAt: order.paid_at, customerName: order.customer_name,
+    currency: order.currency, subtotal: order.subtotal_cents, shipping: order.shipping_cents, tax: order.tax_cents,
+    discount: order.discount_cents, total: order.total_cents,
+    shippingAddress: order.shipping_json ? JSON.parse(order.shipping_json) : null,
+    tracking: order.tracking_number || order.tracking_url ? { carrier: order.tracking_carrier, number: order.tracking_number, url: order.tracking_url, shippedAt: order.shipped_at, deliveredAt: order.delivered_at } : null,
+    lines,
+    proofs: units.map((u) => ({ ...u, status: (byKey[u.proofKey] && byKey[u.proofKey].status) || "pending", comment: (byKey[u.proofKey] && byKey[u.proofKey].comment) || null, decidedAt: (byKey[u.proofKey] && byKey[u.proofKey].decided_at) || null })),
+  };
+}
+
+async function handleCustomerOrder(request, env) {
+  const hit = await authorizedOrder(request, env);
+  if (!hit) return json({ error: "This private order link is invalid or has expired." }, 404);
+  const { results } = await env.DB.prepare("SELECT * FROM proof_decisions WHERE order_number = ? ORDER BY line_index, item_index").bind(hit.order.order_number).all();
+  return json({ order: customerOrderView(hit.order, results) });
+}
+
+async function handleProofDecision(request, env) {
+  const origin = request.headers.get("origin");
+  if (origin && origin !== new URL(request.url).origin) return json({ error: "Request refused." }, 403);
+  const hit = await authorizedOrder(request, env);
+  if (!hit) return json({ error: "This private order link is invalid or has expired." }, 404);
+  let body; try { body = await request.json(); } catch { return json({ error: "Invalid request." }, 400); }
+  const proofKey = clip(body.proofKey, 80), action = body.action, comment = clip(body.comment, 1000);
+  if (!proofKey || !["approve", "request_changes"].includes(action)) return json({ error: "Choose approve or request changes." }, 400);
+  if (action === "request_changes" && !comment) return json({ error: "Please describe the change you need." }, 400);
+  const current = await env.DB.prepare("SELECT * FROM proof_decisions WHERE order_number = ? AND proof_key = ?").bind(hit.order.order_number, proofKey).first();
+  if (!current) return json({ error: "Design proof not found." }, 404);
+  const next = action === "approve" ? "approved" : "changes_requested";
+  if (current.status !== "pending") {
+    if (current.status === next && (next === "approved" || current.comment === comment)) return json({ saved: true, duplicate: true });
+    return json({ error: "A response has already been recorded for this design. Please contact us if it needs to change." }, 409);
+  }
+  const at = nowIso();
+  const saved = await env.DB.prepare("UPDATE proof_decisions SET status = ?, comment = ?, decided_at = ? WHERE order_number = ? AND proof_key = ? AND status = 'pending'")
+    .bind(next, comment || null, at, hit.order.order_number, proofKey).run();
+  if (!saved.meta.changes) return json({ error: "A response has already been recorded for this design." }, 409);
+  const counts = await env.DB.prepare("SELECT status, COUNT(*) AS n FROM proof_decisions WHERE order_number = ? GROUP BY status").bind(hit.order.order_number).all();
+  const tally = Object.fromEntries(counts.results.map((r) => [r.status, r.n]));
+  const production = tally.changes_requested ? "changes_requested" : tally.pending ? "awaiting_approval" : "ready";
+  await env.DB.prepare("UPDATE orders SET production_status = ? WHERE order_number = ? AND production_status IN ('not_started', 'awaiting_approval', 'changes_requested', 'ready')").bind(production, hit.order.order_number).run();
+  return json({ saved: true, status: next, decidedAt: at, productionStatus: production });
 }
 
 // ---------------------------------------------------------------- admin (GitHub repo editors only)
@@ -423,10 +578,11 @@ async function adminUser(request, env) {
 
 function orderView(o, full) {
   const req = o.req_key ? { neededBy: o.req_needed_by, message: o.req_message, confirmedAt: o.req_confirmed_at, declinedAt: o.req_declined_at, reply: o.req_reply, key: o.req_key } : null;
-  const base = { request: req, orderNumber: o.order_number, status: o.status, createdAt: o.created_at, paidAt: o.paid_at, customerName: o.customer_name, customerEmail: o.customer_email, total: o.total_cents, subtotal: o.subtotal_cents, livemode: !!o.livemode };
+  const base = { request: req, orderNumber: o.order_number, status: o.status, productionStatus: o.production_status, createdAt: o.created_at, paidAt: o.paid_at, customerName: o.customer_name, customerEmail: o.customer_email, total: o.total_cents, subtotal: o.subtotal_cents, livemode: !!o.livemode };
   if (!full) return base;
   return { ...base, phone: o.customer_phone, shipping: o.shipping_cents, tax: o.tax_cents, discount: o.discount_cents, shippingAddress: o.shipping_json ? JSON.parse(o.shipping_json) : null,
-    lines: JSON.parse(o.lines_json || "[]"), packing: o.packing_json ? JSON.parse(o.packing_json) : null, paymentIntent: o.payment_intent, fulfilledAt: o.fulfilled_at, notes: o.notes };
+    lines: JSON.parse(o.lines_json || "[]"), packing: o.packing_json ? JSON.parse(o.packing_json) : null, paymentIntent: o.payment_intent, fulfilledAt: o.fulfilled_at, notes: o.notes,
+    tracking: { carrier: o.tracking_carrier, number: o.tracking_number, url: o.tracking_url, shippedAt: o.shipped_at, deliveredAt: o.delivered_at } };
 }
 
 async function handleAdmin(request, env, url) {
@@ -446,17 +602,36 @@ async function handleAdmin(request, env, url) {
     if (status && status !== "all") { where.push("o.status = ?"); args.push(status); } else where.push("o.status != 'cancelled'");
     if (mode !== "all") { where.push("o.livemode = ?"); args.push(mode === "test" ? 0 : 1); }
     const { results } = await env.DB.prepare(`${WITH_REQ} WHERE ${where.join(" AND ")} ORDER BY o.id DESC LIMIT 200`).bind(...args).all();
+    const proofRows = await env.DB.prepare("SELECT order_number, proof_key, line_index, item_index, status, comment, decided_at FROM proof_decisions ORDER BY order_number, line_index, item_index LIMIT 2000").all();
+    const proofsByOrder = {};
+    for (const p of proofRows.results) (proofsByOrder[p.order_number] ||= []).push(p);
     const reqs = await env.DB.prepare("SELECT COUNT(*) AS n FROM orders WHERE status = 'requested' AND livemode = ?").bind(mode === "test" ? 0 : 1).first();
     const tests = await env.DB.prepare("SELECT COUNT(*) AS n FROM orders WHERE livemode = 0 AND status != 'cancelled'").first();
-    return json({ orders: results.map((o) => orderView(o, true)), sandboxCount: tests ? tests.n : 0, requestCount: reqs ? reqs.n : 0, origin: siteOrigin(env, request) });
+    return json({ orders: results.map((o) => ({ ...orderView(o, true), proofs: proofsByOrder[o.order_number] || [] })), sandboxCount: tests ? tests.n : 0, requestCount: reqs ? reqs.n : 0, origin: siteOrigin(env, request) });
   }
   if (!m[1]) return json({ error: "Not found." }, 404);
   const one = () => env.DB.prepare(`${WITH_REQ} WHERE o.order_number = ?`).bind(m[1]).first();
   const order = await one();
   if (!order) return json({ error: "Order not found." }, 404);
-  if (request.method === "GET") return json({ order: orderView(order, true) });
+  if (request.method === "GET") {
+    const { results } = await env.DB.prepare("SELECT proof_key, line_index, item_index, status, comment, decided_at FROM proof_decisions WHERE order_number = ? ORDER BY line_index, item_index").bind(m[1]).all();
+    return json({ order: { ...orderView(order, true), proofs: results } });
+  }
   if (request.method === "POST") {
     let body; try { body = await request.json(); } catch { return json({ error: "Invalid request." }, 400); }
+    if (body.proofRevision && typeof body.proofRevision === "object") {
+      const proofKey = clip(body.proofRevision.proofKey, 80), preview = cleanFileUrl(env, body.proofRevision.preview);
+      if (!proofKey || !preview) return json({ error: "A saved preview from the approved upload host is required." }, 400);
+      const proof = await env.DB.prepare("SELECT * FROM proof_decisions WHERE order_number = ? AND proof_key = ?").bind(m[1], proofKey).first();
+      if (!proof || proof.status !== "changes_requested") return json({ error: "Only a design with requested changes can be replaced." }, 409);
+      const lines = JSON.parse(order.lines_json || "[]"), line = lines[proof.line_index];
+      if (!line) return json({ error: "The saved order line was not found." }, 409);
+      if (proof.item_index !== null && line.customization && Array.isArray(line.customization.items) && line.customization.items[proof.item_index]) line.customization.items[proof.item_index].previews = { ...(line.customization.items[proof.item_index].previews || {}), main: preview };
+      else if (line.customization) line.customization.previews = { ...(line.customization.previews || {}), main: preview };
+      else line.files = { ...(line.files || {}), preview };
+      await env.DB.prepare("UPDATE orders SET lines_json = ?, production_status = 'awaiting_approval' WHERE order_number = ?").bind(JSON.stringify(lines), m[1]).run();
+      await env.DB.prepare("UPDATE proof_decisions SET status = 'pending', comment = NULL, decided_at = NULL WHERE order_number = ? AND proof_key = ?").bind(m[1], proofKey).run();
+    }
     if (body.request === "confirm" || body.request === "decline") {
       if (order.status !== "requested") return json({ error: "Only a request that is waiting can be confirmed or declined." }, 400);
       const reply = clip(body.reply, 500) || null;
@@ -469,9 +644,33 @@ async function handleAdmin(request, env, url) {
       }
     }
     if (body.status === "fulfilled" && order.status !== "paid") return json({ error: "Only paid orders can be marked fulfilled." }, 400);
+    if (body.status === "fulfilled" || ["ready", "in_production", "shipped", "delivered"].includes(body.productionStatus)) {
+      const blocked = await env.DB.prepare("SELECT COUNT(*) AS n FROM proof_decisions WHERE order_number = ? AND status != 'approved'").bind(m[1]).first();
+      if (blocked && blocked.n) return json({ error: "Every required design proof must be approved before production." }, 409);
+    }
     if (body.status === "paid" && order.status !== "fulfilled") return json({ error: "Only a fulfilled order can be moved back to paid." }, 400);
     if (body.status === "fulfilled" || body.status === "paid") {
       await env.DB.prepare("UPDATE orders SET status = ?, fulfilled_at = ? WHERE order_number = ?").bind(body.status, body.status === "fulfilled" ? nowIso() : null, m[1]).run();
+    }
+    if (["ready", "in_production", "shipped", "delivered"].includes(body.productionStatus)) {
+      const fields = { ready: [null, null], in_production: [null, null], shipped: [nowIso(), null], delivered: [order.shipped_at || nowIso(), nowIso()] }[body.productionStatus];
+      await env.DB.prepare("UPDATE orders SET production_status = ?, shipped_at = ?, delivered_at = ? WHERE order_number = ?")
+        .bind(body.productionStatus, fields[0], fields[1], m[1]).run();
+    }
+    if (body.tracking && typeof body.tracking === "object") {
+      const carrier = clip(body.tracking.carrier, 80) || null, number = clip(body.tracking.number, 120) || null;
+      let trackingUrl = clip(body.tracking.url, 500) || null;
+      if (trackingUrl) { try { const u = new URL(trackingUrl); if (u.protocol !== "https:") trackingUrl = null; } catch { trackingUrl = null; } }
+      if (body.tracking.url && !trackingUrl) return json({ error: "Tracking link must be a valid https address." }, 400);
+      await env.DB.prepare("UPDATE orders SET tracking_carrier = ?, tracking_number = ?, tracking_url = ? WHERE order_number = ?").bind(carrier, number, trackingUrl, m[1]).run();
+    }
+    if (["rotate", "revoke", "resend"].includes(body.access)) {
+      if (body.access === "revoke") await env.DB.prepare("UPDATE order_access SET revoked_at = ? WHERE order_number = ?").bind(nowIso(), m[1]).run();
+      else {
+        const access = await createAccess(env, m[1], body.access === "rotate");
+        await sendOrderEmail(env, order, access.token, siteOrigin(env, request));
+        await env.DB.prepare("UPDATE order_access SET email_sent_at = ?, email_error_at = NULL WHERE order_number = ?").bind(nowIso(), m[1]).run();
+      }
     }
     if (typeof body.notes === "string") await env.DB.prepare("UPDATE orders SET notes = ? WHERE order_number = ?").bind(clip(body.notes, 2000), m[1]).run();
     const updated = await one();
@@ -488,6 +687,8 @@ export default {
       if (url.pathname === "/api/checkout" && request.method === "POST") return await handleCheckout(request, env);
       if (url.pathname === "/api/stripe/webhook" && request.method === "POST") return await handleWebhook(request, env);
       if (url.pathname === "/api/order-status" && request.method === "GET") return await handleOrderStatus(url, env);
+      if (url.pathname === "/api/customer/order" && request.method === "GET") return await handleCustomerOrder(request, env);
+      if (url.pathname === "/api/customer/proof" && request.method === "POST") return await handleProofDecision(request, env);
       if (url.pathname === "/api/order-request" && request.method === "POST") return await handleRequestCreate(request, env);
       if (url.pathname === "/api/order-request" && request.method === "GET") return await handleRequestStatus(url, env);
       if (url.pathname === "/api/order-request/pay" && request.method === "POST") return await handleRequestPay(request, env);

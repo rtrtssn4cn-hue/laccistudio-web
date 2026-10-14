@@ -88,7 +88,7 @@
     if (d.status === "paid" || d.status === "fulfilled") {
       try { localStorage.removeItem("lacci_stripe_cart_v1"); } catch (e) {}
       title.textContent = "Thank you — your order is in!";
-      lead.textContent = "Order " + d.orderNumber + (d.email ? " · a receipt is on its way to " + d.email : "");
+      lead.innerHTML = "Order <strong>" + esc(d.orderNumber) + "</strong>" + (d.email ? "<br>We sent your Lacci Studio confirmation and private order link to " + esc(d.email) + "." : "");
       card.innerHTML = "<table style='width:100%;border-collapse:collapse'>" +
         d.items.map((i) => "<tr><td style='padding:.4rem 0'><strong>" + esc(i.name) + "</strong> × " + i.qty + "<br><small>" + esc(i.options) + "</small></td><td style='text-align:right'>" + money(i.line) + "</td></tr>").join("") +
         "<tr><td style='padding-top:.8rem'>Subtotal</td><td style='text-align:right;padding-top:.8rem'>" + money(d.subtotal) + "</td></tr>" +
@@ -96,7 +96,8 @@
         "<tr><td>Shipping</td><td style='text-align:right'>" + money(d.shipping) + "</td></tr>" +
         "<tr><td>Tax</td><td style='text-align:right'>" + money(d.tax) + "</td></tr>" +
         "<tr><td><strong>Total</strong></td><td style='text-align:right'><strong>" + money(d.total) + "</strong></td></tr></table>" +
-        "<p style='margin-top:1rem'>If you asked for a proof, we'll email it before we print. Questions? <a href='mailto:info@laccistudio.com'>info@laccistudio.com</a></p>";
+        "<p style='margin-top:1rem'>Use the private link in your Lacci Studio confirmation email to review your saved designs, approve any required proofs and follow delivery. The separate Stripe receipt confirms payment only.</p>" +
+        "<p>Questions? <a href='mailto:info@laccistudio.com'>info@laccistudio.com</a></p>";
       return;
     }
     if (d.status === "pending" && tries < 10) { setTimeout(() => check(tries + 1), 2000); return; }

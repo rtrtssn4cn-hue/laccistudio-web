@@ -53,6 +53,11 @@
   .previews a { display:block; text-align:center; font-size:.75rem; color:var(--espresso); text-decoration:none }
   .previews img { width:96px; height:96px; object-fit:contain; background:#fff; border:1px solid var(--line); border-radius:6px; display:block }
   .design ul { margin:.2rem 0; padding-left:1.1rem; font-size:.88rem }
+  .proof-admin { margin:.7rem 0; padding:.7rem; border:1px solid var(--line); border-radius:8px; background:#fffdf8 }
+  .proof-admin input { width:100%; margin:.35rem 0; padding:.45rem; border:1px solid var(--line); border-radius:5px; font:inherit }
+  .tracking-fields { display:grid; grid-template-columns:1fr 1fr; gap:.4rem; margin:.65rem 0 }
+  .tracking-fields input { min-width:0; padding:.45rem; border:1px solid var(--line); border-radius:5px; font:inherit }
+  .tracking-fields input:last-child { grid-column:1/-1 }
   @media (max-width:760px) { .order > summary { grid-template-columns:1fr 1fr } .body { grid-template-columns:1fr } }
 </style>
 </head>
@@ -163,12 +168,25 @@
         l.customization ? designView(l.customization) : null
       ]);
     }));
+    var proofs = (o.proofs || []).map(function (p) {
+      var label = "Line " + (p.line_index + 1) + (p.item_index == null ? "" : " · design " + (p.item_index + 1));
+      var kids = [el("strong", { text: label + " — " + p.status.replace("_", " ") }), p.comment ? el("div", { text: "Customer note: " + p.comment }) : null, p.decided_at ? el("div", { cls: "muted", text: when(p.decided_at) }) : null];
+      if (p.status === "changes_requested") {
+        var replacement = el("input", { type: "url", placeholder: "New saved preview https://…", "aria-label": "Replacement preview for " + label });
+        var replace = el("button", { cls: "ghost", type: "button", text: "Save revision & request approval" });
+        replace.onclick = function () { replace.disabled = true; api("/api/admin/orders/" + o.orderNumber, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ proofRevision: { proofKey: p.proof_key, preview: replacement.value } }) }).then(load).catch(function (e) { alert(e.message); replace.disabled = false; }); };
+        kids.push(replacement, replace);
+      }
+      return el("div", { cls: "proof-admin" }, kids);
+    });
     var ship = el("div", {}, [
       el("h3", { text: "Ship to" }),
       addr ? el("div", {}, [o.shippingAddress.name || o.customerName || "", el("br"), addr.line1 || "", addr.line2 ? el("br") : null, addr.line2 || "", el("br"), (addr.city || "") + ", " + (addr.state || "") + " " + (addr.postal_code || ""), el("br"), addr.country || ""]) : el("div", { cls: "muted", text: "No address yet" }),
       el("div", { cls: "muted", text: (o.customerEmail || "") + (o.phone ? " · " + o.phone : "") }),
       o.shippingAddress && o.shippingAddress.method ? el("div", {}, ["Method: ", el("strong", { text: o.shippingAddress.method })]) : null,
       o.packing ? el("div", { cls: "muted", text: o.packing.suggestedBox ? "Suggested box: " + o.packing.suggestedBox + " (" + o.packing.coasters + " coasters)" : (o.packing.note || "") }) : null,
+      el("div", { cls: "note", text: "Production: " + (o.productionStatus || "not started").replace(/_/g, " ") }),
+      proofs.length ? el("div", {}, [el("h4", { text: "Design approvals" })].concat(proofs)) : null,
       el("table", {}, [
         el("tr", {}, [el("td", { text: "Subtotal" }), el("td", { text: money(o.subtotal) })]),
         o.discount ? el("tr", {}, [el("td", { text: "Discount" }), el("td", { text: "−" + money(o.discount) })]) : null,
@@ -178,19 +196,31 @@
       ]),
       el("div", { cls: "muted", text: "Paid: " + when(o.paidAt) + (o.fulfilledAt ? " · Fulfilled: " + when(o.fulfilledAt) : "") })
     ]);
+    var canProduce = (o.proofs || []).every(function (p) { return p.status === "approved"; });
     var notes = el("textarea", { "aria-label": "Private notes for " + o.orderNumber }); notes.value = o.notes || "";
+    var carrier = el("input", { type: "text", placeholder: "Carrier", "aria-label": "Shipping carrier" }); carrier.value = o.tracking && o.tracking.carrier || "";
+    var trackingNumber = el("input", { type: "text", placeholder: "Tracking number", "aria-label": "Tracking number" }); trackingNumber.value = o.tracking && o.tracking.number || "";
+    var trackingUrl = el("input", { type: "url", placeholder: "https:// tracking link", "aria-label": "Tracking link" }); trackingUrl.value = o.tracking && o.tracking.url || "";
     var actions = el("div", {}, [
       o.notes && /CHECK|OUTSIDE AREA/.test(o.notes) ? el("div", { cls: "note", text: o.notes }) : null,
       el("label", { cls: "muted", text: "Private notes" }), notes,
+      el("div", { cls: "tracking-fields" }, [carrier, trackingNumber, trackingUrl]),
       el("div", { style: "margin-top:.5rem;display:flex;gap:.5rem;flex-wrap:wrap" }, [
-        o.status === "paid" ? btn("Mark fulfilled", function () { return { status: "fulfilled", notes: notes.value }; }) : null,
+        o.productionStatus === "ready" ? btn("Start production", function () { return { productionStatus: "in_production" }; }) : null,
+        o.productionStatus === "in_production" ? btn("Mark shipped", function () { return { productionStatus: "shipped", tracking: { carrier: carrier.value, number: trackingNumber.value, url: trackingUrl.value } }; }) : null,
+        o.productionStatus === "shipped" ? btn("Mark delivered", function () { return { productionStatus: "delivered", tracking: { carrier: carrier.value, number: trackingNumber.value, url: trackingUrl.value } }; }) : null,
+        ["shipped", "delivered"].includes(o.productionStatus) ? btn("Save tracking", function () { return { tracking: { carrier: carrier.value, number: trackingNumber.value, url: trackingUrl.value } }; }) : null,
+        o.status === "paid" && canProduce ? btn("Mark fulfilled", function () { return { status: "fulfilled", notes: notes.value }; }) : null,
         o.status === "fulfilled" ? btn("Move back to 'to make'", function () { return { status: "paid", notes: notes.value }; }) : null,
-        btn("Save notes", function () { return { notes: notes.value }; })
+        btn("Save notes", function () { return { notes: notes.value }; }),
+        btn("Resend customer link", function () { return { access: "resend" }; }),
+        btn("Replace customer link", function () { if (!confirm("Replace the private link for " + o.orderNumber + "? The old link will stop working.")) throw new Error("Cancelled"); return { access: "rotate" }; }),
+        btn("Revoke customer link", function () { if (!confirm("Revoke the private link for " + o.orderNumber + "?")) throw new Error("Cancelled"); return { access: "revoke" }; })
       ])
     ]);
     function btn(label, body) {
       var b = el("button", { cls: "act", type: "button", text: label });
-      b.onclick = function () { b.disabled = true; api("/api/admin/orders/" + o.orderNumber, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body()) }).then(load).catch(function (e) { alert(e.message); b.disabled = false; }); };
+      b.onclick = function () { var payload; try { payload = body(); } catch (e) { return; } b.disabled = true; api("/api/admin/orders/" + o.orderNumber, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).then(load).catch(function (e) { alert(e.message); b.disabled = false; }); };
       return b;
     }
     var testNote = o.livemode ? null : el("div", { cls: "sandbox-note", text: "Sandbox test order: paid with a Stripe test card, no money was taken. Do not make or ship." });

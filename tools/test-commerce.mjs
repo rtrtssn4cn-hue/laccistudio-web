@@ -15,11 +15,13 @@ const UC = "https://51niy1s3e7.ucarecd.net/3f8e2c0e-1111-4222-8333-444455556666/
 
 // ---------------------------------------------------------------- simulated Stripe / GitHub
 const stripeState = { sessions: {}, created: [], taxRates: [], calls: [] };
+const emailState = [];
 const realFetch = globalThis.fetch;
 function parseForm(body) { const o = {}; for (const [k, v] of new URLSearchParams(body || "")) o[k] = v; return o; }
 globalThis.fetch = async (input, init = {}) => {
   const url = typeof input === "string" ? input : input.url;
   const reply = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json" } });
+  if (url === "https://email.test/messages") { emailState.push({ headers: init.headers, body: JSON.parse(init.body) }); return reply({ id: "email_" + emailState.length }); }
   if (url.startsWith("https://api.stripe.com/v1/")) {
     const path = url.slice("https://api.stripe.com/v1/".length).split("?")[0];
     stripeState.calls.push(`${init.method} ${path}`);
@@ -67,7 +69,7 @@ async function sign(payload, secret = WEBHOOK_SECRET, t = Math.floor(Date.now() 
 
 // ---------------------------------------------------------------- harness
 // Fixed values so the suite never depends on a local .dev.vars.
-const env = makeEnv({ STRIPE_SECRET_KEY: "sk_test_local_simulated", STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, TAX_MODE: "none" });
+const env = makeEnv({ STRIPE_SECRET_KEY: "sk_test_local_simulated", STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET, TAX_MODE: "none", ORDER_LINK_SECRET: "local-order-link-secret-with-at-least-32-bytes", EMAIL_API_KEY: "local-email-key", EMAIL_API_URL: "https://email.test/messages", ORDER_EMAIL_FROM: "Lacci Studio <orders@laccistudio.com>" });
 const call = (path, opts = {}) => worker.fetch(new Request("http://localhost:8787" + path, opts), env).then(async (r) => ({ status: r.status, body: await r.json() }));
 const checkout = (lines) => call("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lines }) });
 const webhook = async (event, secret) => { const raw = JSON.stringify(event); return call("/api/stripe/webhook", { method: "POST", headers: { "stripe-signature": await sign(raw, secret) }, body: raw }); };
@@ -569,6 +571,61 @@ await test("39. Free local delivery is offered only for a ZIP in the delivery ar
   const paid = pay(s.id, { shipping: 0, zip: outZip, method: local.name });
   await webhook({ id: "evt_local_1", type: "checkout.session.completed", data: { object: paid } });
   ok(/LOCAL DELIVERY OUTSIDE AREA/.test((await order(s.id)).notes || ""), "address outside the area after choosing local delivery is flagged");
+});
+
+await test("40. Private guest order: two coaster designs, exact saved previews, proof gate, expiry and revocation", async () => {
+  const preview2 = "https://51niy1s3e7.ucarecd.net/4f8e2c0e-2222-4333-8444-555566667777/-/inline/no/";
+  const design = (id, preview, text) => ({ schema: 1, customizationId: id, productId: "ceramic-coasters", layout: "same", proof: true, comments: "",
+    areas: { main: { layers: [{ type: "image", src: preview, name: "photo.jpg", naturalW: 1800, naturalH: 1800, x: 0.5, y: 0.5, w: 0.9, rotation: 0, removeWhite: false }, { type: "text", text, font: "Montserrat", color: "#25140F", size: 0.1, x: 0.5, y: 0.82, rotation: 0 }] } }, previews: { main: preview } });
+  const opts = { Quantity: "Set of 4", Material: "Ceramic", Shape: "Round" };
+  const startEmails = emailState.length;
+  const { s } = await chain([
+    line("ceramic-coasters", opts, { personalization: {}, files: {}, customization: design("c_order1009a", UC, "First set") }),
+    line("ceramic-coasters", opts, { personalization: {}, files: {}, customization: design("c_order1009b", preview2, "Second set") }),
+  ], [C4, C4]);
+  pay(s.id, { shipping: 1195 });
+  const event = { id: "evt_private_order", type: "checkout.session.completed", data: { object: s } };
+  eq((await webhook(event)).status, 200, "paid webhook");
+  eq(emailState.length, startEmails + 1, "one branded confirmation email");
+  const email = emailState.at(-1).body;
+  ok(email.html.includes(UC) && email.html.includes(preview2), "email contains both exact saved previews");
+  const token = email.html.match(/track-order\.html#token=([^\"]+)/)[1];
+  ok(token.length > 100, "unguessable private token");
+  const auth = { headers: { Authorization: "Bearer " + token } };
+  eq((await call("/api/customer/order")).status, 404, "missing token refused");
+  eq((await call("/api/customer/order", { headers: { Authorization: "Bearer " + token.replace(/.$/, "x") } })).status, 404, "changed token refused");
+  const opened = await call("/api/customer/order", auth);
+  eq(opened.status, 200, "private order opens"); eq(opened.body.order.lines.length, 2, "two product lines"); eq(opened.body.order.proofs.length, 2, "two proofs");
+  eq(opened.body.order.lines[0].customization.previews.main, UC, "first exact preview"); eq(opened.body.order.lines[1].customization.previews.main, preview2, "second exact preview");
+  const dbAccess = await env.DB.prepare("SELECT * FROM order_access WHERE order_number = ?").bind(opened.body.order.orderNumber).first();
+  ok(!JSON.stringify(dbAccess).includes(token), "usable token is not stored in D1");
+  const postProof = (body, customAuth = auth) => call("/api/customer/proof", { method: "POST", headers: { ...customAuth.headers, "Content-Type": "application/json", Origin: "http://localhost:8787" }, body: JSON.stringify(body) });
+  const p1 = opened.body.order.proofs[0], p2 = opened.body.order.proofs[1];
+  eq((await postProof({ proofKey: p1.proofKey, action: "approve" })).status, 200, "first design approved");
+  eq((await postProof({ proofKey: p2.proofKey, action: "request_changes", comment: "Move the name higher." })).status, 200, "change requested on second design");
+  eq((await order(s.id)).production_status, "changes_requested", "production blocked by requested change");
+  const ownerHeaders = { Authorization: "Bearer good", "Content-Type": "application/json" };
+  const ownerPost = (body) => call("/api/admin/orders/" + opened.body.order.orderNumber, { method: "POST", headers: ownerHeaders, body: JSON.stringify(body) });
+  eq((await ownerPost({ productionStatus: "in_production" })).status, 409, "owner cannot start production");
+  eq((await postProof({ proofKey: p1.proofKey, action: "request_changes", comment: "Different" })).status, 409, "recorded approval cannot be overwritten");
+  eq((await ownerPost({ proofRevision: { proofKey: p2.proofKey, preview: UC } })).status, 200, "revised saved preview reopens approval");
+  const revised = await call("/api/customer/order", auth);
+  eq(revised.body.order.proofs.find((p) => p.proofKey === p2.proofKey).status, "pending", "revision waits for approval again");
+  eq((await ownerPost({ productionStatus: "in_production" })).status, 409, "revision still blocks production");
+  eq((await postProof({ proofKey: p2.proofKey, action: "approve" })).status, 200, "revised design approved");
+  eq((await ownerPost({ productionStatus: "in_production" })).status, 200, "production can start after every approval");
+  eq((await ownerPost({ productionStatus: "shipped", tracking: { carrier: "USPS", number: "TEST123", url: "https://tools.usps.com/go/TrackConfirmAction?tLabels=TEST123" } })).status, 200, "shipment and tracking saved");
+  const tracked = await call("/api/customer/order", auth);
+  eq(tracked.body.order.tracking.number, "TEST123", "customer sees tracking"); eq(tracked.body.order.productionStatus, "shipped", "customer sees shipped state");
+  eq((await webhook(event)).body.duplicate, true, "duplicate webhook recognised"); eq(emailState.length, startEmails + 1, "duplicate webhook sends no second email");
+  await env.DB.prepare("UPDATE order_access SET expires_at = '2000-01-01T00:00:00.000Z' WHERE order_number = ?").bind(opened.body.order.orderNumber).run();
+  eq((await call("/api/customer/order", auth)).status, 404, "expired token refused");
+  eq((await ownerPost({ access: "rotate" })).status, 200, "owner can rotate the private link");
+  const newToken = emailState.at(-1).body.html.match(/track-order\.html#token=([^\"]+)/)[1];
+  eq((await call("/api/customer/order", auth)).status, 404, "old token stays invalid after rotation");
+  eq((await call("/api/customer/order", { headers: { Authorization: "Bearer " + newToken } })).status, 200, "rotated token works");
+  eq((await ownerPost({ access: "revoke" })).status, 200, "owner can revoke the link");
+  eq((await call("/api/customer/order", { headers: { Authorization: "Bearer " + newToken } })).status, 404, "revoked token refused");
 });
 
 for (const [r, n] of results) console.log(`${r}  ${n}`);
