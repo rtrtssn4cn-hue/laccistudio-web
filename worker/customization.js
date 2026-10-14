@@ -82,6 +82,10 @@ function cleanPreviews(p, cleanUrl) {
   }
   return { previews: out };
 }
+function hasEveryPreview(areas, previews) {
+  const ids = Object.keys(areas || {});
+  return ids.length > 0 && ids.every((id) => typeof previews[id] === "string" && previews[id]);
+}
 
 // Returns { customization } (cleaned), { none: true } when absent, or { error }.
 export function cleanCustomization(c, productId, cleanUrl) {
@@ -100,6 +104,7 @@ export function cleanCustomization(c, productId, cleanUrl) {
     for (const [i, it] of c.items.entries()) {
       const a = cleanAreas(it && it.areas, cleanUrl); if (a.error) return a;
       const p = cleanPreviews(it.previews, cleanUrl); if (p.error) return p;
+      if (!hasEveryPreview(a.areas, p.previews)) return { error: `Coaster ${i + 1}'s saved design preview is missing. Open the design, save it again, then retry checkout.` };
       out.items.push({ index: i, areas: a.areas, ...(Object.keys(p.previews).length ? { previews: p.previews } : {}) });
       if (!a.count) return { error: `Coaster ${i + 1} has no design yet.` };
       total += a.count;
@@ -107,6 +112,7 @@ export function cleanCustomization(c, productId, cleanUrl) {
   } else {
     const a = cleanAreas(c.areas, cleanUrl); if (a.error) return a;
     const p = cleanPreviews(c.previews, cleanUrl); if (p.error) return p;
+    if (!hasEveryPreview(a.areas, p.previews)) return { error: "The saved design preview is missing. Open the design, save it again, then retry checkout." };
     out.areas = a.areas; out.previews = p.previews; total = a.count;
   }
   if (!total) return { error: "Add your text or upload a design." };

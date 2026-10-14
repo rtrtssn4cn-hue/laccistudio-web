@@ -1565,6 +1565,13 @@ async function addToCart() {
   }
   jobs.push(...Object.entries(cuts).map(([src, p]) => p.then((u) => { if (u) recLayers.filter((l) => l.src === src).forEach((l) => (l.cutout = u)); })));
   await Promise.all(jobs);
+  const missingItem = each ? rec.items.findIndex((it) => ar.some((a) => !it.previews || !it.previews[a.id])) : -1;
+  const hasMissingPreview = each ? missingItem >= 0 : ar.some((a) => !rec.previews[a.id]);
+  if (hasMissingPreview) {
+    add.disabled = false; add.textContent = "Add to cart";
+    if (each) { S.item = missingItem; render(); }
+    return error("We couldn't save your design preview. Your design is still here—please try again.");
+  }
   const firstPreview = each ? Object.values((rec.items[0] || {}).previews || {})[0] : rec.previews[ar[0].id];
   const allLayers = (each ? rec.items.flatMap((it) => Object.values(it.areas)) : Object.values(rec.areas)).flatMap((d) => d.layers);
   const texts = allLayers.filter((l) => l.type === "text");
