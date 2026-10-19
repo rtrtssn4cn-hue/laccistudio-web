@@ -11,7 +11,7 @@
 // with ?customizer=classic.
 
 import { priceLine, visibleGroups, choiceName, money, itemCount, MAX_ITEMS_PER_ORDER } from "./pricing.mjs";
-import R from "./customizer-render.mjs?v=2";
+import R from "./customizer-render.mjs?v=3";
 
 const PROOF_YES = "Yes — send me a proof before production (recommended)";
 const PROOF_NO = "No proof needed — produce as submitted";
@@ -29,6 +29,7 @@ const ucDisplay = (url) => url.replace(/-\/inline\/no\/?$/, "").replace(/\/?$/, 
 const setSize = (options) => { const q = (options || {}).Quantity || ""; const m = /(\d+)/.exec(q); return /^Set of/i.test(q) && m ? Number(m[1]) : 1; };
 const bundleGroup = (g) => /^(quantity|pack)$/i.test(g.label) && (g.choices || []).some((c) => /^(Single|Set of|Pack of)/i.test(choiceName(c)));
 const bundleCount = (value) => { const m = /(\d+)/.exec(value || ""); return /^(Set of|Pack of)/i.test(value || "") && m ? Number(m[1]) : 1; };
+const maxLayerSize = (layer) => layer.type === "image" ? 12 : 3;
 const isMobile = () => window.matchMedia("(max-width: 899px)").matches;
 
 let S = null;          // the design being edited
@@ -642,8 +643,8 @@ function tool(act, el) {
   if (act === "caps") { l.caps = l.caps === "upper" ? "lower" : l.caps === "lower" ? "" : "upper"; if (l.fromDesign) fitText(l); }
   if (act === "align") l.align = l.align === "left" ? "center" : l.align === "right" ? "left" : l.align === "center" || !l.align ? "right" : "center";
   if (act === "vertical") l.vertical = !l.vertical;
-  if (act === "bigger") l[k] = round(clamp(l[k] * 1.1, 0.03, 3));
-  if (act === "smaller") l[k] = round(clamp(l[k] / 1.1, 0.03, 3));
+  if (act === "bigger") l[k] = round(clamp(l[k] * 1.1, 0.03, maxLayerSize(l)));
+  if (act === "smaller") l[k] = round(clamp(l[k] / 1.1, 0.03, maxLayerSize(l)));
   if (act === "rotl") l.rotation = snapRot(l.rotation - 15);
   if (act === "rotr") l.rotation = snapRot(l.rotation + 15);
   if (act === "center") { l.x = 0.5; l.y = 0.5; }
@@ -950,7 +951,7 @@ function openCrop(l) {
       if (full) delete l.crop; else l.crop = { x: round(c.x), y: round(c.y), w: round(c.w), h: round(c.h) };
       // keep the visible height roughly the same after cropping
       const newH = R.layerBox(l, area(), 1, 1, imgs).h;
-      if (newH > 0) l.w = round(clamp(l.w * oldH / newH, 0.03, 3));
+      if (newH > 0) l.w = round(clamp(l.w * oldH / newH, 0.03, maxLayerSize(l)));
       commit(); render();
     }
     ov.remove();
@@ -1234,15 +1235,16 @@ function addUpload(file, replaceLayer) {
   const layer = replaceLayer || { type: "image", src: key, naturalW: 0, naturalH: 0, x: 0.5, y: 0.5, w: 0.8, rotation: 0, removeWhite: true, name: info.name };
   const place = (img) => {
     info.img = img; info.w = img.naturalWidth; info.h = img.naturalHeight; info.display = R.removeWhite(img);
-    if (replaceLayer) { layer.src = key; layer.name = info.name; layer.naturalW = info.w; layer.naturalH = info.h; delete layer.crop; }
+    if (replaceLayer) { layer.src = key; layer.name = info.name; layer.naturalW = info.w; layer.naturalH = info.h; delete layer.crop; if (info.display.contentCrop) layer.crop = { ...info.display.contentCrop }; }
     else {
       layer.naturalW = info.w; layer.naturalH = info.h;
+      if (info.display.contentCrop) layer.crop = { ...info.display.contentCrop };
       const frame = !replaceLayer && photoFrame();
       if (frame) {
         layers().filter((x) => x.clip).forEach((x) => layers().splice(layers().indexOf(x), 1)); // one photo per spot: a new one replaces it
         placeInSpot(layer, frame.spot); layers().unshift(layer); S.sel = 0;
       } else {
-        fitLayer(layer, "fit", 0.85);
+        fitLayer(layer, "fill", 1.02);
         if (!layers().includes(layer)) { layers().push(layer); S.sel = layers().length - 1; }
       }
     }
@@ -1372,13 +1374,13 @@ function bindGestures() {
       S.guides = { v: Math.abs(l.x - 0.5) < SNAP, h: Math.abs(l.y - 0.5) < SNAP }; // centre guide lines, and a gentle snap to them
       if (S.guides.v) l.x = 0.5; if (S.guides.h) l.y = 0.5;
     } else if (g.kind === "resize") {
-      l[k] = round(clamp(g.s[k] * Math.hypot(p.x - g.c.cx, p.y - g.c.cy) / Math.max(1, g.d0), 0.03, 3));
+      l[k] = round(clamp(g.s[k] * Math.hypot(p.x - g.c.cx, p.y - g.c.cy) / Math.max(1, g.d0), 0.03, maxLayerSize(l)));
     } else if (g.kind === "rotate") {
       l.rotation = snapRot(g.s.rotation + (Math.atan2(p.y - g.c.cy, p.x - g.c.cx) - g.a0) * 180 / Math.PI);
     } else if (g.kind === "pinch" && pts.size >= 2) {
       const [a, c] = [...pts.values()];
       const m = { x: (a.x + c.x) / 2, y: (a.y + c.y) / 2 };
-      l[k] = round(clamp(g.s[k] * dist(a, c) / Math.max(1, g.d0), 0.03, 3));
+      l[k] = round(clamp(g.s[k] * dist(a, c) / Math.max(1, g.d0), 0.03, maxLayerSize(l)));
       l.rotation = snapRot(g.s.rotation + (ang(a, c) - g.a0) * 180 / Math.PI);
       l.x = round(clamp(g.s.x + (m.x - g.m0.x) / b.w, -0.5, 1.5));
       l.y = round(clamp(g.s.y + (m.y - g.m0.y) / b.h, -0.5, 1.5));
@@ -1403,7 +1405,7 @@ function bindGestures() {
     e.preventDefault();
     const k = l.type === "text" ? "size" : "w";
     if (e.shiftKey) l.rotation = snapRot(l.rotation + (e.deltaY > 0 ? 3 : -3));
-    else l[k] = round(clamp(l[k] * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.002)), 0.03, 3));
+    else l[k] = round(clamp(l[k] * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.002)), 0.03, maxLayerSize(l)));
     draw(); commitSoon(); clearTimeout(refreshMeasures.t); refreshMeasures.t = setTimeout(refreshMeasures, 300);
   }, { passive: false });
   if (!keysBound) { keysBound = true; document.addEventListener("keydown", onKey); }
@@ -1439,7 +1441,7 @@ function onKey(e) {
     const acts = {
       ArrowLeft: () => (l.x = round(l.x - step)), ArrowRight: () => (l.x = round(l.x + step)),
       ArrowUp: () => (l.y = round(l.y - step)), ArrowDown: () => (l.y = round(l.y + step)),
-      "+": () => (l[k] = round(clamp(l[k] * 1.05, 0.03, 3))), "=": () => (l[k] = round(clamp(l[k] * 1.05, 0.03, 3))), "-": () => (l[k] = round(clamp(l[k] / 1.05, 0.03, 3))),
+      "+": () => (l[k] = round(clamp(l[k] * 1.05, 0.03, maxLayerSize(l)))), "=": () => (l[k] = round(clamp(l[k] * 1.05, 0.03, maxLayerSize(l)))), "-": () => (l[k] = round(clamp(l[k] / 1.05, 0.03, maxLayerSize(l)))),
       "[": () => (l.rotation = snapRot(l.rotation - (e.shiftKey ? 15 : 5))), "]": () => (l.rotation = snapRot(l.rotation + (e.shiftKey ? 15 : 5))),
     };
     if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); return tool("delete"); }

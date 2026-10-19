@@ -141,7 +141,7 @@ export function removeWhite(img, maxSide = 2200) {
   for (let y = 1; y < h - 1; y++) edge.push(y * w, y * w + w - 1);
   let clear = 0;
   for (const p of edge) if (d[p * 4 + 3] < 16) clear++;
-  if (clear > edge.length * 0.3) { c.bgKind = "transparent"; return c; }
+  if (clear > edge.length * 0.3) { c.bgKind = "transparent"; c.contentCrop = alphaCrop(d, w, h); return c; }
   const med = [0, 1, 2].map((k) => { const v = edge.map((p) => d[p * 4 + k]).sort((m, n) => m - n); return v[v.length >> 1]; });
   const diff = (p) => Math.max(Math.abs(d[p * 4] - med[0]), Math.abs(d[p * 4 + 1] - med[1]), Math.abs(d[p * 4 + 2] - med[2]));
   const T1 = 34, T2 = 64; // same colour up to T1 (JPEG noise); T1–T2 is the soft edge
@@ -163,7 +163,25 @@ export function removeWhite(img, maxSide = 2200) {
   }
   ctx.putImageData(id, 0, 0);
   c.bgKind = "plain";
+  c.contentCrop = alphaCrop(d, w, h);
   return c;
+}
+
+// Visible-pixel bounds let transparent cut-outs use the whole product instead of being sized by
+// empty pixels around the subject. A small padding keeps soft edges and shadows intact.
+function alphaCrop(data, w, h) {
+  let left = w, top = h, right = -1, bottom = -1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    if (data[(y * w + x) * 4 + 3] < 16) continue;
+    if (x < left) left = x; if (x > right) right = x;
+    if (y < top) top = y; if (y > bottom) bottom = y;
+  }
+  if (right < left || bottom < top) return null;
+  const pad = Math.max(2, Math.ceil(Math.max(w, h) * 0.02));
+  left = Math.max(0, left - pad); top = Math.max(0, top - pad);
+  right = Math.min(w - 1, right + pad); bottom = Math.min(h - 1, bottom + pad);
+  if (left === 0 && top === 0 && right === w - 1 && bottom === h - 1) return null;
+  return { x: left / w, y: top / h, w: (right - left + 1) / w, h: (bottom - top + 1) / h };
 }
 
 // Garment photo recoloured to the chosen colour: the white background (flood-filled from the corners)
