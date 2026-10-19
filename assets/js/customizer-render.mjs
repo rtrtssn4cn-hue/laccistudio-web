@@ -40,10 +40,10 @@ export const swatchName = (hex) => (TEXT_SWATCHES.find((s) => s.hex.toLowerCase(
 
 const A = (id, label, rect, print, extra) => ({ id, label, rect, print: { dpi: 300, ...print }, shape: "rect", ...extra });
 const DEFAULT_AREAS = {
-  "sublimation-tumbler": [A("main", "Wrap", { x: 0.345, y: 0.24, w: 0.23, h: 0.46 }, { widthIn: 3.8, heightIn: 7.6 },
-    { printBy: { Size: { "30 oz": { widthIn: 4.3, heightIn: 8.6 }, "40 oz": { widthIn: 4.5, heightIn: 9 } } } })],
-  "sublimation-mug": [A("main", "Front", { x: 0.13, y: 0.24, w: 0.44, h: 0.44 }, { widthIn: 3.5, heightIn: 3.5 },
-    { printBy: { Size: { "15 oz": { widthIn: 3.8, heightIn: 3.8 } } } })],
+  "sublimation-tumbler": [A("main", "Full wrap", { x: 0.25, y: 0.18, w: 0.5, h: 0.62 }, { widthIn: 9.3, heightIn: 7.6 },
+    { printBy: { Size: { "30 oz": { widthIn: 10.25, heightIn: 8.6 }, "40 oz": { widthIn: 11.25, heightIn: 9 } } } })],
+  "sublimation-mug": [A("main", "Full wrap", { x: 0.08, y: 0.22, w: 0.68, h: 0.48 }, { widthIn: 8.75, heightIn: 3.5 },
+    { printBy: { Size: { "15 oz": { widthIn: 9, heightIn: 3.8 } } } })],
   "apparel-t-shirt": [
     // Whole front / back of the shirt body, collar to hem, so a design can go anywhere on it (chest, low, off-centre)
     A("front", "Front", { x: 0.28, y: 0.19, w: 0.46, h: 0.69 }, { widthIn: 14, heightIn: 21 }, { mockupSuffix: "-front" }),

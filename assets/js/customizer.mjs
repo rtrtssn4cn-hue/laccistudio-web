@@ -3,7 +3,7 @@
 // Artwork and text are objects placed directly on the product: tap to select, drag to move, corner
 // handle to resize, top handle to rotate; on a phone one finger moves and two fingers resize and
 // turn. A toolbar under the product shows only the tools for the selected object. Product options
-// (size, finish, quantity) live in their own panel. Every change can be undone.
+// stay in Product; quantity and sets open only from Add to cart. Every change can be undone.
 //
 // The design is saved as a structured record in print-area coordinates
 // with the original uploads and a rendered preview, so the cart, the order page and the production
@@ -11,7 +11,7 @@
 // with ?customizer=classic.
 
 import { priceLine, visibleGroups, choiceName, money, itemCount, MAX_ITEMS_PER_ORDER } from "./pricing.mjs";
-import R from "./customizer-render.mjs";
+import R from "./customizer-render.mjs?v=2";
 
 const PROOF_YES = "Yes — send me a proof before production (recommended)";
 const PROOF_NO = "No proof needed — produce as submitted";
@@ -27,6 +27,8 @@ const ucKey = () => (shop().checkout || {}).uploadcarePublicKey || "";
 const UCCDN = "https://51niy1s3e7.ucarecd.net/";
 const ucDisplay = (url) => url.replace(/-\/inline\/no\/?$/, "").replace(/\/?$/, "/") + "-/preview/2000x2000/-/format/auto/";
 const setSize = (options) => { const q = (options || {}).Quantity || ""; const m = /(\d+)/.exec(q); return /^Set of/i.test(q) && m ? Number(m[1]) : 1; };
+const bundleGroup = (g) => /^(quantity|pack)$/i.test(g.label) && (g.choices || []).some((c) => /^(Single|Set of|Pack of)/i.test(choiceName(c)));
+const bundleCount = (value) => { const m = /(\d+)/.exec(value || ""); return /^(Set of|Pack of)/i.test(value || "") && m ? Number(m[1]) : 1; };
 const isMobile = () => window.matchMedia("(max-width: 899px)").matches;
 
 let S = null;          // the design being edited
@@ -451,6 +453,7 @@ function renderPrice() {
   eachEl.textContent = n > 1 ? `${money(Math.round(pr.unitCents / n))} per coaster` + (S.qty > 1 ? ` · ${S.qty} sets` : "") : (S.qty > 1 ? `${money(pr.unitCents)} each` : "");
   add.disabled = uploadingAny();
   add.textContent = uploadingAny() ? "Uploading your design…" : (S.editIndex !== null ? "Save changes" : "Add to cart");
+  if (!uploadingAny() && S.sheet && S.tab === "quantity") add.textContent = S.editIndex !== null ? "Save selected changes" : "Add selected to cart";
 }
 const uploadingAny = () => Object.values(imgs).some((i) => i.uploading);
 
@@ -958,10 +961,10 @@ function openCrop(l) {
 function renderPanel() {
   const box = root.querySelector("#lz-panel");
   const tab = S.tab === "position" && !isMobile() ? "design" : S.tab;
-  const titles = { design: "Add", text: "Text", product: "Product", review: "Review", position: "Position" };
+  const titles = { design: "Add", text: "Text", product: "Product", quantity: "Choose quantity", review: "Review", position: "Position" };
   root.querySelector("#lz-sheet-title").textContent = titles[tab] || "";
   parkTextTools(); // keep the toolbar safe while the panel is redrawn
-  box.innerHTML = { design: designPanel, text: textPanel, product: productPanel, review: reviewPanel, position: positionPanel }[tab]();
+  box.innerHTML = { design: designPanel, text: textPanel, product: productPanel, quantity: quantityPanel, review: reviewPanel, position: positionPanel }[tab]();
   bindPanel(box);
   placeTextTools();
 }
@@ -1087,30 +1090,30 @@ function positionPanel() {
 
 function productPanel() {
   const p = product(), rp = rawProduct() || { optionGroups: [] };
-  const groups = visibleGroups(rp).filter((g) => g.choices.length > 1);
-  const html = groups.map((g) => {
-    const isSet = /^quantity$/i.test(g.label) && g.choices.some((c) => /^Set of|^Single/i.test(choiceName(c)));
-    if (isSet) {
-      return `<div class="lz-field"><span>How many coasters</span><div class="lz-qcards">${g.choices.map((c) => {
-        const name = choiceName(c), pr = priceLine(rp, { options: { ...S.options, [g.label]: name }, color: S.color }, raw().colors);
-        const n = setSize({ Quantity: name });
-        return `<button type="button" data-opt="${esc(g.label)}" data-v="${esc(name)}" aria-pressed="${S.options[g.label] === name}"><strong>${n}</strong><small>${n > 1 ? "coasters" : "coaster"}</small>${pr.ok ? `<em>${money(pr.unitCents)}</em>${n > 1 ? `<small>${money(Math.round(pr.unitCents / n))} each</small>` : ""}` : ""}</button>`;
-      }).join("")}<button type="button" class="lz-qbulk" data-qbulk="1"><strong>21+</strong><small>Large order</small><em>Pay after we confirm</em></button></div></div>`;
-    }
-    return `<div class="lz-field"><span>${esc(g.label)}</span><div class="lz-chips">${g.choices.map((c) => {
+  const groups = visibleGroups(rp).filter((g) => g.choices.length > 1 && !bundleGroup(g));
+  const html = groups.map((g) => `<div class="lz-field"><span>${esc(g.label)}</span><div class="lz-chips">${g.choices.map((c) => {
       const name = choiceName(c);
       const tag = c && typeof c === "object" ? (c.price != null && c.price !== "" ? money(Math.round(c.price * 100)) : c.add ? "+" + money(Math.round(c.add * 100)) : "") : "";
       return `<button type="button" data-opt="${esc(g.label)}" data-v="${esc(name)}" aria-pressed="${S.options[g.label] === name}">${esc(name)}${tag ? ` <small>${tag}</small>` : ""}</button>`;
-    }).join("")}</div></div>`;
-  }).join("");
-  const singles = visibleGroups(rp).filter((g) => g.choices.length === 1);
+    }).join("")}</div></div>`).join("");
+  const singles = visibleGroups(rp).filter((g) => g.choices.length === 1 && !bundleGroup(g));
   const colors = p.colors && p.colors.length > 1 ? `<div class="lz-field"><span>Garment colour — ${esc((p.colors.find((c) => c.id === S.color) || {}).name || "")}</span><div class="lz-swatches">${p.colors.map((c) => `<button type="button" data-garment="${esc(c.id)}" aria-label="${esc(c.name)}" title="${esc(c.name)}" aria-pressed="${c.id === S.color}" style="background:${esc(c.hex)}"></button>`).join("")}</div>${vinylNote()}</div>`
     : p.colors && p.colors.length === 1 ? `<p class="lz-note">Garment colour: ${esc(p.colors[0].name)}</p>` : "";
-  const n = setSize(S.options);
   return `${html}${colors}
-    ${singles.length ? `<p class="lz-info-line">${singles.map((g) => `<span><small>${esc(g.label)}</small> ${esc(choiceName(g.choices[0]))}</span>`).join("")}</p>` : ""}
-    <div class="lz-field"><span>${n > 1 ? "Number of sets" : "Quantity"}</span><div class="lz-stepper"><button type="button" data-qty="-1" aria-label="Fewer">−</button><output id="lz-qty">${S.qty}</output><button type="button" data-qty="1" aria-label="More">+</button></div></div>
-    ${fitsLimit(S.qty) ? `<p class="lz-note${S.limitHit ? " lz-qnote" : ""}">Orders over ${MAX_ITEMS_PER_ORDER} items${cartItemsElsewhere() ? ` (you have ${cartItemsElsewhere()} in your cart)` : ""} are sent as a request: tell us the date you need them by, we confirm, then you pay. Raise the ${n > 1 ? "number of sets" : "quantity"} above to order more.</p>`
+    ${singles.length ? `<p class="lz-info-line">${singles.map((g) => `<span><small>${esc(g.label)}</small> ${esc(choiceName(g.choices[0]))}</span>`).join("")}</p>` : ""}`;
+}
+
+function quantityPanel() {
+  const rp = rawProduct() || { optionGroups: [] };
+  const group = visibleGroups(rp).find(bundleGroup);
+  const cards = group ? `<div class="lz-field"><span>Choose 1 or a set</span><div class="lz-qcards">${group.choices.map((c) => {
+    const name = choiceName(c), count = bundleCount(name);
+    const pr = priceLine(rp, { options: { ...S.options, [group.label]: name }, color: S.color }, raw().colors);
+    return `<button type="button" data-opt="${esc(group.label)}" data-v="${esc(name)}" aria-pressed="${S.options[group.label] === name}"><strong>${count}</strong><small>${esc(name)}</small>${pr.ok ? `<em>${money(pr.unitCents)}</em>${count > 1 ? `<small>${money(Math.round(pr.unitCents / count))} each</small>` : ""}` : ""}</button>`;
+  }).join("")}</div></div>` : "";
+  return `${cards}<div class="lz-field"><span>${group && bundleCount(S.options[group.label]) > 1 ? "Number of sets" : "Quantity"}</span><div class="lz-stepper"><button type="button" data-qty="-1" aria-label="Fewer">−</button><output id="lz-qty">${S.qty}</output><button type="button" data-qty="1" aria-label="More">+</button></div></div>
+    <button type="button" class="lz-qbulk" data-qbulk="1"><strong>21+</strong><small>Large order</small><em>Pay after we confirm</em></button>
+    ${fitsLimit(S.qty) ? `<p class="lz-note${S.limitHit ? " lz-qnote" : ""}">Orders over ${MAX_ITEMS_PER_ORDER} items${cartItemsElsewhere() ? ` (you have ${cartItemsElsewhere()} in your cart)` : ""} are sent as a request: tell us the date you need them by, we confirm, then you pay.</p>`
       : `<p class="lz-note lz-qnote">This order is over ${MAX_ITEMS_PER_ORDER} items, so it will be sent as a <strong>request</strong>. You won't pay now: we'll confirm the date you need it by, then send you a link to pay.</p>`}`;
 }
 
@@ -1530,6 +1533,7 @@ function liveLayer(l) {
 async function addToCart() {
   const add = root.querySelector("#lz-add");
   if (uploadingAny()) return;
+  if (!(S.sheet && S.tab === "quantity")) { S.tab = "quantity"; S.sheet = true; render(); return; }
   const pr = priced(); if (!pr.ok) return error(pr.error);
   const used = new Set(Object.values(S.shared).concat(...S.items.map((d) => Object.values(d))).flat().filter((l) => l && l.type === "image").map((l) => l.src));
   if ([...used].some((k) => imgs[k] && imgs[k].failed)) return error("One of your files didn't upload. Delete it and upload it again.");

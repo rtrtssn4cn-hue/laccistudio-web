@@ -505,7 +505,7 @@
   function personalize(p) {
     if (!p) return;
     if (STRIPE && customizerChoice() === "visual") {
-      import("/assets/js/customizer.mjs?v=1").then(function (m) { m.open(p.id); }).catch(function () { openCustomize(p); });
+      import("/assets/js/customizer.mjs?v=2").then(function (m) { m.open(p.id); }).catch(function () { openCustomize(p); });
       return;
     }
     openCustomize(p);
