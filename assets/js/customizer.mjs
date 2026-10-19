@@ -11,7 +11,7 @@
 // with ?customizer=classic.
 
 import { priceLine, visibleGroups, choiceName, money, itemCount, MAX_ITEMS_PER_ORDER } from "./pricing.mjs";
-import R from "./customizer-render.mjs?v=3";
+import R from "./customizer-render.mjs?v=4";
 
 const PROOF_YES = "Yes — send me a proof before production (recommended)";
 const PROOF_NO = "No proof needed — produce as submitted";

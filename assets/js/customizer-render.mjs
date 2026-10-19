@@ -42,7 +42,7 @@ const A = (id, label, rect, print, extra) => ({ id, label, rect, print: { dpi: 3
 const DEFAULT_AREAS = {
   "sublimation-tumbler": [A("main", "Full wrap", { x: 0.25, y: 0.18, w: 0.5, h: 0.62 }, { widthIn: 9.3, heightIn: 7.6 },
     { printBy: { Size: { "30 oz": { widthIn: 10.25, heightIn: 8.6 }, "40 oz": { widthIn: 11.25, heightIn: 9 } } } })],
-  "sublimation-mug": [A("main", "Full wrap", { x: 0.08, y: 0.22, w: 0.68, h: 0.48 }, { widthIn: 8.75, heightIn: 3.5 },
+  "sublimation-mug": [A("main", "Full wrap", { x: 0.06, y: 0.13, w: 0.62, h: 0.77 }, { widthIn: 8.75, heightIn: 3.5 },
     { printBy: { Size: { "15 oz": { widthIn: 9, heightIn: 3.8 } } } })],
   "apparel-t-shirt": [
     // Whole front / back of the shirt body, collar to hem, so a design can go anywhere on it (chest, low, off-centre)
