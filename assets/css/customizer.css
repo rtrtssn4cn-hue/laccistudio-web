@@ -27,6 +27,7 @@ html.lz-lock, html.lz-lock body { overflow: hidden; }
 .lz-areatabs, .lz-itemtabs { margin-bottom: 6px; overflow-x: auto; max-width: 100%; }
 .lz-areatabs button, .lz-itemtabs button { flex: none; border: 1px solid var(--lz-line); background: #fff; border-radius: 99px; padding: 6px 14px; font-size: .82rem; font-weight: 600; }
 .lz-areatabs button[aria-selected=true], .lz-itemtabs button[aria-selected=true] { background: var(--lz-ink); color: #fff; border-color: var(--lz-ink); }
+.lz-sidenote { flex: none; align-self: center; font-size: .74rem; color: var(--lz-muted); padding: 0 6px; white-space: nowrap; }
 .lz-itemtabs { display: flex; gap: 6px; }
 .lz-itemtabs button { display: flex; align-items: center; gap: 6px; padding: 3px 10px 3px 3px; }
 .lz-itemtabs canvas { width: 30px; height: 30px; border-radius: 50%; background: #fff; }
