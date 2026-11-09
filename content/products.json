@@ -1654,8 +1654,9 @@
       "video": "",
       "id": "personalized-ornament",
       "description": "Capture the memory with a custom keepsake ornament featuring names, dates, or a favorite photo. Ceramic, in multiple shapes and sizes — a cherished holiday gift and yearly tradition.",
-      "status": "hidden",
-      "category": "Gifts"
+      "status": "active",
+      "category": "Gifts",
+      "updatedAt": "2026-11-09T19:55:17.326Z"
     },
     {
       "price": 6.99,
